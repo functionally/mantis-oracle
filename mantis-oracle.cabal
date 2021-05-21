@@ -1,0 +1,35 @@
+name:               mantis-oracle
+version:            0.1.0.0
+cabal-version:      2.4
+author:             Brian W Bush
+maintainer:         code@functionally.io
+extra-source-files: CHANGELOG.md
+
+library
+  hs-source-dirs  : src
+  exposed-modules : Mantis.Oracle
+                    Mantis.Oracle.Client
+                    Mantis.Oracle.Owner
+                    Mantis.Oracle.Types
+  build-depends   : base ^>=4.14.1.0
+                  , aeson
+                  , containers
+                  , data-default
+                  , freer-extras
+                  , playground-common
+                  , plutus-contract
+                  , plutus-ledger
+                  , plutus-ledger-api
+                  , plutus-tx-plugin
+                  , plutus-tx
+                  , plutus-use-cases
+                  , prettyprinter
+                  , text
+  default-language: Haskell2010
+
+executable sofr-oracle
+   hs-source-dirs  : app
+   main-is         : Main.hs
+   build-depends   : base ^>=4.14.1.0
+   default-language: Haskell2010
+

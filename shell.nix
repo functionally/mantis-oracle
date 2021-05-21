@@ -4,11 +4,11 @@ in
   project.shellFor {
 
     packages = ps: with ps; [
-#     mantis
+      mantis-oracle
     ];
 
     # Set the following to `false` do disable the lengthy building of documentation.
-    withHoogle = true;
+    withHoogle = false;
 
      # See overlays/tools.nix for more details
     tools = {
