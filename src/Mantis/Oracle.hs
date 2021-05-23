@@ -57,11 +57,14 @@ makeValidator Oracle{..} inputDatum redeemer context@ScriptContext{..} =
       case getContinuingOutputs context of
         [output] -> output
         _        -> traceError "Not exactly one oracle output."
+    tokenInput  = assetClassValueOf (txOutValue oracleInput ) token == 1
+    tokenOutput = assetClassValueOf (txOutValue oracleOutput) token == 1
     tokenConstraint =
-         traceIfFalse "Missing single oracle token input."
-           (assetClassValueOf (txOutValue oracleInput) token == 1)
-      && traceIfFalse "Missing single oracle token output."
-           (assetClassValueOf (txOutValue oracleOutput) token == 1)
+         traceIfFalse "Missing single oracle token input."  tokenInput
+      && traceIfFalse "Missing single oracle token output." tokenOutput
+    deleteConstraint =
+         traceIfFalse "Missing single oracle token input."  tokenInput
+      && traceIfFalse "No continuing autputs allowed." (null $ getContinuingOutputs context)
     signedByOwner =
       traceIfFalse "Not signed by owner."
         $ scriptContextTxInfo `txSignedBy` owner
@@ -77,9 +80,9 @@ makeValidator Oracle{..} inputDatum redeemer context@ScriptContext{..} =
         $ txOutValue oracleOutput `geq` (txOutValue oracleInput <> lovelaceValueOf fee)
   in
     case redeemer of
-      Delete -> traceError "Unsupported operation."
-      Read   -> tokenConstraint && unchangedDatum && feePaid
-      Write  -> tokenConstraint && signedByOwner  && datumPresent
+      Delete -> deleteConstraint && signedByOwner
+      Read   -> tokenConstraint  && unchangedDatum && feePaid
+      Write  -> tokenConstraint  && signedByOwner  && datumPresent
 
 
 data OracleScript

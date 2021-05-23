@@ -21,8 +21,8 @@ library
                   , plutus-contract
                   , plutus-ledger
                   , plutus-ledger-api
-                  , plutus-tx-plugin
                   , plutus-tx
+                  , plutus-tx-plugin
                   , plutus-use-cases
                   , prettyprinter
                   , text

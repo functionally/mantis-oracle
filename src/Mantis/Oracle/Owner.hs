@@ -25,7 +25,7 @@ import Ledger.Constraints  (mustPayToTheScript, mustSpendScriptOutput, otherScri
 import Ledger.Value        (assetClassValue)
 import Mantis.Oracle       (OracleScript, findOracle, oracleInstance, oracleValidator)
 import Mantis.Oracle.Types (Action(..), Oracle(..), Parameters(..))
-import Plutus.Contract     (BlockchainActions, Contract, Endpoint, HasBlockchainActions, type (.\/), awaitTxConfirmed, endpoint, logError, logInfo, ownPubKey, submitTxConstraints, submitTxConstraintsWith, tell)
+import Plutus.Contract     (BlockchainActions, Contract, Endpoint, HasBlockchainActions, type (.\/), awaitTxConfirmed, endpoint, logError, logInfo, ownPubKey, select, submitTxConstraints, submitTxConstraintsWith, tell)
 import PlutusTx            (toData)
 import Prelude             ((<>))
 
@@ -47,11 +47,30 @@ createOracle Parameters{..} =
 
 
 deleteOracle :: HasBlockchainActions s
-             => Parameters
+             => Oracle
              -> Contract w s Text ()
-deleteOracle _ =
-  do
-    logError @String $ "Unsupported operation."
+deleteOracle oracle =
+  let
+    notFound = logError @String $ "Oracle not found."
+    found (outputRef, output, _) =
+      do
+        let
+          lookups = otherScript (oracleValidator oracle)
+                 <> unspentOutputs (M.singleton outputRef output)
+                 <> scriptInstanceLookups (oracleInstance oracle)
+          tx = mustSpendScriptOutput outputRef (Redeemer $ toData Delete)
+        ledgerTx <- submitTxConstraintsWith @OracleScript lookups tx
+        awaitTxConfirmed $ txId ledgerTx
+        logInfo @String $ "Deleted oracle datum."
+  in
+    maybe notFound found
+      =<< findOracle oracle
+
+
+type OracleSchema =
+      BlockchainActions
+  .\/ Endpoint "write"  Integer
+  .\/ Endpoint "delete" ()
 
 
 writeOracle :: HasBlockchainActions s
@@ -82,12 +101,6 @@ writeOracle oracle@Oracle{..} datum =
       =<< findOracle oracle
 
 
-type OracleSchema =
-      BlockchainActions
-  .\/ Endpoint "write"  Integer
-  .\/ Endpoint "delete" ()
-
-
 runOracleOwner :: Parameters
          -> Contract (Last Oracle) OracleSchema Text ()
 runOracleOwner parameters =
@@ -95,9 +108,7 @@ runOracleOwner parameters =
     oracle <- createOracle parameters
     tell . Last $ Just oracle
     let
-      go oracle' =
-        do
-          datum <- endpoint @"write"
-          writeOracle oracle' datum
-          go oracle'
-    go oracle
+      write'  = endpoint @"write"  >>= writeOracle  oracle
+      delete' = endpoint @"delete" >>  deleteOracle oracle
+      go = (write' `select` delete') >> go
+    go

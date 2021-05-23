@@ -89,6 +89,12 @@ testTrace =
     E.callEndpoint @"read" w3 ()
     void $ E.waitNSlots 3
 
+    E.callEndpoint @"delete" w1 ()
+    void $ E.waitNSlots 3
+
+    E.callEndpoint @"read" w3 ()
+    void $ E.waitNSlots 3
+
 
 peekDatum :: Oracle
           -> C.Contract () C.BlockchainActions Text a
@@ -100,8 +106,6 @@ peekDatum oracle =
       Just (_, _, datum) -> C.logInfo $ "Oracle value: " ++ show datum ++ "."
     C.waitNSlots 1
       >> peekDatum oracle
-
-
 
 
 oracleSymbol :: CurrencySymbol
