@@ -3,3 +3,4 @@ tmp/
 *.log
 *.sw?
 week06/
+dist-newstyle/

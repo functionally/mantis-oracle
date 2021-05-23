@@ -1,4 +1,10 @@
-module Main where
+module Main (
+  main
+) where
+
+
+import Mantis.Oracle.Test (test)
+
 
 main :: IO ()
-main = putStrLn "Hello, Haskell!"
+main = test
