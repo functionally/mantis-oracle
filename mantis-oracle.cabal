@@ -10,21 +10,13 @@ library
   exposed-modules : Mantis.Oracle
                     Mantis.Oracle.Client
                     Mantis.Oracle.Owner
-                    Mantis.Oracle.Test
                     Mantis.Oracle.Types
   build-depends   : base ^>=4.14.1.0
                   , aeson
                   , containers
-                  , data-default
-                  , freer-extras
-                  , playground-common
                   , plutus-contract
                   , plutus-ledger
-                  , plutus-ledger-api
                   , plutus-tx
-                  , plutus-tx-plugin
-                  , plutus-use-cases
-                  , prettyprinter
                   , text
   default-language: Haskell2010
   ghc-options     : -Wall
@@ -33,7 +25,14 @@ executable sofr-oracle
    hs-source-dirs  : app
    main-is         : Main.hs
    build-depends   : base ^>=4.14.1.0
+                   , containers
+                   , data-default
+                   , freer-extras
                    , mantis-oracle
+                   , plutus-contract
+                   , plutus-ledger
+                   , plutus-tx
+                   , text
    default-language: Haskell2010
    ghc-options     : -Wall
 

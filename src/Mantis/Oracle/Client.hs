@@ -10,6 +10,7 @@
 
 module Mantis.Oracle.Client (
   Client
+, readOracleConstraints
 , readOracle
 , runOracleClient
 ) where
@@ -21,7 +22,7 @@ import Data.Monoid          (Last (..))
 import Data.Text            (Text)
 import Ledger               (Datum(..), Redeemer(..), Value, txId, txOutTxOut, txOutValue, validatorHash)
 import Ledger.Ada           (lovelaceValueOf)
-import Ledger.Constraints   (mustPayToOtherScript, mustSpendScriptOutput, otherScript, unspentOutputs)
+import Ledger.Constraints   (ScriptLookups, TxConstraints, mustPayToOtherScript, mustSpendScriptOutput, otherScript, unspentOutputs)
 import Ledger.Typed.Scripts (DatumType, RedeemerType, ScriptType)
 import Mantis.Oracle        (findOracle, oracleValidator)
 import Mantis.Oracle.Types  (Oracle(..), Action(Read))
@@ -39,30 +40,49 @@ instance ScriptType Client where
   type instance RedeemerType Client = ()
 
 
+readOracleConstraints :: HasBlockchainActions s
+                      => Oracle
+                      -> Contract w s Text (Maybe (ScriptLookups a, TxConstraints i o, Integer))
+readOracleConstraints oracle@Oracle{..} =
+  let
+    found (outputRef, output, datum) =
+      
+      let
+         lookups = otherScript (oracleValidator oracle)
+                <> unspentOutputs (M.singleton outputRef output)
+         tx = mustSpendScriptOutput
+                outputRef (Redeemer $ toData Read)
+           <> mustPayToOtherScript
+                (validatorHash $ oracleValidator oracle)
+                (Datum $ toData datum)
+                (txOutValue (txOutTxOut output) <> lovelaceValueOf fee)
+      in
+        (lookups, tx, datum)
+  in
+    do
+      inst <- findOracle oracle
+      return $ found <$> inst
+
+
 readOracle :: HasBlockchainActions s
            => Oracle
-           -> Contract w s Text ()
-readOracle oracle@Oracle{..} =
+           -> Contract w s Text Integer
+readOracle oracle =
   let
-    notFound = logError @String "Oracle not found."
-    found (outputRef, output, datum) =
+    notFound =
+      do
+        logError @String "Oracle not found."
+        return (-1)
+    found (lookups, tx, datum) =
       do
         logInfo @String $ "Found oracle with datum:  " ++ show datum ++ "."
-        let
-           lookups = otherScript (oracleValidator oracle)
-                  <> unspentOutputs (M.singleton outputRef output)
-           tx = mustSpendScriptOutput
-                  outputRef (Redeemer $ toData Read)
-             <> mustPayToOtherScript
-                  (validatorHash $ oracleValidator oracle)
-                  (Datum $ toData datum)
-                  (txOutValue (txOutTxOut output) <> lovelaceValueOf fee)
         ledgerTx <- submitTxConstraintsWith @Client lookups tx
         awaitTxConfirmed $ txId ledgerTx
         logInfo @String $ "Transaction succesful: " ++ show (txId ledgerTx) ++ "."
+        return datum
   in
     maybe notFound found
-      =<< findOracle oracle
+      =<< readOracleConstraints oracle
 
 
 type ClientSchema = BlockchainActions
@@ -77,5 +97,6 @@ runOracleClient oracle =
       handleError logError
         $  endpoint @"read"
         >> readOracle oracle
+        >> return ()
   in
     read' >> runOracleClient oracle

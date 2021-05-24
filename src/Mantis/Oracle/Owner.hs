@@ -18,16 +18,17 @@ module Mantis.Oracle.Owner (
 
 import PlutusTx.Prelude hiding ((<>))
 
-import Data.Monoid         (Last (..))
-import Data.Text           (Text)
-import Ledger              (Redeemer(..), pubKeyHash, txId)
-import Ledger.Constraints  (mustPayToTheScript, mustSpendScriptOutput, otherScript, scriptInstanceLookups, unspentOutputs)
-import Ledger.Value        (assetClassValue)
-import Mantis.Oracle       (OracleScript, findOracle, oracleInstance, oracleValidator)
-import Mantis.Oracle.Types (Action(..), Oracle(..), Parameters(..))
-import Plutus.Contract     (BlockchainActions, Contract, Endpoint, HasBlockchainActions, type (.\/), awaitTxConfirmed, endpoint, logError, logInfo, ownPubKey, select, submitTxConstraints, submitTxConstraintsWith, tell)
-import PlutusTx            (toData)
-import Prelude             ((<>))
+import Data.Monoid          (Last (..))
+import Data.Text            (Text)
+import Ledger               (Redeemer(..), pubKeyHash, txId)
+import Ledger.Constraints   (mustPayToTheScript, mustSpendScriptOutput, otherScript, scriptInstanceLookups, unspentOutputs)
+import Ledger.Value         (assetClassValue)
+import Mantis.Oracle        (OracleScript, findOracle, oracleInstance, oracleValidator)
+import Mantis.Oracle.Client (readOracle)
+import Mantis.Oracle.Types  (Action(..), Oracle(..), Parameters(..))
+import Plutus.Contract      (BlockchainActions, Contract, Endpoint, HasBlockchainActions, type (.\/), awaitTxConfirmed, endpoint, logError, logInfo, ownPubKey, select, submitTxConstraints, submitTxConstraintsWith, tell)
+import PlutusTx             (toData)
+import Prelude              ((<>))
 
 import qualified Data.Map as M (singleton)
 
@@ -70,6 +71,7 @@ deleteOracle oracle =
 type OracleSchema =
       BlockchainActions
   .\/ Endpoint "write"  Integer
+  .\/ Endpoint "read"   ()
   .\/ Endpoint "delete" ()
 
 
@@ -109,6 +111,7 @@ runOracleOwner parameters =
     tell . Last $ Just oracle
     let
       write'  = endpoint @"write"  >>= writeOracle  oracle
+      read'   = endpoint @"read"   >>  readOracle   oracle >> return ()
       delete' = endpoint @"delete" >>  deleteOracle oracle
-      go = (write' `select` delete') >> go
+      go = (write' `select` read' `select` delete') >> go
     go
