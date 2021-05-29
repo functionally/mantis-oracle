@@ -21,7 +21,6 @@ import PlutusTx.Prelude hiding ((<>))
 import Data.Monoid          (Last (..))
 import Data.Text            (Text)
 import Ledger               (Datum(..), Redeemer(..), Value, txId, txOutTxOut, txOutValue, validatorHash)
-import Ledger.Ada           (lovelaceValueOf)
 import Ledger.Constraints   (ScriptLookups, TxConstraints, mustPayToOtherScript, mustSpendScriptOutput, otherScript, unspentOutputs)
 import Ledger.Typed.Scripts (DatumType, RedeemerType, ScriptType)
 import Mantis.Oracle        (findOracle, oracleValidator)
@@ -55,7 +54,7 @@ readOracleConstraints oracle@Oracle{..} =
            <> mustPayToOtherScript
                 (validatorHash $ oracleValidator oracle)
                 (Datum $ toData datum)
-                (txOutValue (txOutTxOut output) <> lovelaceValueOf fee)
+                (txOutValue (txOutTxOut output) <> requiredFee)
       in
         (lookups, tx, datum)
   in

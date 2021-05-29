@@ -1,12 +1,14 @@
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 
 module Mantis.Oracle.Types (
   Oracle(..)
-, Action(..)
+, makeOracle
 , Parameters(..)
+, Action(..)
 ) where
 
 
@@ -14,20 +16,43 @@ import PlutusTx.Prelude
 
 import Data.Aeson   (FromJSON, ToJSON)
 import GHC.Generics (Generic)
-import Ledger       (PubKeyHash)
-import Ledger.Value (AssetClass)
+import Ledger.Value (AssetClass(..), Value)
 
-import qualified Prelude as Haskell (Eq, Ord)
+import qualified Ledger.Value as Value   (singleton)
+import qualified Prelude      as Haskell (Eq)
 
 
 data Oracle =
   Oracle
   {
-    owner :: !PubKeyHash
-  , token :: !AssetClass
-  , fee   :: !Integer
+    controlToken :: !AssetClass
+  , datumToken   :: !AssetClass
+  , requiredFee  :: !Value
   }
-    deriving (Haskell.Eq, Generic, FromJSON, Haskell.Ord, Show, ToJSON)
+    deriving (Haskell.Eq, Generic, FromJSON, Show, ToJSON)
+
+
+data Parameters =
+  Parameters
+  {
+    controlParameter :: AssetClass
+  , datumParameter   :: AssetClass
+  , feeToken         :: AssetClass
+  , feeAmount        :: Integer
+  }
+    deriving (Haskell.Eq, Generic, FromJSON, Show, ToJSON)
+
+
+makeOracle :: Parameters
+           -> Oracle
+makeOracle Parameters{..} =
+  let
+    controlToken = controlParameter
+    datumToken   = datumParameter
+    (symbol, name) = unAssetClass feeToken
+    requiredFee = Value.singleton symbol name feeAmount
+  in
+    Oracle{..}
 
 
 data Action =
@@ -35,12 +60,3 @@ data Action =
   | Read
   | Write
     deriving Show
-
-
-data Parameters =
-  Parameters
-  {
-    oracleToken :: !AssetClass
-  , oracleFee   :: !Integer
-  }
-    deriving (Generic, FromJSON, Show, ToJSON)

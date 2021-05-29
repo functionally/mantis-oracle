@@ -21,11 +21,11 @@ import PlutusTx.Prelude hiding ((<>))
 import Data.Monoid          (Last (..))
 import Data.Text            (Text)
 import Ledger               (Redeemer(..), pubKeyHash, txId)
-import Ledger.Constraints   (mustPayToTheScript, mustSpendScriptOutput, otherScript, scriptInstanceLookups, unspentOutputs)
+import Ledger.Constraints   (mustPayToPubKey, mustPayToTheScript, mustSpendScriptOutput, otherScript, scriptInstanceLookups, unspentOutputs)
 import Ledger.Value         (assetClassValue)
 import Mantis.Oracle        (OracleScript, findOracle, oracleInstance, oracleValidator)
 import Mantis.Oracle.Client (readOracle)
-import Mantis.Oracle.Types  (Action(..), Oracle(..), Parameters(..))
+import Mantis.Oracle.Types  (Action(..), Oracle(..), Parameters, makeOracle)
 import Plutus.Contract      (BlockchainActions, Contract, Endpoint, HasBlockchainActions, type (.\/), awaitTxConfirmed, endpoint, logError, logInfo, ownPubKey, select, submitTxConstraints, submitTxConstraintsWith, tell)
 import PlutusTx             (toData)
 import Prelude              ((<>))
@@ -36,42 +36,18 @@ import qualified Data.Map as M (singleton)
 createOracle :: HasBlockchainActions s
              => Parameters
              -> Contract w s Text Oracle
-createOracle Parameters{..} =
+createOracle parameters =
   do
-    owner <- pubKeyHash <$> ownPubKey
     let
-      token = oracleToken
-      fee = oracleFee
-      oracle = Oracle{..}
+      oracle = makeOracle parameters
     logInfo @String $ "Created oracle: " ++ show oracle
     return oracle
 
 
-deleteOracle :: HasBlockchainActions s
-             => Oracle
-             -> Contract w s Text ()
-deleteOracle oracle =
-  let
-    notFound = logError @String $ "Oracle not found."
-    found (outputRef, output, _) =
-      do
-        let
-          lookups = otherScript (oracleValidator oracle)
-                 <> unspentOutputs (M.singleton outputRef output)
-                 <> scriptInstanceLookups (oracleInstance oracle)
-          tx = mustSpendScriptOutput outputRef (Redeemer $ toData Delete)
-        ledgerTx <- submitTxConstraintsWith @OracleScript lookups tx
-        awaitTxConfirmed $ txId ledgerTx
-        logInfo @String $ "Deleted oracle datum."
-  in
-    maybe notFound found
-      =<< findOracle oracle
-
-
 type OracleSchema =
       BlockchainActions
-  .\/ Endpoint "write"  Integer
   .\/ Endpoint "read"   ()
+  .\/ Endpoint "write"  Integer
   .\/ Endpoint "delete" ()
 
 
@@ -80,31 +56,60 @@ writeOracle :: HasBlockchainActions s
             -> Integer
             -> Contract w s Text ()
 writeOracle oracle@Oracle{..} datum =
-  let
-    mustUseToken = mustPayToTheScript datum $ assetClassValue token 1
-    notFound = 
-      do
-        ledgerTx <- submitTxConstraints (oracleInstance oracle) mustUseToken
-        awaitTxConfirmed $ txId ledgerTx
-        logInfo @String $ "Set oracle datum: " ++ show datum ++ "."
-    found (outputRef, output, _) =
-      do
-        let
-          lookups = otherScript (oracleValidator oracle)
-                 <> unspentOutputs (M.singleton outputRef output)
-                 <> scriptInstanceLookups (oracleInstance oracle)
-          tx = mustUseToken
-            <> mustSpendScriptOutput outputRef (Redeemer $ toData Write)
-        ledgerTx <- submitTxConstraintsWith @OracleScript lookups tx
-        awaitTxConfirmed $ txId ledgerTx
-        logInfo @String $ "Updated oracle datum: " ++ show datum ++ "."
-  in
+  do
+    owner <- pubKeyHash <$> ownPubKey
+    let
+      mustControl  = mustPayToPubKey    owner $ assetClassValue controlToken 1
+      mustUseDatum = mustPayToTheScript datum $ assetClassValue datumToken   1
+      notFound = 
+        do
+          ledgerTx <-
+            submitTxConstraints (oracleInstance oracle)
+              $ mustControl <> mustUseDatum
+          awaitTxConfirmed $ txId ledgerTx
+          logInfo @String $ "Set oracle datum: " ++ show datum ++ "."
+      found (outputRef, output, _) =
+        do
+          let
+            lookups = otherScript (oracleValidator oracle)
+                   <> unspentOutputs (M.singleton outputRef output)
+                   <> scriptInstanceLookups (oracleInstance oracle)
+            tx = mustControl
+              <> mustUseDatum
+              <> mustSpendScriptOutput outputRef (Redeemer $ toData Write)
+          ledgerTx <- submitTxConstraintsWith @OracleScript lookups tx
+          awaitTxConfirmed $ txId ledgerTx
+          logInfo @String $ "Updated oracle datum: " ++ show datum ++ "."
+    maybe notFound found
+      =<< findOracle oracle
+
+
+deleteOracle :: HasBlockchainActions s
+             => Oracle
+             -> Contract w s Text ()
+deleteOracle oracle@Oracle{..} =
+  do
+    owner <- pubKeyHash <$> ownPubKey
+    let
+      mustControl  = mustPayToPubKey    owner $ assetClassValue controlToken 1
+      notFound = logError @String $ "Oracle not found."
+      found (outputRef, output, _) =
+        do
+          let
+            lookups = otherScript (oracleValidator oracle)
+                   <> unspentOutputs (M.singleton outputRef output)
+                   <> scriptInstanceLookups (oracleInstance oracle)
+            tx = mustControl
+              <> mustSpendScriptOutput outputRef (Redeemer $ toData Delete)
+          ledgerTx <- submitTxConstraintsWith @OracleScript lookups tx
+          awaitTxConfirmed $ txId ledgerTx
+          logInfo @String $ "Deleted oracle datum."
     maybe notFound found
       =<< findOracle oracle
 
 
 runOracleOwner :: Parameters
-         -> Contract (Last Oracle) OracleSchema Text ()
+               -> Contract (Last Oracle) OracleSchema Text ()
 runOracleOwner parameters =
   do
     oracle <- createOracle parameters

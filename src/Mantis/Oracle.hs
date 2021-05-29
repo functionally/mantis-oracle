@@ -25,8 +25,7 @@ module Mantis.Oracle (
 import PlutusTx.Prelude hiding ((<>))
 
 import Data.Text            (Text)
-import Ledger               (Address, Datum(..), DatumHash, ScriptContext(..), TxOut(..), TxOutRef(..), TxOutTx(..), Validator, findDatum, findOwnInput, getContinuingOutputs, scriptAddress, txInInfoResolved, txData, txOutValue, txSignedBy)
-import Ledger.Ada           (lovelaceValueOf)
+import Ledger               (Address, Datum(..), DatumHash, ScriptContext(..), TxOut(..), TxOutRef(..), TxOutTx(..), Validator, findDatum, findOwnInput, getContinuingOutputs, scriptAddress, txInInfoResolved, txData, txOutValue, valueSpent)
 import Ledger.Typed.Scripts (DatumType, RedeemerType, ScriptInstance, ScriptType, validator, validatorScript, wrapValidator)
 import Ledger.Value         (assetClassValueOf, geq)
 import Mantis.Oracle.Types  (Action(..), Oracle(..))
@@ -49,25 +48,27 @@ makeValidator :: Oracle
               -> ScriptContext
               -> Bool
 makeValidator Oracle{..} inputDatum redeemer context@ScriptContext{..} =
+
   let
+
+    -- Oracle input and output.
+    continuingOutputs = getContinuingOutputs context
     oracleInput =
       maybe (traceError "Missing oracle input.") txInInfoResolved
         $ findOwnInput context
     oracleOutput =
-      case getContinuingOutputs context of
+      case continuingOutputs of
         [output] -> output
         _        -> traceError "Not exactly one oracle output."
-    tokenInput  = assetClassValueOf (txOutValue oracleInput ) token == 1
-    tokenOutput = assetClassValueOf (txOutValue oracleOutput) token == 1
-    tokenConstraint =
-         traceIfFalse "Missing single oracle token input."  tokenInput
-      && traceIfFalse "Missing single oracle token output." tokenOutput
-    deleteConstraint =
-         traceIfFalse "Missing single oracle token input."  tokenInput
-      && traceIfFalse "No continuing autputs allowed." (null $ getContinuingOutputs context)
-    signedByOwner =
-      traceIfFalse "Not signed by owner."
-        $ scriptContextTxInfo `txSignedBy` owner
+
+    -- Datum token.
+    datumTokenInput  = assetClassValueOf (txOutValue oracleInput ) datumToken == 1
+    datumTokenOutput = assetClassValueOf (txOutValue oracleOutput) datumToken == 1
+    singleDatum =
+         traceIfFalse "Missing single oracle token input."  datumTokenInput
+      && traceIfFalse "Missing single oracle token output." datumTokenOutput
+
+    -- Datum value.
     outputDatum = fetchDatum oracleOutput (`findDatum` scriptContextTxInfo)
     datumPresent =
       traceIfFalse "Missing output datum."
@@ -75,14 +76,32 @@ makeValidator Oracle{..} inputDatum redeemer context@ScriptContext{..} =
     unchangedDatum =
       traceIfFalse "Datum illegally changed."
         $ outputDatum == Just inputDatum
+
+    -- Control token.
+    controlTokenInput  = assetClassValueOf (valueSpent scriptContextTxInfo        ) controlToken
+    controlTokenOutput = assetClassValueOf (sum $ txOutValue <$> continuingOutputs) controlToken
+    signedByControl = traceIfFalse "Not accompanied by control token."
+      $ controlTokenInput > 0
+    noScriptControl = traceIfFalse "Control token may not be sent to script."
+      $ controlTokenOutput == 0
+    controlled = signedByControl && noScriptControl
+
+    -- Deletion.
+    deleting =
+         traceIfFalse "Missing single oracle token input." datumTokenInput
+      && traceIfFalse "No continuing outputs allowed." (null continuingOutputs)
+
+    -- Fee amount.
     feePaid =
       traceIfFalse "Insufficient fee."
-        $ txOutValue oracleOutput `geq` (txOutValue oracleInput <> lovelaceValueOf fee)
+        $ txOutValue oracleOutput `geq` (txOutValue oracleInput <> requiredFee)
+
   in
+
     case redeemer of
-      Delete -> deleteConstraint && signedByOwner
-      Read   -> tokenConstraint  && unchangedDatum && feePaid
-      Write  -> tokenConstraint  && signedByOwner  && datumPresent
+      Delete -> deleting && controlled
+      Read   -> singleDatum  && unchangedDatum && feePaid
+      Write  -> singleDatum  && controlled  && datumPresent
 
 
 data OracleScript
@@ -96,7 +115,8 @@ oracleInstance :: Oracle
                -> ScriptInstance OracleScript
 oracleInstance oracle = 
   validator @OracleScript
-    ($$(compile [|| makeValidator ||]) `PlutusTx.applyCode` PlutusTx.liftCode oracle) $$(PlutusTx.compile [|| wrap ||])
+    ($$(compile [|| makeValidator ||]) `PlutusTx.applyCode` PlutusTx.liftCode oracle)
+      $$(PlutusTx.compile [|| wrap ||])
     where
       wrap = wrapValidator @Integer @Action
 
@@ -118,7 +138,7 @@ findOracle oracle@Oracle{..} =
   do
     utxos <-
       M.filter 
-        (\o -> assetClassValueOf (txOutValue $ txOutTxOut o) token == 1)
+        (\o -> assetClassValueOf (txOutValue $ txOutTxOut o) datumToken == 1)
         <$> utxoAt (oracleAddress oracle)
     return
       $ case M.toList utxos of

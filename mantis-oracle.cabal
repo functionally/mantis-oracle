@@ -17,6 +17,7 @@ library
                   , plutus-contract
                   , plutus-ledger
                   , plutus-tx
+                  , plutus-tx-plugin
                   , text
   default-language: Haskell2010
   ghc-options     : -Wall
