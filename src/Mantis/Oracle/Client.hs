@@ -1,3 +1,18 @@
+-----------------------------------------------------------------------------
+--
+-- Module      :  $Headers
+-- Copyright   :  (c) 2021 Brian W Bush
+-- License     :  MIT
+--
+-- Maintainer  :  Brian W Bush <code@functionally.io>
+-- Stability   :  Experimental
+-- Portability :  Portable
+--
+-- | Client access for the general-purpose oracle.
+--
+-----------------------------------------------------------------------------
+
+
 {-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE NoImplicitPrelude #-}
@@ -9,9 +24,13 @@
 
 
 module Mantis.Oracle.Client (
-  Client
+-- * Script and Schema
+  ClientScript
+, ClientSchema
+-- * Enpoints
 , readOracleConstraints
 , readOracle
+-- * Utilities
 , runOracleClient
 ) where
 
@@ -21,32 +40,32 @@ import PlutusTx.Prelude hiding ((<>))
 import Data.Monoid          (Last (..))
 import Data.Text            (Text)
 import Ledger               (Datum(..), Redeemer(..), Value, txId, txOutTxOut, txOutValue, validatorHash)
-import Ledger.Ada           (lovelaceValueOf)
 import Ledger.Constraints   (ScriptLookups, TxConstraints, mustPayToOtherScript, mustSpendScriptOutput, otherScript, unspentOutputs)
 import Ledger.Typed.Scripts (DatumType, RedeemerType, ScriptType)
 import Mantis.Oracle        (findOracle, oracleValidator)
 import Mantis.Oracle.Types  (Oracle(..), Action(Read))
 import Plutus.Contract      (BlockchainActions, Contract, Endpoint, HasBlockchainActions, type (.\/), awaitTxConfirmed, endpoint, handleError, logError, logInfo, submitTxConstraintsWith)
-import PlutusTx             (toData)
+import PlutusTx             (Data, toData)
 import Prelude              ((<>))
 
 import qualified Data.Map as M (singleton)
 
 
-data Client
+-- | Oracle script for clients.
+data ClientScript
 
-instance ScriptType Client where
-  type instance DatumType    Client = ()
-  type instance RedeemerType Client = ()
+instance ScriptType ClientScript where
+  type instance DatumType    ClientScript = ()
+  type instance RedeemerType ClientScript = ()
 
 
+-- | Compute the lookup and constratins for reading the oracle on-chain.
 readOracleConstraints :: HasBlockchainActions s
-                      => Oracle
-                      -> Contract w s Text (Maybe (ScriptLookups a, TxConstraints i o, Integer))
+                      => Oracle                                                               -- ^ The oracle.
+                      -> Contract w s Text (Maybe (ScriptLookups a, TxConstraints i o, Data)) -- ^ Action for computing the oracle's lookups, constraints, and data.
 readOracleConstraints oracle@Oracle{..} =
   let
     found (outputRef, output, datum) =
-      
       let
          lookups = otherScript (oracleValidator oracle)
                 <> unspentOutputs (M.singleton outputRef output)
@@ -55,7 +74,7 @@ readOracleConstraints oracle@Oracle{..} =
            <> mustPayToOtherScript
                 (validatorHash $ oracleValidator oracle)
                 (Datum $ toData datum)
-                (txOutValue (txOutTxOut output) <> lovelaceValueOf fee)
+                (txOutValue (txOutTxOut output) <> requiredFee)
       in
         (lookups, tx, datum)
   in
@@ -64,33 +83,36 @@ readOracleConstraints oracle@Oracle{..} =
       return $ found <$> inst
 
 
+-- | Endpoint for reading the datum from the oracle.
 readOracle :: HasBlockchainActions s
-           => Oracle
-           -> Contract w s Text Integer
+           => Oracle                         -- ^ The oracle.
+           -> Contract w s Text (Maybe Data) -- ^ Action for reading the datum.
 readOracle oracle =
   let
     notFound =
       do
         logError @String "Oracle not found."
-        return (-1)
+        return Nothing
     found (lookups, tx, datum) =
       do
-        logInfo @String $ "Found oracle with datum:  " ++ show datum ++ "."
-        ledgerTx <- submitTxConstraintsWith @Client lookups tx
+        logInfo $ "Found oracle with datum: " ++ show datum ++ "."
+        ledgerTx <- submitTxConstraintsWith @ClientScript lookups tx
         awaitTxConfirmed $ txId ledgerTx
-        logInfo @String $ "Transaction succesful: " ++ show (txId ledgerTx) ++ "."
-        return datum
+        logInfo $ "Transaction succesful: " ++ show (txId ledgerTx) ++ "."
+        return $ Just datum
   in
     maybe notFound found
       =<< readOracleConstraints oracle
 
 
+-- | Schema for reading the oracle.
 type ClientSchema = BlockchainActions
                 .\/ Endpoint "read" ()
 
 
-runOracleClient :: Oracle ->
-                   Contract (Last Value) ClientSchema Text ()
+-- | Repeatedly read the oracle's datum from its endpoint.
+runOracleClient :: Oracle                                     -- ^ The oracle.
+                -> Contract (Last Value) ClientSchema Text () -- ^ The action for repeatedly reading the oracle.
 runOracleClient oracle =
   let
     read' =

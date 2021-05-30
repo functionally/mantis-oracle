@@ -1,3 +1,19 @@
+-----------------------------------------------------------------------------
+--
+-- Module      :  $Headers
+-- Copyright   :  (c) 2021 Brian W Bush
+-- License     :  MIT
+--
+-- Maintainer  :  Brian W Bush <code@functionally.io>
+-- Stability   :  Experimental
+-- Portability :  Portable
+--
+-- | Oracle for general data.
+--
+-----------------------------------------------------------------------------
+
+
+{-# LANGUAGE AllowAmbiguousTypes   #-}
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -13,10 +29,12 @@
 
 
 module Mantis.Oracle (
+-- * Oracle
   OracleScript
 , oracleInstance
 , oracleValidator
 , oracleAddress
+-- * Access
 , findOracle
 , fetchDatum
 ) where
@@ -25,14 +43,13 @@ module Mantis.Oracle (
 import PlutusTx.Prelude hiding ((<>))
 
 import Data.Text            (Text)
-import Ledger               (Address, Datum(..), DatumHash, ScriptContext(..), TxOut(..), TxOutRef(..), TxOutTx(..), Validator, findDatum, findOwnInput, getContinuingOutputs, scriptAddress, txInInfoResolved, txData, txOutValue, txSignedBy)
-import Ledger.Ada           (lovelaceValueOf)
+import Ledger               (Address, Datum(..), DatumHash, ScriptContext(..), TxOut(..), TxOutRef(..), TxOutTx(..), Validator, findDatum, findOwnInput, getContinuingOutputs, scriptAddress, txInInfoResolved, txData, txOutValue, valueSpent)
 import Ledger.Typed.Scripts (DatumType, RedeemerType, ScriptInstance, ScriptType, validator, validatorScript, wrapValidator)
 import Ledger.Value         (assetClassValueOf, geq)
 import Mantis.Oracle.Types  (Action(..), Oracle(..))
 import Prelude              ((<>))
 import Plutus.Contract      (Contract, HasBlockchainActions, utxoAt)
-import PlutusTx             (applyCode, compile, fromData, liftCode, makeLift, unstableMakeIsData)
+import PlutusTx             (Data, applyCode, compile, fromData, liftCode, makeLift, unstableMakeIsData)
 
 import qualified Data.Map.Strict as M (filter, lookup, toList)
 
@@ -43,31 +60,35 @@ unstableMakeIsData ''Action
 
 
 {-# INLINABLE makeValidator #-}
-makeValidator :: Oracle
-              -> Integer
-              -> Action
-              -> ScriptContext
-              -> Bool
+
+-- | Make the validator for the oracle.
+makeValidator :: Oracle         -- ^ The oracle.
+              -> Data           -- ^ The datum.
+              -> Action         -- ^ The redeemer.
+              -> ScriptContext  -- ^ The context.
+              -> Bool           -- ^ Whether the transaction is valid.
 makeValidator Oracle{..} inputDatum redeemer context@ScriptContext{..} =
+
   let
+
+    -- Oracle input and output.
+    continuingOutputs = getContinuingOutputs context
     oracleInput =
       maybe (traceError "Missing oracle input.") txInInfoResolved
         $ findOwnInput context
     oracleOutput =
-      case getContinuingOutputs context of
+      case continuingOutputs of
         [output] -> output
         _        -> traceError "Not exactly one oracle output."
-    tokenInput  = assetClassValueOf (txOutValue oracleInput ) token == 1
-    tokenOutput = assetClassValueOf (txOutValue oracleOutput) token == 1
-    tokenConstraint =
-         traceIfFalse "Missing single oracle token input."  tokenInput
-      && traceIfFalse "Missing single oracle token output." tokenOutput
-    deleteConstraint =
-         traceIfFalse "Missing single oracle token input."  tokenInput
-      && traceIfFalse "No continuing autputs allowed." (null $ getContinuingOutputs context)
-    signedByOwner =
-      traceIfFalse "Not signed by owner."
-        $ scriptContextTxInfo `txSignedBy` owner
+
+    -- Datum token.
+    datumTokenInput  = assetClassValueOf (txOutValue oracleInput ) datumToken == 1
+    datumTokenOutput = assetClassValueOf (txOutValue oracleOutput) datumToken == 1
+    singleDatum =
+         traceIfFalse "Missing single oracle token input."  datumTokenInput
+      && traceIfFalse "Missing single oracle token output." datumTokenOutput
+
+    -- Datum value.
     outputDatum = fetchDatum oracleOutput (`findDatum` scriptContextTxInfo)
     datumPresent =
       traceIfFalse "Missing output datum."
@@ -75,67 +96,92 @@ makeValidator Oracle{..} inputDatum redeemer context@ScriptContext{..} =
     unchangedDatum =
       traceIfFalse "Datum illegally changed."
         $ outputDatum == Just inputDatum
+
+    -- Control token.
+    controlTokenInput  = assetClassValueOf (valueSpent scriptContextTxInfo        ) controlToken
+    controlTokenOutput = assetClassValueOf (sum $ txOutValue <$> continuingOutputs) controlToken
+    signedByControl = traceIfFalse "Not accompanied by control token."
+      $ controlTokenInput > 0
+    noScriptControl = traceIfFalse "Control token may not be sent to script."
+      $ controlTokenOutput == 0
+    controlled = signedByControl && noScriptControl
+
+    -- Deletion.
+    deleting =
+         traceIfFalse "Missing single oracle token input." datumTokenInput
+      && traceIfFalse "No continuing outputs allowed." (null continuingOutputs)
+
+    -- Fee amount.
     feePaid =
       traceIfFalse "Insufficient fee."
-        $ txOutValue oracleOutput `geq` (txOutValue oracleInput <> lovelaceValueOf fee)
+        $ txOutValue oracleOutput `geq` (txOutValue oracleInput <> requiredFee)
+
   in
+
     case redeemer of
-      Delete -> deleteConstraint && signedByOwner
-      Read   -> tokenConstraint  && unchangedDatum && feePaid
-      Write  -> tokenConstraint  && signedByOwner  && datumPresent
+      Delete -> deleting && controlled
+      Read   -> singleDatum  && unchangedDatum && feePaid
+      Write  -> singleDatum  && controlled  && datumPresent
 
 
+-- | Type for the script.
 data OracleScript
 
-instance ScriptType OracleScript where
-    type instance DatumType    OracleScript = Integer
-    type instance RedeemerType OracleScript = Action
+instance ScriptType OracleScript  where
+    type instance DatumType    OracleScript  = Data
+    type instance RedeemerType OracleScript  = Action
 
 
-oracleInstance :: Oracle
-               -> ScriptInstance OracleScript
+-- | Compute the instance for an oracle.
+oracleInstance :: Oracle                      -- ^ The oracle.
+               -> ScriptInstance OracleScript -- ^ The instance.
 oracleInstance oracle = 
   validator @OracleScript
-    ($$(compile [|| makeValidator ||]) `PlutusTx.applyCode` PlutusTx.liftCode oracle) $$(PlutusTx.compile [|| wrap ||])
+    ($$(compile [|| makeValidator ||]) `applyCode` liftCode oracle)
+      $$(compile [|| wrap ||])
     where
-      wrap = wrapValidator @Integer @Action
+      wrap = wrapValidator @Data @Action
 
 
-oracleValidator :: Oracle
-                -> Validator
+-- | Compute the validator for an oracle.
+oracleValidator :: Oracle    -- ^ The oracle.
+                -> Validator -- ^ The validator.
 oracleValidator = validatorScript . oracleInstance
 
 
-oracleAddress :: Oracle
-              -> Address
+-- | Compute the address for an oracle.
+oracleAddress :: Oracle  -- ^ The oracle.
+              -> Address -- ^ The script address.
 oracleAddress = scriptAddress . oracleValidator
 
 
+-- | Find an oracle on the blockchain.
 findOracle :: HasBlockchainActions s
-           => Oracle
-           -> Contract w s Text (Maybe (TxOutRef, TxOutTx, Integer))
+           => Oracle                                              -- ^ The oracle.
+           -> Contract w s Text (Maybe (TxOutRef, TxOutTx, Data)) -- ^ Action for finding the oracle's UTxO and datum.
 findOracle oracle@Oracle{..} =
   do
     utxos <-
       M.filter 
-        (\o -> assetClassValueOf (txOutValue $ txOutTxOut o) token == 1)
+        (\o -> assetClassValueOf (txOutValue $ txOutTxOut o) datumToken == 1)
         <$> utxoAt (oracleAddress oracle)
     return
       $ case M.toList utxos of
-          [(oref, o)] -> do
+          [(oref, o@TxOutTx{..})] -> do
                            datum <-
-                             fetchDatum (txOutTxOut o)
-                                $ \dh -> M.lookup dh
-                                $ txData
-                                $ txOutTxTx o
+                             fetchDatum txOutTxOut
+                                . flip M.lookup
+                                $ txData txOutTxTx
                            return (oref, o, datum)
           _            -> Nothing
 
 
 {-# INLINABLE fetchDatum #-}
-fetchDatum :: TxOut
-           -> (DatumHash -> Maybe Datum)
-           -> Maybe Integer
+
+-- | Retrieve the oracle's datum from a transaction output.
+fetchDatum :: TxOut                      -- ^ The transaction output.
+           -> (DatumHash -> Maybe Datum) -- ^ Function for looking up the datum, given its hash.
+           -> Maybe Data                 -- ^ The datum, if it was found.
 fetchDatum TxOut{..} fetch =
   do
     hash <- txOutDatumHash
