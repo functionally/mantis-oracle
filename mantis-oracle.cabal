@@ -9,7 +9,7 @@ library
   hs-source-dirs  : src
   exposed-modules : Mantis.Oracle
                     Mantis.Oracle.Client
-                    Mantis.Oracle.Owner
+                    Mantis.Oracle.Controller
                     Mantis.Oracle.Types
   build-depends   : base ^>=4.14.1.0
                   , aeson

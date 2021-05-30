@@ -7,12 +7,12 @@
 {-# LANGUAGE TypeOperators         #-}
 
 
-module Mantis.Oracle.Owner (
+module Mantis.Oracle.Controller (
   OracleSchema
 , createOracle
 , deleteOracle
 , writeOracle
-, runOracleOwner
+, runOracleController
 ) where
 
 
@@ -108,9 +108,9 @@ deleteOracle oracle@Oracle{..} =
       =<< findOracle oracle
 
 
-runOracleOwner :: Parameters
-               -> Contract (Last Oracle) OracleSchema Text ()
-runOracleOwner parameters =
+runOracleController :: Parameters
+                    -> Contract (Last Oracle) OracleSchema Text ()
+runOracleController parameters =
   do
     oracle <- createOracle parameters
     tell . Last $ Just oracle

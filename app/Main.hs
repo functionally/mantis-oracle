@@ -14,21 +14,21 @@ module Main (
 
 import PlutusTx.Prelude hiding ((<>), last)
 
-import Control.Monad          (void)
-import Data.Default           (def)
-import Data.Monoid            (Last (..))
-import Data.Text              (Text)
-import Ledger.Ada             (fromValue, getLovelace, lovelaceValueOf)
-import Ledger.Address         (pubKeyAddress)
-import Ledger.Tx              (txOutTxOut, txOutValue)
-import Ledger.Value           (AssetClass(..), Value, assetClass, assetClassValueOf, flattenValue, toString)
-import Mantis.Oracle          (findOracle, oracleAddress)
-import Mantis.Oracle.Client   (runOracleClient)
-import Mantis.Oracle.Owner    (runOracleOwner)
-import Mantis.Oracle.Types    (Oracle(..), Parameters(..))
-import Prelude                ((<>))
-import PlutusTx               (Data(I))
-import Wallet.Emulator.Wallet (Wallet(..))
+import Control.Monad            (void)
+import Data.Default             (def)
+import Data.Monoid              (Last (..))
+import Data.Text                (Text)
+import Ledger.Ada               (fromValue, getLovelace, lovelaceValueOf)
+import Ledger.Address           (pubKeyAddress)
+import Ledger.Tx                (txOutTxOut, txOutValue)
+import Ledger.Value             (AssetClass(..), Value, assetClass, assetClassValueOf, flattenValue, toString)
+import Mantis.Oracle            (findOracle, oracleAddress)
+import Mantis.Oracle.Client     (runOracleClient)
+import Mantis.Oracle.Controller (runOracleController)
+import Mantis.Oracle.Types      (Oracle(..), Parameters(..))
+import Prelude                  ((<>))
+import PlutusTx                 (Data(I))
+import Wallet.Emulator.Wallet   (Wallet(..))
 
 import qualified Control.Monad.Freer.Extras as X (logInfo)
 import qualified Data.Map                   as M (elems, fromList)
@@ -104,7 +104,7 @@ testTrace parameters =
 
     X.logInfo @String "Wallet 1 starts the oracle, but does not set its value yet."
     w1 <- E.activateContractWallet (Wallet 1)
-       $  runOracleOwner parameters
+       $  runOracleController parameters
     void $ E.waitNSlots 1
     oracle <- getOracle w1
 

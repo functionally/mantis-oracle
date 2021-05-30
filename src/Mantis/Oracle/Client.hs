@@ -9,7 +9,8 @@
 
 
 module Mantis.Oracle.Client (
-  Client
+  ClientScript
+, ClientSchema
 , readOracleConstraints
 , readOracle
 , runOracleClient
@@ -32,11 +33,11 @@ import Prelude              ((<>))
 import qualified Data.Map as M (singleton)
 
 
-data Client
+data ClientScript
 
-instance ScriptType Client where
-  type instance DatumType    Client = ()
-  type instance RedeemerType Client = ()
+instance ScriptType ClientScript where
+  type instance DatumType    ClientScript = ()
+  type instance RedeemerType ClientScript = ()
 
 
 readOracleConstraints :: HasBlockchainActions s
@@ -74,7 +75,7 @@ readOracle oracle =
     found (lookups, tx, datum) =
       do
         logInfo $ "Found oracle with datum: " ++ show datum ++ "."
-        ledgerTx <- submitTxConstraintsWith @Client lookups tx
+        ledgerTx <- submitTxConstraintsWith @ClientScript lookups tx
         awaitTxConfirmed $ txId ledgerTx
         logInfo $ "Transaction succesful: " ++ show (txId ledgerTx) ++ "."
         return $ Just datum
