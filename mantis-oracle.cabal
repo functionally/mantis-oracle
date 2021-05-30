@@ -1,6 +1,6 @@
 cabal-version     : 2.4
 name              : mantis-oracle
-version           : 0.1.0.0
+version           : 0.1.1.0
 author            : Brian W Bush
 maintainer        : code@functionally.io
 extra-source-files: CHANGELOG.md
@@ -14,7 +14,6 @@ library
   build-depends   : base ^>=4.14.1.0
                   , aeson
                   , containers
-                  , plutus-core
                   , plutus-contract
                   , plutus-ledger
                   , plutus-tx
