@@ -1,3 +1,4 @@
+{-# LANGUAGE AllowAmbiguousTypes   #-}
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -31,7 +32,7 @@ import Ledger.Value         (assetClassValueOf, geq)
 import Mantis.Oracle.Types  (Action(..), Oracle(..))
 import Prelude              ((<>))
 import Plutus.Contract      (Contract, HasBlockchainActions, utxoAt)
-import PlutusTx             (applyCode, compile, fromData, liftCode, makeLift, unstableMakeIsData)
+import PlutusTx             (Data, applyCode, compile, fromData, liftCode, makeLift, unstableMakeIsData)
 
 import qualified Data.Map.Strict as M (filter, lookup, toList)
 
@@ -43,7 +44,7 @@ unstableMakeIsData ''Action
 
 {-# INLINABLE makeValidator #-}
 makeValidator :: Oracle
-              -> Integer
+              -> Data
               -> Action
               -> ScriptContext
               -> Bool
@@ -106,19 +107,19 @@ makeValidator Oracle{..} inputDatum redeemer context@ScriptContext{..} =
 
 data OracleScript
 
-instance ScriptType OracleScript where
-    type instance DatumType    OracleScript = Integer
-    type instance RedeemerType OracleScript = Action
+instance ScriptType OracleScript  where
+    type instance DatumType    OracleScript  = Data
+    type instance RedeemerType OracleScript  = Action
 
 
 oracleInstance :: Oracle
                -> ScriptInstance OracleScript
 oracleInstance oracle = 
   validator @OracleScript
-    ($$(compile [|| makeValidator ||]) `PlutusTx.applyCode` PlutusTx.liftCode oracle)
-      $$(PlutusTx.compile [|| wrap ||])
+    ($$(compile [|| makeValidator ||]) `applyCode` liftCode oracle)
+      $$(compile [|| wrap ||])
     where
-      wrap = wrapValidator @Integer @Action
+      wrap = wrapValidator @Data @Action
 
 
 oracleValidator :: Oracle
@@ -133,7 +134,7 @@ oracleAddress = scriptAddress . oracleValidator
 
 findOracle :: HasBlockchainActions s
            => Oracle
-           -> Contract w s Text (Maybe (TxOutRef, TxOutTx, Integer))
+           -> Contract w s Text (Maybe (TxOutRef, TxOutTx, Data))
 findOracle oracle@Oracle{..} =
   do
     utxos <-
@@ -155,7 +156,7 @@ findOracle oracle@Oracle{..} =
 {-# INLINABLE fetchDatum #-}
 fetchDatum :: TxOut
            -> (DatumHash -> Maybe Datum)
-           -> Maybe Integer
+           -> Maybe Data
 fetchDatum TxOut{..} fetch =
   do
     hash <- txOutDatumHash

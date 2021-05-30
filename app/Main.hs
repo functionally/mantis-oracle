@@ -22,11 +22,12 @@ import Ledger.Ada             (fromValue, getLovelace, lovelaceValueOf)
 import Ledger.Address         (pubKeyAddress)
 import Ledger.Tx              (txOutTxOut, txOutValue)
 import Ledger.Value           (AssetClass(..), Value, assetClass, assetClassValueOf, flattenValue, toString)
-import Mantis.Oracle          (findOracle)
+import Mantis.Oracle          (findOracle, oracleAddress)
 import Mantis.Oracle.Client   (runOracleClient)
 import Mantis.Oracle.Owner    (runOracleOwner)
 import Mantis.Oracle.Types    (Oracle(..), Parameters(..))
 import Prelude                ((<>))
+import PlutusTx               (Data(I))
 import Wallet.Emulator.Wallet (Wallet(..))
 
 import qualified Control.Monad.Freer.Extras as X (logInfo)
@@ -107,7 +108,8 @@ testTrace parameters =
     void $ E.waitNSlots 1
     oracle <- getOracle w1
 
-    sequence_ [E.activateContractWallet (Wallet i) $ peekFunds oracle i | i <- [1..4]]
+    sequence_ [E.activateContractWallet (Wallet i) . peekFunds oracle $ Just i | i <- [1..4]]
+    void . E.activateContractWallet (Wallet 1) $ peekFunds oracle Nothing
 
     X.logInfo @String "Wallet 4 just watches transactions of the oracle."
     void . E.activateContractWallet (Wallet 4)
@@ -124,7 +126,7 @@ testTrace parameters =
     void $ E.waitNSlots 3
 
     X.logInfo @String "Wallet 1 writes a value to the oracle."
-    E.callEndpoint @"write" w1 1_500
+    E.callEndpoint @"write" w1 $ I 1_500
     void $ E.waitNSlots 3
 
     X.logInfo @String "Wallet 2 read the oracle."
@@ -141,7 +143,7 @@ testTrace parameters =
     void $ E.waitNSlots 3
 
     X.logInfo @String "Wallet 1 updates the value of the oracle."
-    E.callEndpoint @"write" w1 2_500
+    E.callEndpoint @"write" w1 $ I 2_500
     void $ E.waitNSlots 3
 
     X.logInfo @String "Wallet 2 reads the oracle a second time."
@@ -163,14 +165,14 @@ peekDatum oracle =
   do
     inst <- findOracle oracle
     case inst of
-      Nothing            -> return ()
-      Just (_, _, datum) -> C.logInfo $ "Oracle value: " ++ show datum ++ "."
+      Just (_, _, I datum) -> C.logInfo $ "Oracle value: " ++ show datum ++ "."
+      _                    -> return ()
     C.waitNSlots 1
       >> peekDatum oracle
 
 
 peekFunds :: Oracle
-          -> Integer
+          -> Maybe Integer
           -> C.Contract (Last Value) C.BlockchainActions Text ()
 peekFunds oracle@Oracle{..} i =
   do
@@ -181,11 +183,11 @@ peekFunds oracle@Oracle{..} i =
       funds =
         do
           owner <- C.ownPubKey
-          utxos <- C.utxoAt $ pubKeyAddress owner
+          utxos <- C.utxoAt $ maybe (oracleAddress oracle) (const $ pubKeyAddress owner) i
           let
             value = sum $ txOutValue . txOutTxOut <$> M.elems utxos
           C.logInfo
-            $ "Funds in Wallet " ++ show i
+            $ maybe "Funds in Script" (("Funds in Wallet " ++) . show) i
             ++ ": " ++ show (getLovelace $ fromValue value) ++ " Lovelace"
             ++ ", " ++ show (assetClassValueOf value controlToken) ++ " " ++ toString (snd $ unAssetClass controlToken)
             ++ ", " ++ show (assetClassValueOf value datumToken  ) ++ " " ++ toString (snd $ unAssetClass datumToken  )

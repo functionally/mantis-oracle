@@ -27,7 +27,7 @@ import Mantis.Oracle        (OracleScript, findOracle, oracleInstance, oracleVal
 import Mantis.Oracle.Client (readOracle)
 import Mantis.Oracle.Types  (Action(..), Oracle(..), Parameters, makeOracle)
 import Plutus.Contract      (BlockchainActions, Contract, Endpoint, HasBlockchainActions, type (.\/), awaitTxConfirmed, endpoint, logError, logInfo, ownPubKey, select, submitTxConstraints, submitTxConstraintsWith, tell)
-import PlutusTx             (toData)
+import PlutusTx             (Data, toData)
 import Prelude              ((<>))
 
 import qualified Data.Map as M (singleton)
@@ -40,20 +40,20 @@ createOracle parameters =
   do
     let
       oracle = makeOracle parameters
-    logInfo @String $ "Created oracle: " ++ show oracle
+    logInfo $ "Created oracle: " ++ show oracle
     return oracle
 
 
 type OracleSchema =
       BlockchainActions
   .\/ Endpoint "read"   ()
-  .\/ Endpoint "write"  Integer
+  .\/ Endpoint "write"  Data
   .\/ Endpoint "delete" ()
 
 
 writeOracle :: HasBlockchainActions s
             => Oracle
-            -> Integer
+            -> Data
             -> Contract w s Text ()
 writeOracle oracle@Oracle{..} datum =
   do
@@ -67,7 +67,7 @@ writeOracle oracle@Oracle{..} datum =
             submitTxConstraints (oracleInstance oracle)
               $ mustControl <> mustUseDatum
           awaitTxConfirmed $ txId ledgerTx
-          logInfo @String $ "Set oracle datum: " ++ show datum ++ "."
+          logInfo $ "Set oracle datum: " ++ show datum ++ "."
       found (outputRef, output, _) =
         do
           let
@@ -79,7 +79,7 @@ writeOracle oracle@Oracle{..} datum =
               <> mustSpendScriptOutput outputRef (Redeemer $ toData Write)
           ledgerTx <- submitTxConstraintsWith @OracleScript lookups tx
           awaitTxConfirmed $ txId ledgerTx
-          logInfo @String $ "Updated oracle datum: " ++ show datum ++ "."
+          logInfo $ "Updated oracle datum: " ++ show datum ++ "."
     maybe notFound found
       =<< findOracle oracle
 

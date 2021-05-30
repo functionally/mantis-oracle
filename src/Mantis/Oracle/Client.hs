@@ -26,7 +26,7 @@ import Ledger.Typed.Scripts (DatumType, RedeemerType, ScriptType)
 import Mantis.Oracle        (findOracle, oracleValidator)
 import Mantis.Oracle.Types  (Oracle(..), Action(Read))
 import Plutus.Contract      (BlockchainActions, Contract, Endpoint, HasBlockchainActions, type (.\/), awaitTxConfirmed, endpoint, handleError, logError, logInfo, submitTxConstraintsWith)
-import PlutusTx             (toData)
+import PlutusTx             (Data, toData)
 import Prelude              ((<>))
 
 import qualified Data.Map as M (singleton)
@@ -41,11 +41,10 @@ instance ScriptType Client where
 
 readOracleConstraints :: HasBlockchainActions s
                       => Oracle
-                      -> Contract w s Text (Maybe (ScriptLookups a, TxConstraints i o, Integer))
+                      -> Contract w s Text (Maybe (ScriptLookups a, TxConstraints i o, Data))
 readOracleConstraints oracle@Oracle{..} =
   let
     found (outputRef, output, datum) =
-      
       let
          lookups = otherScript (oracleValidator oracle)
                 <> unspentOutputs (M.singleton outputRef output)
@@ -65,20 +64,20 @@ readOracleConstraints oracle@Oracle{..} =
 
 readOracle :: HasBlockchainActions s
            => Oracle
-           -> Contract w s Text Integer
+           -> Contract w s Text (Maybe Data)
 readOracle oracle =
   let
     notFound =
       do
         logError @String "Oracle not found."
-        return (-1)
+        return Nothing
     found (lookups, tx, datum) =
       do
-        logInfo @String $ "Found oracle with datum:  " ++ show datum ++ "."
+        logInfo $ "Found oracle with datum: " ++ show datum ++ "."
         ledgerTx <- submitTxConstraintsWith @Client lookups tx
         awaitTxConfirmed $ txId ledgerTx
-        logInfo @String $ "Transaction succesful: " ++ show (txId ledgerTx) ++ "."
-        return datum
+        logInfo $ "Transaction succesful: " ++ show (txId ledgerTx) ++ "."
+        return $ Just datum
   in
     maybe notFound found
       =<< readOracleConstraints oracle
@@ -88,8 +87,8 @@ type ClientSchema = BlockchainActions
                 .\/ Endpoint "read" ()
 
 
-runOracleClient :: Oracle ->
-                   Contract (Last Value) ClientSchema Text ()
+runOracleClient :: Oracle
+                -> Contract (Last Value) ClientSchema Text ()
 runOracleClient oracle =
   let
     read' =
