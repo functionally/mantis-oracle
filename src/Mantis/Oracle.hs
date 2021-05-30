@@ -168,12 +168,12 @@ findOracle oracle@Oracle{..} =
     return
       $ case M.toList utxos of
           [(oref, o@TxOutTx{..})] -> do
-                           datum <-
-                             fetchDatum txOutTxOut
-                                . flip M.lookup
-                                $ txData txOutTxTx
-                           return (oref, o, datum)
-          _            -> Nothing
+                                       datum <-
+                                         fetchDatum txOutTxOut
+                                            . flip M.lookup
+                                            $ txData txOutTxTx
+                                       return (oref, o, datum)
+          _                       -> Nothing
 
 
 {-# INLINABLE fetchDatum #-}
