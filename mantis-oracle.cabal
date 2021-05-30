@@ -8,6 +8,7 @@ copyright         : (c) 2021 Brian W Bush
 license           : MIT
 license-file      : LICENSE
 extra-source-files: ReadMe.md
+                  , transaction.png
 
 homepage   : https://github.com/functionally/mantis-oracle/ReadMe.md
 bug-reports: https://github.com/functionally/mantis-oracle/issues/
