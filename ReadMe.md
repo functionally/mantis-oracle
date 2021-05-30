@@ -41,7 +41,7 @@ The oracle can perform three simple actions:
 Usage
 -----
 
-The oracle can be incorporated into other smart-contract scripts that use the oracle's value in their validation logicvia the `readOracleConstraints` function in [`Mantis.Oracle.Client`](src/Mantis/Oracle/Client.hs), which returns the correct lookups, transaction constraints, and datum for a script endpoint to employ the oracle. The `readOracle` function is the simples example of an endpoint: it just reads the oracle value and performs no other actions.
+The oracle can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic via the `readOracleConstraints` function in [`Mantis.Oracle.Client`](src/Mantis/Oracle/Client.hs), which returns the correct lookups, transaction constraints, and datum for a script endpoint to employ the oracle. The `readOracle` function is the simplest example of an endpoint: it just reads the oracle value and performs no other actions.
 
 
 Example

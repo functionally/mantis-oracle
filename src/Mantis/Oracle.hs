@@ -1,3 +1,18 @@
+-----------------------------------------------------------------------------
+--
+-- Module      :  $Headers
+-- Copyright   :  (c) 2021 Brian W Bush
+-- License     :  MIT
+--
+-- Maintainer  :  Brian W Bush <code@functionally.io>
+-- Stability   :  Experimental
+-- Portability :  Portable
+--
+-- | Oracle for general data.
+--
+-----------------------------------------------------------------------------
+
+
 {-# LANGUAGE AllowAmbiguousTypes   #-}
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE FlexibleContexts      #-}
@@ -14,10 +29,12 @@
 
 
 module Mantis.Oracle (
+-- * Oracle
   OracleScript
 , oracleInstance
 , oracleValidator
 , oracleAddress
+-- * Access
 , findOracle
 , fetchDatum
 ) where
@@ -43,11 +60,13 @@ unstableMakeIsData ''Action
 
 
 {-# INLINABLE makeValidator #-}
-makeValidator :: Oracle
-              -> Data
-              -> Action
-              -> ScriptContext
-              -> Bool
+
+-- | Make the validator for the oracle.
+makeValidator :: Oracle         -- ^ The oracle.
+              -> Data           -- ^ The datum.
+              -> Action         -- ^ The redeemer.
+              -> ScriptContext  -- ^ The context.
+              -> Bool           -- ^ Whether the transaction is valid.
 makeValidator Oracle{..} inputDatum redeemer context@ScriptContext{..} =
 
   let
@@ -105,6 +124,7 @@ makeValidator Oracle{..} inputDatum redeemer context@ScriptContext{..} =
       Write  -> singleDatum  && controlled  && datumPresent
 
 
+-- | Type for the script.
 data OracleScript
 
 instance ScriptType OracleScript  where
@@ -112,8 +132,9 @@ instance ScriptType OracleScript  where
     type instance RedeemerType OracleScript  = Action
 
 
-oracleInstance :: Oracle
-               -> ScriptInstance OracleScript
+-- | Compute the instance for an oracle.
+oracleInstance :: Oracle                      -- ^ The oracle.
+               -> ScriptInstance OracleScript -- ^ The instance.
 oracleInstance oracle = 
   validator @OracleScript
     ($$(compile [|| makeValidator ||]) `applyCode` liftCode oracle)
@@ -122,19 +143,22 @@ oracleInstance oracle =
       wrap = wrapValidator @Data @Action
 
 
-oracleValidator :: Oracle
-                -> Validator
+-- | Compute the validator for an oracle.
+oracleValidator :: Oracle    -- ^ The oracle.
+                -> Validator -- ^ The validator.
 oracleValidator = validatorScript . oracleInstance
 
 
-oracleAddress :: Oracle
-              -> Address
+-- | Compute the address for an oracle.
+oracleAddress :: Oracle  -- ^ The oracle.
+              -> Address -- ^ The script address.
 oracleAddress = scriptAddress . oracleValidator
 
 
+-- | Find an oracle on the blockchain.
 findOracle :: HasBlockchainActions s
-           => Oracle
-           -> Contract w s Text (Maybe (TxOutRef, TxOutTx, Data))
+           => Oracle                                              -- ^ The oracle.
+           -> Contract w s Text (Maybe (TxOutRef, TxOutTx, Data)) -- ^ Action for finding the oracle's UTxO and datum.
 findOracle oracle@Oracle{..} =
   do
     utxos <-
@@ -143,20 +167,21 @@ findOracle oracle@Oracle{..} =
         <$> utxoAt (oracleAddress oracle)
     return
       $ case M.toList utxos of
-          [(oref, o)] -> do
+          [(oref, o@TxOutTx{..})] -> do
                            datum <-
-                             fetchDatum (txOutTxOut o)
-                                $ \dh -> M.lookup dh
-                                $ txData
-                                $ txOutTxTx o
+                             fetchDatum txOutTxOut
+                                . flip M.lookup
+                                $ txData txOutTxTx
                            return (oref, o, datum)
           _            -> Nothing
 
 
 {-# INLINABLE fetchDatum #-}
-fetchDatum :: TxOut
-           -> (DatumHash -> Maybe Datum)
-           -> Maybe Data
+
+-- | Retrieve the oracle's datum from a transaction output.
+fetchDatum :: TxOut                      -- ^ The transaction output.
+           -> (DatumHash -> Maybe Datum) -- ^ Function for looking up the datum, given its hash.
+           -> Maybe Data                 -- ^ The datum, if it was found.
 fetchDatum TxOut{..} fetch =
   do
     hash <- txOutDatumHash

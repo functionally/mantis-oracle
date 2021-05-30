@@ -1,9 +1,20 @@
 cabal-version     : 2.4
 name              : mantis-oracle
-version           : 0.1.1.0
-author            : Brian W Bush
-maintainer        : code@functionally.io
-extra-source-files: CHANGELOG.md
+description       : This Cardano oracle reports structured data (namely, the `PlutuxTx.Data` type) to a transaction if the fee, as a quantity of a fungible token, is paid. It can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic.
+version           : 0.1.1.2
+author            : Brian W Bush <code@functionally.io>
+maintainer        : Brian W Bush <code@functionally.io>
+copyright         : (c) 2021 Brian W Bush
+license           : MIT
+license-file      : LICENSE
+extra-source-files: ReadMe.md
+
+homepage   : https://github.com/functionally/mantis-oracle/ReadMe.md
+bug-reports: https://github.com/functionally/mantis-oracle/issues/
+
+source-repository head
+  type    : git
+  location: https://github.com/functionally/mantis-oracle.git
 
 library
   hs-source-dirs  : src
@@ -36,4 +47,3 @@ executable sofr-oracle
                    , text
    default-language: Haskell2010
    ghc-options     : -Wall
-

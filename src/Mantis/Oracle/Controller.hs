@@ -1,3 +1,18 @@
+-----------------------------------------------------------------------------
+--
+-- Module      :  $Headers
+-- Copyright   :  (c) 2021 Brian W Bush
+-- License     :  MIT
+--
+-- Maintainer  :  Brian W Bush <code@functionally.io>
+-- Stability   :  Experimental
+-- Portability :  Portable
+--
+-- | Controlling the general-purpose oracle.
+--
+-----------------------------------------------------------------------------
+
+
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
@@ -8,10 +23,13 @@
 
 
 module Mantis.Oracle.Controller (
+-- * Schema
   OracleSchema
+-- * Endpoints
 , createOracle
 , deleteOracle
 , writeOracle
+-- * Utilities
 , runOracleController
 ) where
 
@@ -33,9 +51,10 @@ import Prelude              ((<>))
 import qualified Data.Map as M (singleton)
 
 
+-- | Create an oracle.
 createOracle :: HasBlockchainActions s
-             => Parameters
-             -> Contract w s Text Oracle
+             => Parameters               -- ^ Parameters defining the oracle.
+             -> Contract w s Text Oracle -- ^ Action for creating the oracle.
 createOracle parameters =
   do
     let
@@ -44,6 +63,7 @@ createOracle parameters =
     return oracle
 
 
+-- | Schema for controlling the oracle.
 type OracleSchema =
       BlockchainActions
   .\/ Endpoint "read"   ()
@@ -51,10 +71,11 @@ type OracleSchema =
   .\/ Endpoint "delete" ()
 
 
+-- | Endpoint for writing datum to the oracle.
 writeOracle :: HasBlockchainActions s
-            => Oracle
-            -> Data
-            -> Contract w s Text ()
+            => Oracle               -- ^ The oracle.
+            -> Data                 -- ^ The datum to be written.
+            -> Contract w s Text () -- ^ Action for writing the datum to the oracle.
 writeOracle oracle@Oracle{..} datum =
   do
     owner <- pubKeyHash <$> ownPubKey
@@ -84,9 +105,10 @@ writeOracle oracle@Oracle{..} datum =
       =<< findOracle oracle
 
 
+-- | Endpoint for deleting (closing) the oracle.
 deleteOracle :: HasBlockchainActions s
-             => Oracle
-             -> Contract w s Text ()
+             => Oracle               -- ^ The oracle.
+             -> Contract w s Text () -- ^ Action to close the oracle.
 deleteOracle oracle@Oracle{..} =
   do
     owner <- pubKeyHash <$> ownPubKey
@@ -108,8 +130,9 @@ deleteOracle oracle@Oracle{..} =
       =<< findOracle oracle
 
 
-runOracleController :: Parameters
-                    -> Contract (Last Oracle) OracleSchema Text ()
+-- | Create the oracle and run its control endpoints.
+runOracleController :: Parameters                                  -- ^ The oracle's parameters.
+                    -> Contract (Last Oracle) OracleSchema Text () -- ^ Action for creating and running the oracle.
 runOracleController parameters =
   do
     oracle <- createOracle parameters

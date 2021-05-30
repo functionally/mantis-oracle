@@ -1,3 +1,18 @@
+-----------------------------------------------------------------------------
+--
+-- Module      :  $Headers
+-- Copyright   :  (c) 2021 Brian W Bush
+-- License     :  MIT
+--
+-- Maintainer  :  Brian W Bush <code@functionally.io>
+-- Stability   :  Experimental
+-- Portability :  Portable
+--
+-- | Client access for the general-purpose oracle.
+--
+-----------------------------------------------------------------------------
+
+
 {-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE NoImplicitPrelude #-}
@@ -9,10 +24,13 @@
 
 
 module Mantis.Oracle.Client (
+-- * Script and Schema
   ClientScript
 , ClientSchema
+-- * Enpoints
 , readOracleConstraints
 , readOracle
+-- * Utilities
 , runOracleClient
 ) where
 
@@ -33,6 +51,7 @@ import Prelude              ((<>))
 import qualified Data.Map as M (singleton)
 
 
+-- | Oracle script for clients.
 data ClientScript
 
 instance ScriptType ClientScript where
@@ -40,9 +59,10 @@ instance ScriptType ClientScript where
   type instance RedeemerType ClientScript = ()
 
 
+-- | Compute the lookup and constratins for reading the oracle on-chain.
 readOracleConstraints :: HasBlockchainActions s
-                      => Oracle
-                      -> Contract w s Text (Maybe (ScriptLookups a, TxConstraints i o, Data))
+                      => Oracle                                                               -- ^ The oracle.
+                      -> Contract w s Text (Maybe (ScriptLookups a, TxConstraints i o, Data)) -- ^ Action for computing the oracle's lookups, constraints, and data.
 readOracleConstraints oracle@Oracle{..} =
   let
     found (outputRef, output, datum) =
@@ -63,9 +83,10 @@ readOracleConstraints oracle@Oracle{..} =
       return $ found <$> inst
 
 
+-- | Endpoint for reading the datum from the oracle.
 readOracle :: HasBlockchainActions s
-           => Oracle
-           -> Contract w s Text (Maybe Data)
+           => Oracle                         -- ^ The oracle.
+           -> Contract w s Text (Maybe Data) -- ^ Action for reading the datum.
 readOracle oracle =
   let
     notFound =
@@ -84,12 +105,14 @@ readOracle oracle =
       =<< readOracleConstraints oracle
 
 
+-- | Schema for reading the oracle.
 type ClientSchema = BlockchainActions
                 .\/ Endpoint "read" ()
 
 
-runOracleClient :: Oracle
-                -> Contract (Last Value) ClientSchema Text ()
+-- | Repeatedly read the oracle's datum from its endpoint.
+runOracleClient :: Oracle                                     -- ^ The oracle.
+                -> Contract (Last Value) ClientSchema Text () -- ^ The action for repeatedly reading the oracle.
 runOracleClient oracle =
   let
     read' =

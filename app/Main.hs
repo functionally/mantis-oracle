@@ -1,3 +1,18 @@
+-----------------------------------------------------------------------------
+--
+-- Module      :  $Headers
+-- Copyright   :  (c) 2021 Brian W Bush
+-- License     :  MIT
+--
+-- Maintainer  :  Brian W Bush <code@functionally.io>
+-- Stability   :  Experimental
+-- Portability :  Portable
+--
+-- | Example usaged for the oracle.
+--
+-----------------------------------------------------------------------------
+
+
 {-# LANGUAGE DataKinds          #-}
 {-# LANGUAGE FlexibleContexts   #-}
 {-# LANGUAGE NoImplicitPrelude  #-}
@@ -8,6 +23,7 @@
 
 
 module Main (
+-- * Example
   main
 ) where
 
@@ -37,7 +53,8 @@ import qualified Plutus.Contract            as C (BlockchainActions, Contract, h
 import qualified Plutus.Trace.Emulator      as E (EmulatorConfig(..), EmulatorTrace, activateContractWallet, callEndpoint, observableState, runEmulatorTraceIO', waitNSlots)
 
 
-main :: IO ()
+-- | Run the example.
+main :: IO () -- ^ Action for running the example.
 main =
 
   let
@@ -88,9 +105,9 @@ main =
       $ testTrace Parameters{..}
 
 
-
-testTrace :: Parameters
-          -> E.EmulatorTrace ()
+-- | Trace the oracles operation for a given set of parameters.
+testTrace :: Parameters         -- ^ The parameters for the oracle.
+          -> E.EmulatorTrace () -- ^ The action for running the test.
 testTrace parameters =
   do
 
@@ -159,8 +176,9 @@ testTrace parameters =
     void $ E.waitNSlots 3
 
 
-peekDatum :: Oracle
-          -> C.Contract () C.BlockchainActions Text a
+-- | Log the oracle's current data.
+peekDatum :: Oracle                                    -- ^ The oracle.
+          -> C.Contract () C.BlockchainActions Text () -- ^ Action for logging the oracle's data.
 peekDatum oracle =
   do
     inst <- findOracle oracle
@@ -171,9 +189,10 @@ peekDatum oracle =
       >> peekDatum oracle
 
 
-peekFunds :: Oracle
-          -> Maybe Integer
-          -> C.Contract (Last Value) C.BlockchainActions Text ()
+-- } Log the funds in a wallet or in the oracle script.
+peekFunds :: Oracle                                              -- ^ The oracle.
+          -> Maybe Integer                                       -- ^ The wallet number, or `Nothing` for the oracle script.
+          -> C.Contract (Last Value) C.BlockchainActions Text () -- ^ Action for logging the funds.
 peekFunds oracle@Oracle{..} i =
   do
     let

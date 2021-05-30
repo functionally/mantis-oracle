@@ -1,0 +1,348 @@
+Slot 00000: TxnValidate c30be98c4e2bd64263bd3a55253f5593808e0654eb7cb89a1958f49303018bb6
+Slot 00000: SlotAdd Slot 1
+
+Slot 00001: *** USER LOG: Wallet 1 starts the oracle, but does not set its value yet.
+Slot 00001: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 1}:
+  Contract instance started
+Slot 00001: *** CONTRACT LOG: "Created oracle: Oracle {controlToken = (addacafe,\"BRIO\"), datumToken = (addacafe,\"SOFR\"), requiredFee = Value (Map [(addacafe,Map [(\"PIGY\",1000000)])])}"
+Slot 00001: SlotAdd Slot 2
+
+Slot 00002: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 1}:
+  Sending contract state to Thread 0
+Slot 00002: SlotAdd Slot 3
+
+Slot 00003: *** USER LOG: Oracle {controlToken = (addacafe,"BRIO"), datumToken = (addacafe,"SOFR"), requiredFee = Value (Map [(addacafe,Map [("PIGY",1000000)])])}
+Slot 00003: 00000000-0000-4000-8000-000000000001 {Contract instance for wallet 1}:
+  Contract instance started
+Slot 00003: 00000000-0000-4000-8000-000000000002 {Contract instance for wallet 2}:
+  Contract instance started
+Slot 00003: 00000000-0000-4000-8000-000000000003 {Contract instance for wallet 3}:
+  Contract instance started
+Slot 00003: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00003: 00000000-0000-4000-8000-000000000004 {Contract instance for wallet 4}:
+  Contract instance started
+Slot 00003: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00003: *** USER LOG: Wallet 4 just watches transactions of the oracle.
+Slot 00003: 00000000-0000-4000-8000-000000000005 {Contract instance for wallet 1}:
+  Contract instance started
+Slot 00003: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00003: 00000000-0000-4000-8000-000000000006 {Contract instance for wallet 4}:
+  Contract instance started
+Slot 00003: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00003: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00003: SlotAdd Slot 4
+
+Slot 00004: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00004: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00004: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00004: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00004: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00004: SlotAdd Slot 5
+
+Slot 00005: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00005: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00005: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00005: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00005: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00005: SlotAdd Slot 6
+
+Slot 00006: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00006: *** USER LOG: Wallet 2 has sufficient fee token to read the oracle twice.
+Slot 00006: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2}:
+  Contract instance started
+Slot 00006: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00006: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00006: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00006: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00006: SlotAdd Slot 7
+
+Slot 00007: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00007: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00007: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00007: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00007: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00007: SlotAdd Slot 8
+
+Slot 00008: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00008: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00008: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00008: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00008: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00008: SlotAdd Slot 9
+
+Slot 00009: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00009: *** USER LOG: Wallet 2 tries to read the oracle before it holds data.
+Slot 00009: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00009: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00009: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00009: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00009: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2}:
+  Receive endpoint call: Object (fromList [("tag",String "read"),("value",Object (fromList [("unEndpointValue",Array [])]))])
+Slot 00009: *** CONTRACT LOG: "Oracle not found."
+Slot 00009: SlotAdd Slot 10
+
+Slot 00010: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00010: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00010: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00010: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00010: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00010: SlotAdd Slot 11
+
+Slot 00011: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00011: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00011: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00011: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00011: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00011: SlotAdd Slot 12
+
+Slot 00012: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00012: *** USER LOG: Wallet 1 writes a value to the oracle.
+Slot 00012: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00012: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00012: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00012: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00012: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 1}:
+  Receive endpoint call: Object (fromList [("tag",String "write"),("value",Object (fromList [("unEndpointValue",String "1905dc")]))])
+Slot 00012: W1: TxSubmit: bebbbee80a25d4ba39f607b9dc54b4fab929741fa60ed9675d731bb0d113877a
+Slot 00012: TxnValidate bebbbee80a25d4ba39f607b9dc54b4fab929741fa60ed9675d731bb0d113877a
+Slot 00012: SlotAdd Slot 13
+
+Slot 00013: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00013: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00013: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00013: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00013: *** CONTRACT LOG: "Oracle value: 1500."
+Slot 00013: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
+Slot 00013: *** CONTRACT LOG: "Set oracle datum: I 1500."
+Slot 00013: SlotAdd Slot 14
+
+Slot 00014: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00014: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00014: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00014: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00014: *** CONTRACT LOG: "Oracle value: 1500."
+Slot 00014: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
+Slot 00014: SlotAdd Slot 15
+
+Slot 00015: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00015: *** USER LOG: Wallet 2 read the oracle.
+Slot 00015: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00015: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00015: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00015: *** CONTRACT LOG: "Oracle value: 1500."
+Slot 00015: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
+Slot 00015: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2}:
+  Receive endpoint call: Object (fromList [("tag",String "read"),("value",Object (fromList [("unEndpointValue",Array [])]))])
+Slot 00015: *** CONTRACT LOG: "Found oracle with datum: I 1500."
+Slot 00015: W2: TxSubmit: 4eda51ad65209c8a305d5e3e818a87d0997d1c8257962617d1dd8019297ea713
+Slot 00015: TxnValidate 4eda51ad65209c8a305d5e3e818a87d0997d1c8257962617d1dd8019297ea713
+Slot 00015: SlotAdd Slot 16
+
+Slot 00016: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00016: *** CONTRACT LOG: "Transaction succesful: 4eda51ad65209c8a305d5e3e818a87d0997d1c8257962617d1dd8019297ea713."
+Slot 00016: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00016: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00016: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00016: *** CONTRACT LOG: "Oracle value: 1500."
+Slot 00016: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00016: SlotAdd Slot 17
+
+Slot 00017: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00017: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00017: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00017: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00017: *** CONTRACT LOG: "Oracle value: 1500."
+Slot 00017: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00017: SlotAdd Slot 18
+
+Slot 00018: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00018: *** USER LOG: Wallet 3 doesn't have sufficient fee token to read the oracle at all.
+Slot 00018: 00000000-0000-4000-8000-000000000008 {Contract instance for wallet 3}:
+  Contract instance started
+Slot 00018: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00018: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00018: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00018: *** CONTRACT LOG: "Oracle value: 1500."
+Slot 00018: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00018: SlotAdd Slot 19
+
+Slot 00019: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00019: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00019: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00019: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00019: *** CONTRACT LOG: "Oracle value: 1500."
+Slot 00019: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00019: SlotAdd Slot 20
+
+Slot 00020: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00020: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00020: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00020: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00020: *** CONTRACT LOG: "Oracle value: 1500."
+Slot 00020: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00020: SlotAdd Slot 21
+
+Slot 00021: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00021: *** USER LOG: Wallet 3 tries to read the oracle, even though it has insufficient fee tokens.
+Slot 00021: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00021: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00021: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00021: *** CONTRACT LOG: "Oracle value: 1500."
+Slot 00021: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00021: 00000000-0000-4000-8000-000000000008 {Contract instance for wallet 3}:
+  Receive endpoint call: Object (fromList [("tag",String "read"),("value",Object (fromList [("unEndpointValue",Array [])]))])
+Slot 00021: *** CONTRACT LOG: "Found oracle with datum: I 1500."
+Slot 00021: *** CONTRACT LOG: "WalletError (InsufficientFunds \"Total: Value (Map [(,Map [(\\\"\\\",100000000)]),(addacafe,Map [(\\\"PIGY\\\",500000)])]) expected: Value (Map [(,Map [(\\\"\\\",10)]),(addacafe,Map [(\\\"PIGY\\\",1000000)])])\")"
+Slot 00021: SlotAdd Slot 22
+
+Slot 00022: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00022: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00022: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00022: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00022: *** CONTRACT LOG: "Oracle value: 1500."
+Slot 00022: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00022: SlotAdd Slot 23
+
+Slot 00023: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00023: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00023: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00023: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00023: *** CONTRACT LOG: "Oracle value: 1500."
+Slot 00023: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00023: SlotAdd Slot 24
+
+Slot 00024: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00024: *** USER LOG: Wallet 1 updates the value of the oracle.
+Slot 00024: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00024: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00024: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00024: *** CONTRACT LOG: "Oracle value: 1500."
+Slot 00024: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00024: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 1}:
+  Receive endpoint call: Object (fromList [("tag",String "write"),("value",Object (fromList [("unEndpointValue",String "1909c4")]))])
+Slot 00024: W1: TxSubmit: 6b8c1f5daa4568966c6603bc2ab6beaa300abc5d6312138a252a057e3ef77c67
+Slot 00024: TxnValidate 6b8c1f5daa4568966c6603bc2ab6beaa300abc5d6312138a252a057e3ef77c67
+Slot 00024: SlotAdd Slot 25
+
+Slot 00025: *** CONTRACT LOG: "Funds in Wallet 1: 99999980 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00025: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00025: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00025: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00025: *** CONTRACT LOG: "Oracle value: 2500."
+Slot 00025: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
+Slot 00025: *** CONTRACT LOG: "Updated oracle datum: I 2500."
+Slot 00025: SlotAdd Slot 26
+
+Slot 00026: *** CONTRACT LOG: "Funds in Wallet 1: 99999980 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00026: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00026: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00026: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00026: *** CONTRACT LOG: "Oracle value: 2500."
+Slot 00026: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
+Slot 00026: SlotAdd Slot 27
+
+Slot 00027: *** CONTRACT LOG: "Funds in Wallet 1: 99999980 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00027: *** USER LOG: Wallet 2 reads the oracle a second time.
+Slot 00027: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00027: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00027: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00027: *** CONTRACT LOG: "Oracle value: 2500."
+Slot 00027: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
+Slot 00027: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2}:
+  Receive endpoint call: Object (fromList [("tag",String "read"),("value",Object (fromList [("unEndpointValue",Array [])]))])
+Slot 00027: *** CONTRACT LOG: "Found oracle with datum: I 2500."
+Slot 00027: W2: TxSubmit: 04ec120e4d1e28e879a5d9b2d6bf81c8d116967c14c33ff86391ed9e0743ea5e
+Slot 00027: TxnValidate 04ec120e4d1e28e879a5d9b2d6bf81c8d116967c14c33ff86391ed9e0743ea5e
+Slot 00027: SlotAdd Slot 28
+
+Slot 00028: *** CONTRACT LOG: "Funds in Wallet 1: 99999980 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00028: *** CONTRACT LOG: "Transaction succesful: 04ec120e4d1e28e879a5d9b2d6bf81c8d116967c14c33ff86391ed9e0743ea5e."
+Slot 00028: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00028: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00028: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00028: *** CONTRACT LOG: "Oracle value: 2500."
+Slot 00028: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00028: SlotAdd Slot 29
+
+Slot 00029: *** CONTRACT LOG: "Funds in Wallet 1: 99999980 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00029: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00029: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00029: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00029: *** CONTRACT LOG: "Oracle value: 2500."
+Slot 00029: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00029: SlotAdd Slot 30
+
+Slot 00030: *** CONTRACT LOG: "Funds in Wallet 1: 99999980 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00030: *** USER LOG: Wallet 1 deletes the oracle.
+Slot 00030: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00030: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00030: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00030: *** CONTRACT LOG: "Oracle value: 2500."
+Slot 00030: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00030: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 1}:
+  Receive endpoint call: Object (fromList [("tag",String "delete"),("value",Object (fromList [("unEndpointValue",Array [])]))])
+Slot 00030: W1: TxSubmit: e855818b8c4de5a024c2659341691a7130277547e5843b4bcaba4ade08e88bcf
+Slot 00030: TxnValidate e855818b8c4de5a024c2659341691a7130277547e5843b4bcaba4ade08e88bcf
+Slot 00030: SlotAdd Slot 31
+
+Slot 00031: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Slot 00031: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00031: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00031: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00031: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00031: *** CONTRACT LOG: "Deleted oracle datum."
+Slot 00031: SlotAdd Slot 32
+
+Slot 00032: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Slot 00032: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00032: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00032: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00032: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00032: SlotAdd Slot 33
+
+Slot 00033: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Slot 00033: *** USER LOG: Wallet 2 tries to read the oracle after its deletion.
+Slot 00033: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00033: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00033: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00033: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00033: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2}:
+  Receive endpoint call: Object (fromList [("tag",String "read"),("value",Object (fromList [("unEndpointValue",Array [])]))])
+Slot 00033: *** CONTRACT LOG: "Oracle not found."
+Slot 00033: SlotAdd Slot 34
+
+Slot 00034: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Slot 00034: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00034: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00034: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00034: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00034: SlotAdd Slot 35
+
+Slot 00035: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Slot 00035: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00035: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00035: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00035: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00035: SlotAdd Slot 36
+
+Slot 00036: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Slot 00036: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00036: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00036: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00036: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00036: SlotAdd Slot 37
+
+Slot 00037: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Final balances
+Wallet 1: 
+    {addacafe, "BRIO"}: 1
+    {addacafe, "SOFR"}: 1
+    {addacafe, "PIGY"}: 2000000
+    {, ""}: 99999970
+Wallet 2: 
+    {, ""}: 99999980
+Wallet 3: 
+    {, ""}: 100000000
+    {addacafe, "PIGY"}: 500000
+Wallet 4: 
+    {, ""}: 100000000
