@@ -2,5 +2,11 @@ cradle:
   cabal:
     - path: "./src"
       component: "lib:mantis-oracle"
-    - path: "./app"
-      component: "exe:sofr-oracle"
+    - path: "./app/Test.hs"
+      component: "exe:mantis-oracle-test"
+    - path: "./app/PAB.hs"
+      component: "exe:mantis-oracle-pab"
+    - path: "./app/Controller.hs"
+      component: "exe:mantis-oracle-controller"
+    - path: "./app/Client.hs"
+      component: "exe:mantis-oracle-client"
