@@ -46,7 +46,7 @@ import Mantis.Oracle.Client (readOracle)
 import Mantis.Oracle.Types  (Action(..), Oracle(..), Parameters, makeOracle)
 import Plutus.Contract      (BlockchainActions, Contract, Endpoint, HasBlockchainActions, type (.\/), awaitTxConfirmed, endpoint, logError, logInfo, ownPubKey, select, submitTxConstraints, submitTxConstraintsWith, tell)
 import PlutusTx             (Data, toData)
-import Prelude              ((<>))
+import Prelude              (String, (<>), show)
 
 import qualified Data.Map as M (singleton)
 

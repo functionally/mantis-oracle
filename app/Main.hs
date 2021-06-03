@@ -28,7 +28,7 @@ module Main (
 ) where
 
 
-import PlutusTx.Prelude hiding ((<>), last)
+import PlutusTx.Prelude hiding ((<>))
 
 import Control.Monad            (void)
 import Data.Default             (def)
@@ -42,7 +42,7 @@ import Mantis.Oracle            (findOracle, oracleAddress)
 import Mantis.Oracle.Client     (runOracleClient)
 import Mantis.Oracle.Controller (runOracleController)
 import Mantis.Oracle.Types      (Oracle(..), Parameters(..))
-import Prelude                  ((<>))
+import Prelude                  (IO, String, (<>), show)
 import PlutusTx                 (Data(I))
 import Wallet.Emulator.Wallet   (Wallet(..))
 

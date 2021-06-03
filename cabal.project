@@ -14,6 +14,7 @@ source-repository-package
   location: https://github.com/input-output-hk/plutus.git
   subdir:
     freer-extras
+    marlowe
     playground-common
     plutus-core
     plutus-contract
@@ -25,7 +26,7 @@ source-repository-package
     plutus-use-cases
     prettyprinter-configurable
     quickcheck-dynamic
-  tag: 476409eaee94141e2fe076a7821fc2fcdec5dfcb
+  tag: 13da6d416b2b47cdb6f287ff078b9e759bb90b7f
 
 -- The following sections are copied from the 'plutus' repository cabal.project at the revision
 -- given above.
