@@ -1,7 +1,7 @@
 cabal-version     : 2.4
 name              : mantis-oracle
 description       : This Cardano oracle reports structured data (namely, the `PlutuxTx.Data` type) to a transaction if the fee, as a quantity of a fungible token, is paid. It can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic.
-version           : 0.1.1.2
+version           : 0.1.1.3
 author            : Brian W Bush <code@functionally.io>
 maintainer        : Brian W Bush <code@functionally.io>
 copyright         : (c) 2021 Brian W Bush
@@ -36,7 +36,7 @@ library
 
 executable mantis-oracle-test
    hs-source-dirs  : app
-   main-is         : Test.hs
+   main-is         : test.hs
    build-depends   : base ^>=4.14.1.0
                    , containers
                    , data-default
@@ -51,18 +51,18 @@ executable mantis-oracle-test
 
 executable mantis-oracle-pab
    hs-source-dirs  : app
-   main-is         : PAB.hs
+   main-is         : pab.hs
+   other-modules   : Orphans
    build-depends   : base ^>=4.14.1.0
                    , aeson
-                   , data-default
                    , freer-extras
                    , freer-simple
                    , mantis-oracle
                    , playground-common
                    , plutus-contract
                    , plutus-ledger
-                   , plutus-ledger-api
                    , plutus-pab
+                   , plutus-tx
                    , plutus-use-cases
                    , prettyprinter
                    , text
@@ -71,7 +71,7 @@ executable mantis-oracle-pab
 
 executable mantis-oracle-controller
    hs-source-dirs  : app
-   main-is         : Controller.hs
+   main-is         : controller.hs
    build-depends   : base ^>=4.14.1.0
                    , bytestring
                    , regex-tdfa ^>= 1.3.1.0
@@ -83,7 +83,7 @@ executable mantis-oracle-controller
 
 executable mantis-oracle-client
    hs-source-dirs  : app
-   main-is         : Client.hs
+   main-is         : client.hs
    build-depends   : base ^>=4.14.1.0
                    , aeson
                    , mantis-oracle
