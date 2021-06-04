@@ -65,7 +65,8 @@ updateOracle :: UUID
 updateOracle uuid x =
   runReq defaultHttpConfig
     $ do
-      v <- req
+      v <-
+        req
           POST
           (
             http "127.0.0.1"
@@ -91,7 +92,8 @@ getSofr :: IO (Maybe Data)
 getSofr =
   runReq defaultHttpConfig
     $ do
-      result <- req
+      result <-
+        req
           GET
           (
             https "markets.newyorkfed.org"

@@ -75,10 +75,8 @@ executable mantis-oracle-controller
    build-depends   : base ^>=4.14.1.0
                    , aeson
                    , bytestring
-                   , playground-common
                    , plutus-ledger-api
                    , plutus-tx
-                   , regex-tdfa ^>= 1.3.1.0
                    , req ^>= 3.9.0
                    , text
                    , uuid
@@ -90,9 +88,6 @@ executable mantis-oracle-client
    hs-source-dirs  : app
    main-is         : client.hs
    build-depends   : base ^>=4.14.1.0
-                   , aeson
-                   , mantis-oracle
-                   , plutus-ledger
                    , req ^>= 3.9.0
                    , text
                    , uuid
