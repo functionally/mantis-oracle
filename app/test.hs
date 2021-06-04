@@ -8,7 +8,7 @@
 -- Stability   :  Experimental
 -- Portability :  Portable
 --
--- | Example usaged for the oracle.
+-- | Example usage for the oracle.
 --
 -----------------------------------------------------------------------------
 
