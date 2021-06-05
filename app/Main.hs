@@ -25,10 +25,12 @@ module Main (
 
 
 import Data.Text                    (Text)
+import Data.Version                 (showVersion)
 import Ledger.Value                 (CurrencySymbol(..), TokenName(..))
 import Mantis.Oracle.Client.PAB     (readOraclePAB)
 import Mantis.Oracle.Controller.PAB (runOraclePAB)
 import Mantis.Oracle.SOFR           (fetchSOFR)
+import Paths_mantis_oracle          (version)
 import Wallet.Emulator.Wallet       (Wallet(..))
 
 import qualified Data.ByteString.Char8      as BS       (pack)
@@ -37,6 +39,7 @@ import qualified Mantis.Oracle.Simulate.PAB as Simulate (runPAB)
 import qualified Options.Applicative        as O
 
 
+-- | Available commands.
 data Command =
     Test
     {
@@ -75,10 +78,15 @@ main :: IO () -- ^ Action for running the example.
 main =
   do
     let
+      versionOption =
+        O.infoOption
+          ("Mantis Oracle " ++ showVersion version ++ ", (c) 2021 Brian W Bush <code@functionally.io>")
+          (O.long "version" <> O.help "Show version.")
       parser =
         O.info
         (
                O.helper
+           <*> versionOption
            <*> O.hsubparser (
                     O.command "trace"
                     (
