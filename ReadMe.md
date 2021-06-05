@@ -73,3 +73,24 @@ The PAB example uses three executables:
 
         mantis-oracle employ 127.0.0.1 8080 wallet-2.cid
 
+
+Installation
+------------
+
+This package uses the [`haskell.nix`](https://input-output-hk.github.io/haskell.nix/) build system. Simply clone this repository and execute the build command:
+
+	nix-build -A mantis-oracle.components.exes.mantis-oracle -o build
+
+The executable result will be in `./build/bin/mantis-oracle`.
+
+Alternatively, one can use the `cabal install` installation approach, which relies on the [cabal.project](cabal.project) file and which is known to succeed with cabal 3.4.0.0 and ghc 8.10.4.
+
+
+Development environment
+-----------------------
+
+Due to quirks in how [`haskell.nix`](https://input-output-hk.github.io/haskell.nix/) and [`cabal.project`](https://cabal.readthedocs.io/en/3.4/cabal-project.html) interact, the following procedure needs to be followed to create a development environment for compiling `mantis`:
+
+1.  Run `nix-shell`. This takes a while to build unless you set `withHoogle = false` in [shell.nix](shell.nix).
+2.  Temporarily comment-out the `source-repository-package` lines in [cabal.project](cabal.project).
+3.  Run `cabal build`, `hoogle`, or other development tools defined in [shell.nix](shell.nix).
