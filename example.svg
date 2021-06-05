@@ -295,7 +295,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -713,16 +713,16 @@
     <text
        xml:space="preserve"
        style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333311px;line-height:1.10000002;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#8f1402;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="37.550507"
+       x="37.021339"
        y="209.75471"
        id="text966-9"><tspan
          sodipodi:role="line"
-         x="37.550507"
+         x="37.021336"
          y="209.75471"
          style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333311px;line-height:1.10000002;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;fill:#8f1402;fill-opacity:1;stroke-width:0.26458332"
-         id="tspan968-8">The client pays 10 $PIGY for their smart</tspan><tspan
+         id="tspan968-8">The client pays 2.5 $PIGY for their smart</tspan><tspan
          sodipodi:role="line"
-         x="37.550507"
+         x="37.021339"
          y="214.41138"
          style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333311px;line-height:1.10000002;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;fill:#8f1402;fill-opacity:1;stroke-width:0.26458332"
          id="tspan1003">contract to read the oracle datum.</tspan></text>
