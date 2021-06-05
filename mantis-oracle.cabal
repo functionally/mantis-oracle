@@ -37,13 +37,13 @@ library
                   , playground-common
                   , plutus-contract
                   , plutus-ledger
-                  , plutus-ledger-api
                   , plutus-pab
                   , plutus-tx
                   , plutus-tx-plugin
                   , plutus-use-cases
                   , prettyprinter
                   , req ^>= 3.9.0
+                  , serialise
                   , text
                   , uuid
                   , vector
@@ -56,6 +56,7 @@ executable mantis-oracle
    other-modules   : Paths_mantis_oracle
    autogen-modules : Paths_mantis_oracle
    build-depends   : base ^>=4.14.1.0
+                   , base16-bytestring
                    , bytestring
                    , mantis-oracle
                    , optparse-applicative

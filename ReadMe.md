@@ -74,6 +74,16 @@ The PAB example uses three executables:
         mantis-oracle employ 127.0.0.1 8080 wallet-2.cid
 
 
+Example for exporting the validator
+-----------------------------------
+
+The command-line `export` command will write the validator script and print its address.
+
+    mantis-oracle export cafeadda.BRIO cafeadda.SOFR cafeadda.PIGY 1000000 example.validator
+
+Here the policy ID is `cafeadda` (shortened for brevity in this example), the control token name is `BRIO`, the datum token name is `SOFR`, the fee token name is `PIGY`, and `1000000 PIGY` are required to use the oracle. The bytes of the validator are serialised to `example.validator`.
+
+
 Installation
 ------------
 

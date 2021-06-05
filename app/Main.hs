@@ -26,13 +26,16 @@ module Main (
 
 import Data.Text                    (Text)
 import Data.Version                 (showVersion)
-import Ledger.Value                 (CurrencySymbol(..), TokenName(..))
+import Ledger.Value                 (AssetClass, CurrencySymbol(..), TokenName(..), assetClass)
+import Mantis.Oracle                (exportOracle)
 import Mantis.Oracle.Client.PAB     (readOraclePAB)
 import Mantis.Oracle.Controller.PAB (runOraclePAB)
 import Mantis.Oracle.SOFR           (fetchSOFR)
+import Mantis.Oracle.Types          (Parameters(..), makeOracle)
 import Paths_mantis_oracle          (version)
 import Wallet.Emulator.Wallet       (Wallet(..))
 
+import qualified Data.ByteString.Base16     as Base16   (decode)
 import qualified Data.ByteString.Char8      as BS       (pack)
 import qualified Mantis.Oracle.Simulate     as Simulate (main)
 import qualified Mantis.Oracle.Simulate.PAB as Simulate (runPAB)
@@ -69,6 +72,14 @@ data Command =
       host   :: Text
     , port   :: Int
     , wallet :: FilePath
+    }
+  | Export
+    {
+      controlAsset :: String
+    , datumAsset   :: String
+    , feeAsset     :: String
+    , feeAmount    :: Integer
+    , output       :: FilePath
     }
     deriving (Eq, Ord, Read, Show)
 
@@ -137,6 +148,19 @@ main =
                         )
                         $ O.progDesc "Employ an oracle in the PAB."
                     )
+                 <> O.command "export"
+                    (
+                      O.info
+                        (
+                          Export
+                            <$> O.strArgument     (O.metavar "CONTROL_ASSET" <> O.help "The asset class (<policy> ID `.` <name>) for the control token."       )
+                            <*> O.strArgument     (O.metavar "DATUM_ASSET"   <> O.help "The asset class (<policy> ID `.` <name>) for the datum token."         )
+                            <*> O.strArgument     (O.metavar "FEE_ASSET"     <> O.help "The asset class (<policy> ID `.` <name>) for the fee token."           )
+                            <*> O.argument O.auto (O.metavar "FEE_AMOUNT"    <> O.help "Number of fee tokens needed to read oracle."                           )
+                            <*> O.strArgument     (O.metavar "OUTPUT_FILE"   <> O.help "Output filename for the serialized validator."                         )
+                        )
+                        $ O.progDesc "Export the validator code and compute its address."
+                    )
                )
         )
         (
@@ -170,4 +194,25 @@ main =
                           host
                           port
                           uuid
-                        
+      Export{..}   -> do
+                        address <-
+                          exportOracle output
+                            . makeOracle
+                            $ Parameters
+                              (readAssetClass controlAsset)
+                              (readAssetClass datumAsset  )
+                              (readAssetClass feeAsset    )
+                              feeAmount
+                        print address
+
+
+-- | Read an asset class from a string with the policy ID in hexadecimal followed by a period and the asset name.
+readAssetClass :: String -> AssetClass
+readAssetClass text =
+  let
+    Right currency = Base16.decode . BS.pack $ takeWhile (/= '.') text
+    name           =                 BS.pack $ dropWhile (/= '.') text
+  in
+    assetClass 
+      (CurrencySymbol currency)
+      (TokenName      name    )

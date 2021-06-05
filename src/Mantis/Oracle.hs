@@ -34,6 +34,7 @@ module Mantis.Oracle (
 , oracleInstance
 , oracleValidator
 , oracleAddress
+, exportOracle
 -- * Access
 , findOracle
 , fetchDatum
@@ -42,16 +43,18 @@ module Mantis.Oracle (
 
 import PlutusTx.Prelude hiding ((<>))
 
+import Codec.Serialise      (serialise)
 import Data.Text            (Text)
 import Ledger               (Address, Datum(..), DatumHash, ScriptContext(..), TxOut(..), TxOutRef(..), TxOutTx(..), Validator, findDatum, findOwnInput, getContinuingOutputs, scriptAddress, txInInfoResolved, txData, txOutValue, valueSpent)
 import Ledger.Typed.Scripts (DatumType, RedeemerType, ScriptInstance, ScriptType, validator, validatorScript, wrapValidator)
 import Ledger.Value         (assetClassValueOf, geq)
 import Mantis.Oracle.Types  (Action(..), Oracle(..))
-import Prelude              ((<>))
+import Prelude              (FilePath, IO, (<>))
 import Plutus.Contract      (Contract, HasBlockchainActions, utxoAt)
 import PlutusTx             (Data, applyCode, compile, fromData, liftCode, makeLift, unstableMakeIsData)
 
-import qualified Data.Map.Strict as M (filter, lookup, toList)
+import qualified Data.ByteString.Lazy as LBS (writeFile)
+import qualified Data.Map.Strict      as M (filter, lookup, toList)
 
 
 makeLift ''Oracle
@@ -187,3 +190,17 @@ fetchDatum TxOut{..} fetch =
     hash <- txOutDatumHash
     Datum datum <- fetch hash
     fromData datum
+
+
+-- | Export the validator for an oracle and compute its address.
+exportOracle :: FilePath   -- ^ The filename for writing the validator bytes.
+             -> Oracle     -- ^ The oracle.
+             -> IO Address -- ^ Action writing the validator and returning its address.
+exportOracle filename oracle =
+  do
+    let
+      a = oracleAddress oracle
+      v = oracleValidator oracle
+    LBS.writeFile filename
+      $ serialise v
+    return a
