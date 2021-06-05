@@ -19,6 +19,7 @@
 
 
 module Main (
+-- * Entry point
   main
 ) where
 
@@ -28,6 +29,7 @@ import Control.Exception      (handle)
 import Control.Monad          (void)
 import Control.Monad.IO.Class (liftIO)
 import Data.Proxy             (Proxy (..))
+import Data.Text              (Text)
 import Data.UUID              (UUID)
 import Network.HTTP.Req       (HttpException, JsonResponse, POST(..), ReqBodyJson(..), (/:), defaultHttpConfig, http, port, req, responseStatusCode, runReq)
 import System.Environment     (getArgs)
@@ -36,29 +38,33 @@ import System.IO              (BufferMode(NoBuffering), hSetBuffering, stdout)
 import qualified Data.Text as T (pack)
 
 
-main :: IO ()
+-- | Read the oracle data on demand.
+main :: IO () -- ^ Action for reading the oracle data.
 main =
   do
-    [i :: Int] <- map read <$> getArgs
-    uuid <- read <$> readFile ('W' : show i ++ ".cid")
+    [filename] <- getArgs
+    uuid <- read <$> readFile filename
     let
       go =
         do
           putStrLn "Press enter to read oracle."
           void getLine
-          readOracle uuid
+          readOracle "127.0.0.1" 8080 uuid
           go
     hSetBuffering stdout NoBuffering
-    putStrLn $ "Client instance id for Wallet " ++ show i ++ ": " ++ show uuid
+    putStrLn $ "Client instance id for Wallet " ++ show uuid ++ "."
     go
 
 
-readOracle :: UUID
-           -> IO ()
-readOracle uuid =
+-- | Read the oracle data.
+readOracle :: Text  -- ^ The IP address of the PAB.
+           -> Int   -- ^ The port number of the PAB.
+           -> UUID  -- ^ The Contract ID (CID) for the oracle.
+           -> IO () -- ^ Action for reading the oracle.
+readOracle address portNumber uuid =
   let
     h :: HttpException -> IO ()
-    h _ = threadDelay 1_000_000 >> readOracle uuid
+    h _ = threadDelay 1_000_000 >> readOracle address portNumber uuid
   in
     handle h
       . runReq defaultHttpConfig
@@ -67,7 +73,7 @@ readOracle uuid =
           req
             POST
             (
-              http "127.0.0.1"
+              http address
                  /: "api"
                  /: "new"
                  /: "contract"
@@ -78,7 +84,7 @@ readOracle uuid =
             )
             (ReqBodyJson ())
             (Proxy :: Proxy (JsonResponse ()))
-            (port 8080)
+            (port portNumber)
         liftIO
           $ if responseStatusCode result /= 200
             then putStrLn "Error reading oracle."

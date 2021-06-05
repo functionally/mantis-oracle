@@ -16,7 +16,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 
-module Orphans (
+module Mantis.Orphans (
 ) where
 
 

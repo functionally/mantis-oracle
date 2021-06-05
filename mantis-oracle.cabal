@@ -22,15 +22,27 @@ library
   exposed-modules : Mantis.Oracle
                     Mantis.Oracle.Client
                     Mantis.Oracle.Controller
+                    Mantis.Oracle.Controller.PAB
+                    Mantis.Oracle.PAB
                     Mantis.Oracle.Types
+                    Mantis.Orphans
   build-depends   : base ^>=4.14.1.0
                   , aeson
                   , containers
+                  , freer-extras
+                  , freer-simple
+                  , playground-common
                   , plutus-contract
                   , plutus-ledger
+                  , plutus-ledger-api
+                  , plutus-pab
                   , plutus-tx
                   , plutus-tx-plugin
+                  , plutus-use-cases
+                  , prettyprinter
+                  , req ^>= 3.9.0
                   , text
+                  , uuid
   default-language: Haskell2010
   ghc-options     : -fobject-code -fno-ignore-interface-pragmas -fno-omit-interface-pragmas -fno-strictness -fno-spec-constr -fno-specialise -Wall
 
@@ -52,20 +64,9 @@ executable mantis-oracle-test
 executable mantis-oracle-pab
    hs-source-dirs  : app
    main-is         : pab.hs
-   other-modules   : Orphans
    build-depends   : base ^>=4.14.1.0
-                   , aeson
-                   , freer-extras
-                   , freer-simple
                    , mantis-oracle
-                   , playground-common
                    , plutus-contract
-                   , plutus-ledger
-                   , plutus-pab
-                   , plutus-tx
-                   , plutus-use-cases
-                   , prettyprinter
-                   , text
    default-language: Haskell2010
    ghc-options     : -threaded -Wall
 
@@ -75,11 +76,10 @@ executable mantis-oracle-controller
    build-depends   : base ^>=4.14.1.0
                    , aeson
                    , bytestring
-                   , plutus-ledger-api
+                   , mantis-oracle
                    , plutus-tx
                    , req ^>= 3.9.0
                    , text
-                   , uuid
                    , vector
    default-language: Haskell2010
    ghc-options     : -Wall

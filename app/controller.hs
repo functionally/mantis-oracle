@@ -18,77 +18,36 @@
 
 
 module Main (
+-- * Entry point
   main
 ) where
 
 
-import Control.Concurrent       (threadDelay)
-import Control.Monad            (guard, when)
-import Control.Monad.IO.Class   (liftIO)
-import Data.Aeson               ((.:), withObject)
-import Data.Aeson.Types         (Parser, parseMaybe)
-import Data.Proxy               (Proxy (..))
-import Data.UUID                (UUID)
-import Network.HTTP.Req         (GET(..), JsonResponse, NoReqBody(..), ReqBodyJson(..), POST(..), (/:), defaultHttpConfig, http, https, jsonResponse, port, req, responseBody, responseStatusCode, runReq)
-import Plutus.V1.Ledger.Scripts ()
-import PlutusTx                 (Data(..))
+import Control.Monad                (guard)
+import Control.Monad.IO.Class       (liftIO)
+import Data.Aeson                   ((.:), withObject)
+import Data.Aeson.Types             (Parser, parseMaybe)
+import Mantis.Oracle.Controller.PAB (runOraclePAB)
+import Network.HTTP.Req             (GET(..), NoReqBody(..), (/:), defaultHttpConfig, https, jsonResponse, req, responseBody, runReq)
+import PlutusTx                     (Data(..))
 
 import qualified Data.ByteString.Char8 as BS (pack)
-import qualified Data.Text             as T  (pack)
 import qualified Data.Vector           as V  ((!), null)
 
 
-main :: IO ()
-main = runOracle getSofr
+-- | Poll for new oracle data and send it to the oracle.
+main :: IO () -- ^ Action for controlling the oracle.
+main =
+  runOraclePAB
+    3600_000_000
+    "127.0.0.1"
+    8080
+    "oracle.cid"
+    getSofr
 
 
-runOracle :: IO (Maybe Data)
-          -> IO ()
-runOracle getter =
-  do
-    uuid <- read <$> readFile "oracle.cid"
-    putStrLn $ "Oracle contract instance id: " ++ show uuid
-    let
-      go m =
-        do
-          x <- getter
-          when (m /= x)
-            $ maybe (return ()) (updateOracle uuid) x
-          threadDelay 3600_000_000
-          go x
-    go Nothing
-
-
-updateOracle :: UUID
-             -> Data
-             -> IO ()
-updateOracle uuid x =
-  runReq defaultHttpConfig
-    $ do
-      v <-
-        req
-          POST
-          (
-            http "127.0.0.1"
-              /: "api"
-              /: "new"
-              /: "contract"
-              /: "instance"
-              /: T.pack (show uuid)
-              /: "endpoint"
-              /: "write"
-          )
-          (ReqBodyJson x)
-          (Proxy :: Proxy (JsonResponse ()))
-          (port 8080)
-      liftIO
-        . putStrLn
-        $ if responseStatusCode v == 200
-          then "Updated oracle: " ++ show x ++ "."
-          else "Error updating oracle."
-
-
-getSofr :: IO (Maybe Data)
+-- | Fetch the latest SOFR percent rate from the NY Federal Reserve API.
+getSofr :: IO (Maybe Data) -- ^ Action for fetching the latest SOFR.
 getSofr =
   runReq defaultHttpConfig
     $ do
@@ -115,7 +74,7 @@ getSofr =
                 refRates <- o .: "refRates"
                 guard
                   . not $ V.null refRates
-                flip (withObject "z") (refRates V.! 0) $ \o' ->
+                flip (withObject "refRate") (refRates V.! 0) $ \o' ->
                   do
                     effectiveDate <- o' .: "effectiveDate"
                     percentRate   <- o' .: "percentRate" :: Parser Double
