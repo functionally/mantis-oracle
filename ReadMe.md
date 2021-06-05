@@ -46,7 +46,17 @@ The oracle can be incorporated into other smart-contract scripts that use the or
 ![Example transactions using the oracle.](transactions.png)
 
 
-Example
--------
+Example Using Trace
+-------------------
 
-See [`app/Main.hs`](app/Main.hs) for a simple example of creating, reading, writing, and deleting the oracle. A transcript of the output is in [`example.log`](example.log).
+See [`mantis-oracle-test`](app/test.hs) for a simple example of creating, reading, writing, and deleting the oracle. A transcript of the output is in [`example.log`](example.log).
+
+
+Example Using Plutus Application Backend (PAB)
+----------------------------------------------
+
+The PAB example uses three executables:
+
+1.  [`mantis-oracle-pab`](app/pab.hs) runs the PAB: Start this first, and leave it running. Wait until three `[INFO] Activated instance` messages are printed before running the oracle in step #2.
+2.  [`mantis-oracle-controller`](app/controller.hs) runs the oracle data source: This periodically polls the data source and posts data when it changes.
+3.  [`mantis-oracle-client`](app/client.hs) runs a simple client: This simply use the oracle data in a bare-bones contract.
