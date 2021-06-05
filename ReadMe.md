@@ -49,7 +49,11 @@ The oracle can be incorporated into other smart-contract scripts that use the or
 Example Using Trace
 -------------------
 
-See [`mantis-oracle-test`](app/test.hs) for a simple example of creating, reading, writing, and deleting the oracle. A transcript of the output is in [`example.log`](example.log).
+The following command runs a trace that includes creating, reading, writing, and deleting the oracle. A transcript of the output is in [`example.log`](example.log).
+
+    mantis-oracle trace cafe BRIO SOFR PIGY 1000000
+
+Here `BRIO` is the control token, `SOFR` the datum token, and `PIGY` the fee token: these are assets under the `cafe` currency symbol. The minimum fee for using the oracle in a contract is `1000000 PIGY`.
 
 
 Example Using Plutus Application Backend (PAB)
@@ -57,6 +61,46 @@ Example Using Plutus Application Backend (PAB)
 
 The PAB example uses three executables:
 
-1.  [`mantis-oracle-pab`](app/pab.hs) runs the PAB: Start this first, and leave it running. Wait until three `[INFO] Activated instance` messages are printed before running the oracle in step #2.
-2.  [`mantis-oracle-controller`](app/controller.hs) runs the oracle data source: This periodically polls the data source and posts data when it changes.
-3.  [`mantis-oracle-client`](app/client.hs) runs a simple client: This simply use the oracle data in a bare-bones contract.
+1.  First start the simulate Plutus application backend (PAB), and leave it running. Wait until three `[INFO] Activated instance` messages are printed before running the oracle in step #2: this lets enough slots pass to create the oracle and transfer newly minted funds to the other wallet(s). In this example, `BRIO` is the control token, `SOFR` the datum token, and `PIGY` the fee token: these are assets under the a newly created currency symbol. The minimum fee for using the oracle in a contract is `1000000 PIGY`. Wallet #1, which controls the oracle, will be created with `0 PIGY` and its Contract ID (CID) will be stored in the file `oracle.cid`; wallet #2 will have `2500000 PIGY` and its CID stored in `wallet-2.cid`.
+
+        mantis-oracle simulate BRIO SOFR PIGY 1000000 '[(1, 0, "oracle.cid"), (2, 2500000, "wallet-2.cid")]'
+
+2.  Next run the oracle data source, and leave this running. This periodically polls the data source and posts data when it changes. In this example, we poll the [SOFR oracle](src/Mantis/Oracle/SOFR.hs) every 3600 seconds, connect to the PAB at `127.0.0.1:8080`, and call the `write` endpoint for the Contract ID (CID) in the file `oracle.cid`.
+
+        mantis-oracle control 3600 127.0.0.1 8080 oracle.cid
+
+3.  Each time we want to use the oracle data in a bare-bones contract, we can run the following. In this example, we connect to the PAB at `127.0.0.1:8080` and call the `read` endpoint for the Contract ID (CID) in the file `wallet-2.cid`. If we call the end point too many times, reading the oracle will fail due to insufficient funds.
+
+        mantis-oracle employ 127.0.0.1 8080 wallet-2.cid
+
+
+Example for exporting the validator
+-----------------------------------
+
+The command-line `export` command will write the validator script and print its address.
+
+    mantis-oracle export cafeadda.BRIO cafeadda.SOFR cafeadda.PIGY 1000000 example.validator
+
+Here the policy ID is `cafeadda` (shortened for brevity in this example), the control token name is `BRIO`, the datum token name is `SOFR`, the fee token name is `PIGY`, and `1000000 PIGY` are required to use the oracle. The bytes of the validator are serialised to `example.validator`.
+
+
+Installation
+------------
+
+This package uses the [`haskell.nix`](https://input-output-hk.github.io/haskell.nix/) build system. Simply clone this repository and execute the build command:
+
+	nix-build -A mantis-oracle.components.exes.mantis-oracle -o build
+
+The executable result will be in `./build/bin/mantis-oracle`.
+
+Alternatively, one can use the `cabal install` installation approach, which relies on the [cabal.project](cabal.project) file and which is known to succeed with cabal 3.4.0.0 and ghc 8.10.4.
+
+
+Development environment
+-----------------------
+
+Due to quirks in how [`haskell.nix`](https://input-output-hk.github.io/haskell.nix/) and [`cabal.project`](https://cabal.readthedocs.io/en/3.4/cabal-project.html) interact, the following procedure needs to be followed to create a development environment for compiling `mantis`:
+
+1.  Run `nix-shell`. This takes a while to build unless you set `withHoogle = false` in [shell.nix](shell.nix).
+2.  Temporarily comment-out the `source-repository-package` lines in [cabal.project](cabal.project).
+3.  Run `cabal build`, `hoogle`, or other development tools defined in [shell.nix](shell.nix).

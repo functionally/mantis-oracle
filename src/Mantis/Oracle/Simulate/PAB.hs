@@ -24,7 +24,7 @@
 {-# LANGUAGE TypeOperators      #-}
 
 
-module Mantis.Oracle.PAB (
+module Mantis.Oracle.Simulate.PAB (
 -- * Types
   TheContracts(..)
 -- * Action

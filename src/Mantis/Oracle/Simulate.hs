@@ -22,7 +22,7 @@
 {-# LANGUAGE TypeApplications   #-}
 
 
-module Main (
+module Mantis.Oracle.Simulate (
 -- * Example
   main
 ) where
@@ -37,12 +37,12 @@ import Data.Text                (Text)
 import Ledger.Ada               (fromValue, getLovelace, lovelaceValueOf)
 import Ledger.Address           (pubKeyAddress)
 import Ledger.Tx                (txOutTxOut, txOutValue)
-import Ledger.Value             (AssetClass(..), Value, assetClass, assetClassValueOf, flattenValue, toString)
+import Ledger.Value             (AssetClass(..), CurrencySymbol, TokenName, Value, assetClass, assetClassValueOf, flattenValue, toString)
 import Mantis.Oracle            (findOracle, oracleAddress)
 import Mantis.Oracle.Client     (runOracleClient)
 import Mantis.Oracle.Controller (runOracleController)
 import Mantis.Oracle.Types      (Oracle(..), Parameters(..))
-import Prelude                  (IO, String, (<>), show)
+import Prelude                  (IO, String, (<>), div, show)
 import PlutusTx                 (Data(I))
 import Wallet.Emulator.Wallet   (Wallet(..))
 
@@ -54,20 +54,19 @@ import qualified Plutus.Trace.Emulator      as E (EmulatorConfig(..), EmulatorTr
 
 
 -- | Run the example.
-main :: IO () -- ^ Action for running the example.
-main =
+main :: CurrencySymbol -- ^ Currency symbol for the example tokens.
+     -> TokenName      -- ^ Name of the control token.
+     -> TokenName      -- ^ Name of the datum token.
+     -> TokenName      -- ^ Name of the fee token.
+     -> Integer        -- ^ Amount of fee token needed to read the oracle.
+     -> IO () -- ^ Action for running the example.
+main symbol controlName datumName feeName feeAmount  =
 
   let
-
-    symbol = "addacafe"
-    controlName = "BRIO"
-    datumName   = "SOFR"
-    feeName     = "PIGY"
 
     controlParameter = AssetClass (symbol, controlName)
     datumParameter   = AssetClass (symbol, datumName  )
     feeToken         = AssetClass (symbol, feeName    )
-    feeAmount = 1_000_000
    
     initial = lovelaceValueOf 100_000_000
     withValue = V.singleton symbol
@@ -85,12 +84,12 @@ main =
         , (
           -- Wallet 2 has enough of the fee token to read the oracle twice.
             Wallet 2
-          , initial <> feeName `withValue` 2_000_000
+          , initial <> feeName `withValue` (feeAmount * 2)
           )
         , (
             -- Wallet 3 doesn't not have have enough fee tokens to read the oracle at all.
             Wallet 3
-          , initial <> feeName `withValue` 500_000
+          , initial <> feeName `withValue` (feeAmount `div` 2)
           )
         , (
             -- Wallet 4 just monitors transactions of the oracle.

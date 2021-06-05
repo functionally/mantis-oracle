@@ -29,7 +29,7 @@ import Data.Proxy               (Proxy (..))
 import Data.Text                (Text)
 import Data.UUID                (UUID)
 import Network.HTTP.Req         (JsonResponse, ReqBodyJson(..), POST(..), (/:), defaultHttpConfig, http, port, req, responseStatusCode, runReq)
-import Plutus.V1.Ledger.Scripts ()
+import Ledger.Scripts           ()
 import PlutusTx                 (Data(..))
 
 import qualified Data.Text as T (pack)

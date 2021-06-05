@@ -1,12 +1,63 @@
 index-state: 2021-04-13T00:00:00Z
 
 
-packages: ./.
+-- This configuration is known to work with GHC 8.10.4 and cabal 3.4.0.0.
 
 
--- Never build tests and benchmarks.
-tests: false
-benchmarks: false
+packages: .
+
+
+--  -- FIXME: On some platforms, one may need to explicitly specify the locations of the `zlib`
+--  --        header and library files.
+--  package zlib
+--    extra-include-dirs: /nix/store/m11lzq9kbi76yx339hqi98sjvv3l3jxh-zlib-1.2.11-dev/include
+--    extra-lib-dirs:     /nix/store/qvgf4g9c5h3wzq4xjy566vc0pqgc9fjq-zlib-1.2.11/lib
+--  package digest
+--    extra-include-dirs: /nix/store/m11lzq9kbi76yx339hqi98sjvv3l3jxh-zlib-1.2.11-dev/include
+--    extra-lib-dirs:     /nix/store/qvgf4g9c5h3wzq4xjy566vc0pqgc9fjq-zlib-1.2.11/lib
+
+package cardano-crypto-praos
+  flags: -external-libsodium-vrf
+
+package cryptonite
+  flags: -support_rdrand
+
+
+tests: False
+
+test-show-details: direct
+
+
+package byron-spec-ledger
+  tests: False
+
+package cardano-api
+  tests: False
+
+package cardano-binary
+  tests: False
+
+package cardano-crypto-wrapper
+  tests: False
+
+package cardano-ledger-byron
+  tests: False
+
+package ouroboros-network
+  tests: False
+
+package ouroboros-network-framework
+  tests: False
+
+
+-- ------------------------------------------------------------- --
+--                                                               --
+-- For developing with `nix-shell`:                              --
+-- 1.  Run `nix-shell`.                                          --
+-- 2.  Temporarily comment-out the lines following this comment. --
+-- 3.  Run `cabal build`.                                        --
+--                                                               --
+-- ------------------------------------------------------------- --
 
 
 source-repository-package
