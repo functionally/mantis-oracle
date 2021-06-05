@@ -49,7 +49,11 @@ The oracle can be incorporated into other smart-contract scripts that use the or
 Example Using Trace
 -------------------
 
-See [`mantis-oracle-test`](app/test.hs) for a simple example of creating, reading, writing, and deleting the oracle. A transcript of the output is in [`example.log`](example.log).
+The following command runs a trace that includes creating, reading, writing, and deleting the oracle. A transcript of the output is in [`example.log`](example.log).
+
+    mantis-oracle trace cafe BRIO SOFR PIGY 1000000
+
+Here `BRIO` is the control token, `SOFR` the datum token, and `PIGY` the fee token: these are assets under the `cafe` currency symbol. The minimum fee for using the oracle in a contract is `1000000 PIGY`.
 
 
 Example Using Plutus Application Backend (PAB)
@@ -57,6 +61,15 @@ Example Using Plutus Application Backend (PAB)
 
 The PAB example uses three executables:
 
-1.  [`mantis-oracle-pab`](app/pab.hs) runs the PAB: Start this first, and leave it running. Wait until three `[INFO] Activated instance` messages are printed before running the oracle in step #2.
-2.  [`mantis-oracle-controller`](app/controller.hs) runs the oracle data source: This periodically polls the data source and posts data when it changes.
-3.  [`mantis-oracle-client`](app/client.hs) runs a simple client: This simply use the oracle data in a bare-bones contract.
+1.  First start the simulate Plutus application backend (PAB), and leave it running. Wait until three `[INFO] Activated instance` messages are printed before running the oracle in step #2: this lets enough slots pass to create the oracle and transfer newly minted funds to the other wallet(s). In this example, `BRIO` is the control token, `SOFR` the datum token, and `PIGY` the fee token: these are assets under the `cafe` currency symbol. The minimum fee for using the oracle in a contract is `1000000 PIGY`. Wallet #1, which controls the oracle, will be created with `0 PIGY` and its Contract ID (CID) will be stored in the file `oracle.cid`; wallet #2 will have `2500000 PIGY` and its CID stored in `wallet-2.cid`.
+    
+    mantis-oracle simulate BRIO SOFR PIGY 1000000 '[(1, 0, "oracle.cid"), (2, 2500000, "wallet-2.cid")]'
+    
+2.  Next run the oracle data source, and leave this running. This periodically polls the data source and posts data when it changes. In this example, we poll the [SOFR oracle](src/Mantis/Oracle/SOFR.hs) every 3600 seconds, connect to the PAB at `127.0.0.1:8080`, and call the `write` endpoint for the Contract ID (CID) in the file `oracle.cid`.
+    
+    mantis-oracle control 3600 127.0.0.1 8080 oracle.cid
+    
+3.  Each time we want to use the oracle data in a bare-bones contract, we can run the following. In this example, we connect to the PAB at `127.0.0.1:8080` and call the `read` endpoint for the Contract ID (CID) in the file `wallet-2.cid`. If we call the end point too many times, reading the oracle will fail due to insufficient funds.
+    
+    mantis-oracle employ 127.0.0.1 8080 wallet-2.cid
+    

@@ -66,5 +66,5 @@ readOraclePAB address portNumber uuid =
             (port portNumber)
         liftIO
           $ if responseStatusCode result /= 200
-            then putStrLn "Error reading oracle."
-            else putStrLn "Success reading oracle."
+            then putStrLn "Error submitting transaction to read oracle."
+            else putStrLn "Success submitting transaction to read oracle."
