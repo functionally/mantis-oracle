@@ -1,7 +1,7 @@
 cabal-version     : 2.4
 name              : mantis-oracle
 description       : This Cardano oracle reports structured data (namely, the `PlutuxTx.Data` type) to a transaction if the fee, as a quantity of a fungible token, is paid. It can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic.
-version           : 0.1.1.2
+version           : 0.1.1.3
 author            : Brian W Bush <code@functionally.io>
 maintainer        : Brian W Bush <code@functionally.io>
 copyright         : (c) 2021 Brian W Bush
@@ -22,21 +22,33 @@ library
   exposed-modules : Mantis.Oracle
                     Mantis.Oracle.Client
                     Mantis.Oracle.Controller
+                    Mantis.Oracle.Controller.PAB
+                    Mantis.Oracle.PAB
                     Mantis.Oracle.Types
+                    Mantis.Orphans
   build-depends   : base ^>=4.14.1.0
                   , aeson
                   , containers
+                  , freer-extras
+                  , freer-simple
+                  , playground-common
                   , plutus-contract
                   , plutus-ledger
+                  , plutus-ledger-api
+                  , plutus-pab
                   , plutus-tx
                   , plutus-tx-plugin
+                  , plutus-use-cases
+                  , prettyprinter
+                  , req ^>= 3.9.0
                   , text
+                  , uuid
   default-language: Haskell2010
-  ghc-options     : -Wall
+  ghc-options     : -fobject-code -fno-ignore-interface-pragmas -fno-omit-interface-pragmas -fno-strictness -fno-spec-constr -fno-specialise -Wall
 
-executable sofr-oracle
+executable mantis-oracle-test
    hs-source-dirs  : app
-   main-is         : Main.hs
+   main-is         : test.hs
    build-depends   : base ^>=4.14.1.0
                    , containers
                    , data-default
@@ -46,5 +58,38 @@ executable sofr-oracle
                    , plutus-ledger
                    , plutus-tx
                    , text
+   default-language: Haskell2010
+   ghc-options     : -Wall
+
+executable mantis-oracle-pab
+   hs-source-dirs  : app
+   main-is         : pab.hs
+   build-depends   : base ^>=4.14.1.0
+                   , mantis-oracle
+                   , plutus-contract
+   default-language: Haskell2010
+   ghc-options     : -threaded -Wall
+
+executable mantis-oracle-controller
+   hs-source-dirs  : app
+   main-is         : controller.hs
+   build-depends   : base ^>=4.14.1.0
+                   , aeson
+                   , bytestring
+                   , mantis-oracle
+                   , plutus-tx
+                   , req ^>= 3.9.0
+                   , text
+                   , vector
+   default-language: Haskell2010
+   ghc-options     : -Wall
+
+executable mantis-oracle-client
+   hs-source-dirs  : app
+   main-is         : client.hs
+   build-depends   : base ^>=4.14.1.0
+                   , req ^>= 3.9.0
+                   , text
+                   , uuid
    default-language: Haskell2010
    ghc-options     : -Wall

@@ -36,7 +36,7 @@ import GHC.Generics (Generic)
 import Ledger.Value (AssetClass(..), Value)
 
 import qualified Ledger.Value as Value   (singleton)
-import qualified Prelude      as Haskell (Eq)
+import qualified Prelude      as Haskell (Eq, Show)
 
 
 -- | An oracle controlled by one token, holding another token, and requiring a fee for its use.
@@ -47,7 +47,7 @@ data Oracle =
   , datumToken   :: !AssetClass -- ^ The token with which the oracle datum is always associated.
   , requiredFee  :: !Value      -- ^ The minimum fee required to read the oracle on-chain.
   }
-    deriving (Haskell.Eq, Generic, FromJSON, Show, ToJSON)
+    deriving (Haskell.Eq, Generic, FromJSON, Haskell.Show, ToJSON)
 
 
 -- | Parameters defining the oracle.
@@ -59,7 +59,7 @@ data Parameters =
   , feeToken         :: AssetClass -- ^ The token in which the fee must be paid for reading the oracle.
   , feeAmount        :: Integer    -- ^ The amount of the fee tokend needed for reading the oracle.
   }
-    deriving (Haskell.Eq, Generic, FromJSON, Show, ToJSON)
+    deriving (Haskell.Eq, Generic, FromJSON, Haskell.Show, ToJSON)
 
 
 -- | Construct an oracle.
@@ -80,4 +80,4 @@ data Action =
     Delete -- ^ Delete (close) the oracle.
   | Read   -- ^ Read the oracle's datum.
   | Write  -- ^ Set or update the oracel's datum.
-    deriving Show
+    deriving Haskell.Show

@@ -13,10 +13,7 @@ in
      # See overlays/tools.nix for more details
     tools = {
       cabal                   = "latest";
-      ghcide                  = "latest";
       haskell-language-server = "latest";
-    # hdevtools               = "latest";
-    # hindent                 = "latest";
       hlint                   = "latest";
       pointfree               = "latest";
     # pointfull               = "latest";
