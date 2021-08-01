@@ -1,0 +1,1171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-----------------------------------------------------------------------------</span><span>
+</span><span id="line-2"></span><span class="hs-comment">--</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Module      :  $Headers</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Copyright   :  (c) 2021 Brian W Bush</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- License     :  MIT</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Maintainer  :  Brian W Bush &lt;code@functionally.io&gt;</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Stability   :  Experimental</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Portability :  Portable</span><span>
+</span><span id="line-10"></span><span class="hs-comment">--</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- | Controlling the general-purpose oracle.</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-----------------------------------------------------------------------------</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-pragma">{-# LANGUAGE DataKinds             #-}</span><span>
+</span><span id="line-17"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts      #-}</span><span>
+</span><span id="line-18"></span><span class="hs-pragma">{-# LANGUAGE NoImplicitPrelude     #-}</span><span>
+</span><span id="line-19"></span><span class="hs-pragma">{-# LANGUAGE RecordWildCards       #-}</span><span>
+</span><span id="line-20"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications      #-}</span><span>
+</span><span id="line-21"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies          #-}</span><span>
+</span><span id="line-22"></span><span class="hs-pragma">{-# LANGUAGE TypeOperators         #-}</span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Mantis.Oracle.Controller</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-26"></span><span class="annot"><span class="hs-comment">-- * Schema</span></span><span>
+</span><span id="line-27"></span><span>  </span><span class="annot"><a href="Mantis.Oracle.Controller.html#OracleSchema"><span class="hs-identifier">OracleSchema</span></a></span><span>
+</span><span id="line-28"></span><span class="annot"><span class="hs-comment">-- * Endpoints</span></span><span>
+</span><span id="line-29"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Controller.html#createOracle"><span class="hs-identifier">createOracle</span></a></span><span>
+</span><span id="line-30"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Controller.html#deleteOracle"><span class="hs-identifier">deleteOracle</span></a></span><span>
+</span><span id="line-31"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Controller.html#writeOracle"><span class="hs-identifier">writeOracle</span></a></span><span>
+</span><span id="line-32"></span><span class="annot"><span class="hs-comment">-- * Utilities</span></span><span>
+</span><span id="line-33"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Controller.html#runOracleController"><span class="hs-identifier">runOracleController</span></a></span><span>
+</span><span id="line-34"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">PlutusTx.Prelude</span></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(&lt;&gt;)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Monoid</span></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Last</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ledger</span></span><span>               </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Redeemer</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">pubKeyHash</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">txId</span></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ledger.Constraints</span></span><span>   </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">mustPayToPubKey</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">mustPayToTheScript</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">mustSpendScriptOutput</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">otherScript</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">scriptInstanceLookups</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">unspentOutputs</span></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ledger.Value</span></span><span>         </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">assetClassValue</span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Mantis.Oracle.html"><span class="hs-identifier">Mantis.Oracle</span></a></span><span>        </span><span class="hs-special">(</span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier">OracleScript</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#findOracle"><span class="hs-identifier">findOracle</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#oracleInstance"><span class="hs-identifier">oracleInstance</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#oracleValidator"><span class="hs-identifier">oracleValidator</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Mantis.Oracle.Client.html"><span class="hs-identifier">Mantis.Oracle.Client</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Mantis.Oracle.Client.html#readOracle"><span class="hs-identifier">readOracle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-46"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html"><span class="hs-identifier">Mantis.Oracle.Types</span></a></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier">Action</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier">Oracle</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Parameters"><span class="hs-identifier">Parameters</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#makeOracle"><span class="hs-identifier">makeOracle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Plutus.Contract</span></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">BlockchainActions</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Contract</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Endpoint</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">HasBlockchainActions</span></span><span class="hs-special">,</span><span> </span><span class="hs-keyword">type</span><span> </span><span class="annot"><span class="hs-operator">(.\/)</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">awaitTxConfirmed</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">endpoint</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">logError</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">logInfo</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ownPubKey</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">select</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">submitTxConstraints</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">submitTxConstraintsWith</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">tell</span></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">PlutusTx</span></span><span>             </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">toData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Prelude</span></span><span>              </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">String</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(&lt;&gt;)</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">show</span></span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">singleton</span></span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="hs-comment">-- | Create an oracle.</span><span>
+</span><span id="line-55"></span><span id="local-6989586621679284276"><span id="local-6989586621679284277"><span class="annot"><a href="Mantis.Oracle.Controller.html#createOracle"><span class="hs-identifier hs-type">createOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HasBlockchainActions</span></span><span> </span><span class="annot"><a href="#local-6989586621679284277"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-56"></span><span>             </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Parameters"><span class="hs-identifier hs-type">Parameters</span></a></span><span>               </span><span class="hs-comment">-- ^ Parameters defining the oracle.</span><span>
+</span><span id="line-57"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Contract</span></span><span> </span><span class="annot"><a href="#local-6989586621679284276"><span class="hs-identifier hs-type">w</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679284277"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span> </span><span class="hs-comment">-- ^ Action for creating the oracle.</span></span></span><span>
+</span><span id="line-58"></span><span id="createOracle"><span class="annot"><span class="annottext">createOracle :: Parameters -&gt; Contract w s Text Oracle
+</span><a href="Mantis.Oracle.Controller.html#createOracle"><span class="hs-identifier hs-var hs-var">createOracle</span></a></span></span><span> </span><span id="local-6989586621679284212"><span class="annot"><span class="annottext">Parameters
+</span><a href="#local-6989586621679284212"><span class="hs-identifier hs-var">parameters</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-59"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-60"></span><span>    </span><span class="hs-keyword">let</span><span>
+</span><span id="line-61"></span><span>      </span><span id="local-6989586621679284211"><span class="annot"><span class="annottext">oracle :: Oracle
+</span><a href="#local-6989586621679284211"><span class="hs-identifier hs-var hs-var">oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parameters -&gt; Oracle
+</span><a href="Mantis.Oracle.Types.html#makeOracle"><span class="hs-identifier hs-var">makeOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Parameters
+</span><a href="#local-6989586621679284212"><span class="hs-identifier hs-var">parameters</span></a></span><span>
+</span><span id="line-62"></span><span>    </span><span class="annot"><span class="annottext">[Char] -&gt; Contract w s Text ()
+forall a w (s :: Row *) e. ToJSON a =&gt; a -&gt; Contract w s e ()
+</span><span class="hs-identifier hs-var">logInfo</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Contract w s Text ()) -&gt; [Char] -&gt; Contract w s Text ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;Created oracle: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; [Char] -&gt; [Char]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284211"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><span id="line-63"></span><span>    </span><span class="annot"><span class="annottext">Oracle -&gt; Contract w s Text Oracle
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284211"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span class="hs-comment">-- | Schema for controlling the oracle.</span><span>
+</span><span id="line-67"></span><span class="hs-keyword">type</span><span> </span><span id="OracleSchema"><span class="annot"><a href="Mantis.Oracle.Controller.html#OracleSchema"><span class="hs-identifier hs-var">OracleSchema</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-68"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">BlockchainActions</span></span><span>
+</span><span id="line-69"></span><span>  </span><span class="annot"><span class="hs-operator hs-type">.\/</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Endpoint</span></span><span> </span><span class="annot"><span class="hs-string">&quot;read&quot;</span></span><span>   </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><span class="hs-operator hs-type">.\/</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Endpoint</span></span><span> </span><span class="annot"><span class="hs-string">&quot;write&quot;</span></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Data</span></span><span>
+</span><span id="line-71"></span><span>  </span><span class="annot"><span class="hs-operator hs-type">.\/</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Endpoint</span></span><span> </span><span class="annot"><span class="hs-string">&quot;delete&quot;</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span class="hs-comment">-- | Endpoint for writing datum to the oracle.</span><span>
+</span><span id="line-75"></span><span id="local-6989586621679284258"><span id="local-6989586621679284259"><span class="annot"><a href="Mantis.Oracle.Controller.html#writeOracle"><span class="hs-identifier hs-type">writeOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HasBlockchainActions</span></span><span> </span><span class="annot"><a href="#local-6989586621679284259"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-76"></span><span>            </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>               </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-77"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Data</span></span><span>                 </span><span class="hs-comment">-- ^ The datum to be written.</span><span>
+</span><span id="line-78"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Contract</span></span><span> </span><span class="annot"><a href="#local-6989586621679284258"><span class="hs-identifier hs-type">w</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679284259"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ Action for writing the datum to the oracle.</span></span></span><span>
+</span><span id="line-79"></span><span id="writeOracle"><span class="annot"><span class="annottext">writeOracle :: Oracle -&gt; Data -&gt; Contract w s Text ()
+</span><a href="Mantis.Oracle.Controller.html#writeOracle"><span class="hs-identifier hs-var hs-var">writeOracle</span></a></span></span><span> </span><span id="local-6989586621679284208"><span class="annot"><span class="annottext">oracle :: Oracle
+</span><a href="#local-6989586621679284208"><span class="hs-identifier hs-var">oracle</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span class="hs-special">{</span><span id="local-6989586621679284204"><span id="local-6989586621679284205"><span id="local-6989586621679284206"><span class="annot"><span class="annottext">AssetClass
+Value
+requiredFee :: Oracle -&gt; Value
+datumToken :: Oracle -&gt; AssetClass
+controlToken :: Oracle -&gt; AssetClass
+requiredFee :: Value
+datumToken :: AssetClass
+controlToken :: AssetClass
+</span><a href="Mantis.Oracle.Types.html#requiredFee"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679284200"><span class="annot"><span class="annottext">Data
+</span><a href="#local-6989586621679284200"><span class="hs-identifier hs-var">datum</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-80"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-81"></span><span>    </span><span id="local-6989586621679284199"><span class="annot"><span class="annottext">PubKeyHash
+</span><a href="#local-6989586621679284199"><span class="hs-identifier hs-var">owner</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">PubKey -&gt; PubKeyHash
+</span><span class="hs-identifier hs-var">pubKeyHash</span></span><span> </span><span class="annot"><span class="annottext">(PubKey -&gt; PubKeyHash)
+-&gt; Contract w s Text PubKey -&gt; Contract w s Text PubKeyHash
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Contract w s Text PubKey
+forall w (s :: Row *) e.
+(AsContractError e, HasOwnPubKey s) =&gt;
+Contract w s e PubKey
+</span><span class="hs-identifier hs-var">ownPubKey</span></span><span>
+</span><span id="line-82"></span><span>    </span><span class="hs-keyword">let</span><span>
+</span><span id="line-83"></span><span>      </span><span id="local-6989586621679284197"><span class="annot"><span class="annottext">mustControl :: TxConstraints Action Data
+</span><a href="#local-6989586621679284197"><span class="hs-identifier hs-var hs-var">mustControl</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PubKeyHash -&gt; Value -&gt; TxConstraints Action Data
+forall i o. PubKeyHash -&gt; Value -&gt; TxConstraints i o
+</span><span class="hs-identifier hs-var">mustPayToPubKey</span></span><span>    </span><span class="annot"><span class="annottext">PubKeyHash
+</span><a href="#local-6989586621679284199"><span class="hs-identifier hs-var">owner</span></a></span><span> </span><span class="annot"><span class="annottext">(Value -&gt; TxConstraints Action Data)
+-&gt; Value -&gt; TxConstraints Action Data
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">AssetClass -&gt; Integer -&gt; Value
+</span><span class="hs-identifier hs-var">assetClassValue</span></span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679284206"><span class="hs-identifier hs-var">controlToken</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-84"></span><span>      </span><span id="local-6989586621679284196"><span class="annot"><span class="annottext">mustUseDatum :: TxConstraints Action Data
+</span><a href="#local-6989586621679284196"><span class="hs-identifier hs-var hs-var">mustUseDatum</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Data -&gt; Value -&gt; TxConstraints Action Data
+forall i o. IsData o =&gt; o -&gt; Value -&gt; TxConstraints i o
+</span><span class="hs-identifier hs-var">mustPayToTheScript</span></span><span> </span><span class="annot"><span class="annottext">Data
+</span><a href="#local-6989586621679284200"><span class="hs-identifier hs-var">datum</span></a></span><span> </span><span class="annot"><span class="annottext">(Value -&gt; TxConstraints Action Data)
+-&gt; Value -&gt; TxConstraints Action Data
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">AssetClass -&gt; Integer -&gt; Value
+</span><span class="hs-identifier hs-var">assetClassValue</span></span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679284205"><span class="hs-identifier hs-var">datumToken</span></a></span><span>   </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-85"></span><span>      </span><span id="local-6989586621679284195"><span class="annot"><span class="annottext">notFound :: Contract w s Text ()
+</span><a href="#local-6989586621679284195"><span class="hs-identifier hs-var hs-var">notFound</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span>
+</span><span id="line-86"></span><span>        </span><span class="hs-keyword">do</span><span>
+</span><span id="line-87"></span><span>          </span><span id="local-6989586621679284194"><span class="annot"><span class="annottext">Tx
+</span><a href="#local-6989586621679284194"><span class="hs-identifier hs-var">ledgerTx</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-88"></span><span>            </span><span class="annot"><span class="annottext">ScriptInstance OracleScript
+-&gt; TxConstraints
+     (RedeemerType OracleScript) (DatumType OracleScript)
+-&gt; Contract w s Text Tx
+forall a w (s :: Row *) e.
+(HasWriteTx s, IsData (RedeemerType a), IsData (DatumType a),
+ AsContractError e) =&gt;
+ScriptInstance a
+-&gt; TxConstraints (RedeemerType a) (DatumType a)
+-&gt; Contract w s e Tx
+</span><span class="hs-identifier hs-var">submitTxConstraints</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Oracle -&gt; ScriptInstance OracleScript
+</span><a href="Mantis.Oracle.html#oracleInstance"><span class="hs-identifier hs-var">oracleInstance</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284208"><span class="hs-identifier hs-var">oracle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-89"></span><span>              </span><span class="annot"><span class="annottext">(TxConstraints Action Data -&gt; Contract w s Text Tx)
+-&gt; TxConstraints Action Data -&gt; Contract w s Text Tx
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">TxConstraints Action Data
+</span><a href="#local-6989586621679284197"><span class="hs-identifier hs-var">mustControl</span></a></span><span> </span><span class="annot"><span class="annottext">TxConstraints Action Data
+-&gt; TxConstraints Action Data -&gt; TxConstraints Action Data
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">TxConstraints Action Data
+</span><a href="#local-6989586621679284196"><span class="hs-identifier hs-var">mustUseDatum</span></a></span><span>
+</span><span id="line-90"></span><span>          </span><span class="annot"><span class="annottext">TxId -&gt; Contract w s Text ()
+forall w (s :: Row *) e.
+(AsContractError e, HasTxConfirmation s) =&gt;
+TxId -&gt; Contract w s e ()
+</span><span class="hs-identifier hs-var">awaitTxConfirmed</span></span><span> </span><span class="annot"><span class="annottext">(TxId -&gt; Contract w s Text ()) -&gt; TxId -&gt; Contract w s Text ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Tx -&gt; TxId
+</span><span class="hs-identifier hs-var">txId</span></span><span> </span><span class="annot"><span class="annottext">Tx
+</span><a href="#local-6989586621679284194"><span class="hs-identifier hs-var">ledgerTx</span></a></span><span>
+</span><span id="line-91"></span><span>          </span><span class="annot"><span class="annottext">[Char] -&gt; Contract w s Text ()
+forall a w (s :: Row *) e. ToJSON a =&gt; a -&gt; Contract w s e ()
+</span><span class="hs-identifier hs-var">logInfo</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Contract w s Text ()) -&gt; [Char] -&gt; Contract w s Text ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;Set oracle datum: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; [Char] -&gt; [Char]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Data -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Data
+</span><a href="#local-6989586621679284200"><span class="hs-identifier hs-var">datum</span></a></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; [Char] -&gt; [Char]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;.&quot;</span></span><span>
+</span><span id="line-92"></span><span>      </span><span id="local-6989586621679284193"><span class="annot"><span class="annottext">found :: (TxOutRef, TxOutTx, Data) -&gt; Contract w s Text ()
+</span><a href="#local-6989586621679284193"><span class="hs-identifier hs-var hs-var">found</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679284192"><span class="annot"><span class="annottext">TxOutRef
+</span><a href="#local-6989586621679284192"><span class="hs-identifier hs-var">outputRef</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679284191"><span class="annot"><span class="annottext">TxOutTx
+</span><a href="#local-6989586621679284191"><span class="hs-identifier hs-var">output</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Data
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-93"></span><span>        </span><span class="hs-keyword">do</span><span>
+</span><span id="line-94"></span><span>          </span><span class="hs-keyword">let</span><span>
+</span><span id="line-95"></span><span>            </span><span id="local-6989586621679284190"><span class="annot"><span class="annottext">lookups :: ScriptLookups OracleScript
+</span><a href="#local-6989586621679284190"><span class="hs-identifier hs-var hs-var">lookups</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Validator -&gt; ScriptLookups OracleScript
+forall a. Validator -&gt; ScriptLookups a
+</span><span class="hs-identifier hs-var">otherScript</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Oracle -&gt; Validator
+</span><a href="Mantis.Oracle.html#oracleValidator"><span class="hs-identifier hs-var">oracleValidator</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284208"><span class="hs-identifier hs-var">oracle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-96"></span><span>                   </span><span class="annot"><span class="annottext">ScriptLookups OracleScript
+-&gt; ScriptLookups OracleScript -&gt; ScriptLookups OracleScript
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Map TxOutRef TxOutTx -&gt; ScriptLookups OracleScript
+forall a. Map TxOutRef TxOutTx -&gt; ScriptLookups a
+</span><span class="hs-identifier hs-var">unspentOutputs</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxOutRef -&gt; TxOutTx -&gt; Map TxOutRef TxOutTx
+forall k a. k -&gt; a -&gt; Map k a
+</span><span class="hs-identifier hs-var">M.singleton</span></span><span> </span><span class="annot"><span class="annottext">TxOutRef
+</span><a href="#local-6989586621679284192"><span class="hs-identifier hs-var">outputRef</span></a></span><span> </span><span class="annot"><span class="annottext">TxOutTx
+</span><a href="#local-6989586621679284191"><span class="hs-identifier hs-var">output</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-97"></span><span>                   </span><span class="annot"><span class="annottext">ScriptLookups OracleScript
+-&gt; ScriptLookups OracleScript -&gt; ScriptLookups OracleScript
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">ScriptInstance OracleScript -&gt; ScriptLookups OracleScript
+forall a. ScriptInstance a -&gt; ScriptLookups a
+</span><span class="hs-identifier hs-var">scriptInstanceLookups</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Oracle -&gt; ScriptInstance OracleScript
+</span><a href="Mantis.Oracle.html#oracleInstance"><span class="hs-identifier hs-var">oracleInstance</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284208"><span class="hs-identifier hs-var">oracle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-98"></span><span>            </span><span id="local-6989586621679284189"><span class="annot"><span class="annottext">tx :: TxConstraints Action Data
+</span><a href="#local-6989586621679284189"><span class="hs-identifier hs-var hs-var">tx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxConstraints Action Data
+</span><a href="#local-6989586621679284197"><span class="hs-identifier hs-var">mustControl</span></a></span><span>
+</span><span id="line-99"></span><span>              </span><span class="annot"><span class="annottext">TxConstraints Action Data
+-&gt; TxConstraints Action Data -&gt; TxConstraints Action Data
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">TxConstraints Action Data
+</span><a href="#local-6989586621679284196"><span class="hs-identifier hs-var">mustUseDatum</span></a></span><span>
+</span><span id="line-100"></span><span>              </span><span class="annot"><span class="annottext">TxConstraints Action Data
+-&gt; TxConstraints Action Data -&gt; TxConstraints Action Data
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">TxOutRef -&gt; Redeemer -&gt; TxConstraints Action Data
+forall i o. TxOutRef -&gt; Redeemer -&gt; TxConstraints i o
+</span><span class="hs-identifier hs-var">mustSpendScriptOutput</span></span><span> </span><span class="annot"><span class="annottext">TxOutRef
+</span><a href="#local-6989586621679284192"><span class="hs-identifier hs-var">outputRef</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Data -&gt; Redeemer
+</span><span class="hs-identifier hs-var">Redeemer</span></span><span> </span><span class="annot"><span class="annottext">(Data -&gt; Redeemer) -&gt; Data -&gt; Redeemer
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Action -&gt; Data
+forall a. IsData a =&gt; a -&gt; Data
+</span><span class="hs-identifier hs-var">toData</span></span><span> </span><span class="annot"><span class="annottext">Action
+</span><a href="Mantis.Oracle.Types.html#Write"><span class="hs-identifier hs-var">Write</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-101"></span><span>          </span><span id="local-6989586621679284186"><span class="annot"><span class="annottext">Tx
+</span><a href="#local-6989586621679284186"><span class="hs-identifier hs-var">ledgerTx</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ScriptLookups OracleScript
+-&gt; TxConstraints
+     (RedeemerType OracleScript) (DatumType OracleScript)
+-&gt; Contract w s Text Tx
+forall a w (s :: Row *) e.
+(HasWriteTx s, IsData (RedeemerType a), IsData (DatumType a),
+ AsContractError e) =&gt;
+ScriptLookups a
+-&gt; TxConstraints (RedeemerType a) (DatumType a)
+-&gt; Contract w s e Tx
+</span><span class="hs-identifier hs-var">submitTxConstraintsWith</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span> </span><span class="annot"><span class="annottext">ScriptLookups OracleScript
+</span><a href="#local-6989586621679284190"><span class="hs-identifier hs-var">lookups</span></a></span><span> </span><span class="annot"><span class="annottext">TxConstraints Action Data
+TxConstraints (RedeemerType OracleScript) (DatumType OracleScript)
+</span><a href="#local-6989586621679284189"><span class="hs-identifier hs-var">tx</span></a></span><span>
+</span><span id="line-102"></span><span>          </span><span class="annot"><span class="annottext">TxId -&gt; Contract w s Text ()
+forall w (s :: Row *) e.
+(AsContractError e, HasTxConfirmation s) =&gt;
+TxId -&gt; Contract w s e ()
+</span><span class="hs-identifier hs-var">awaitTxConfirmed</span></span><span> </span><span class="annot"><span class="annottext">(TxId -&gt; Contract w s Text ()) -&gt; TxId -&gt; Contract w s Text ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Tx -&gt; TxId
+</span><span class="hs-identifier hs-var">txId</span></span><span> </span><span class="annot"><span class="annottext">Tx
+</span><a href="#local-6989586621679284186"><span class="hs-identifier hs-var">ledgerTx</span></a></span><span>
+</span><span id="line-103"></span><span>          </span><span class="annot"><span class="annottext">[Char] -&gt; Contract w s Text ()
+forall a w (s :: Row *) e. ToJSON a =&gt; a -&gt; Contract w s e ()
+</span><span class="hs-identifier hs-var">logInfo</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Contract w s Text ()) -&gt; [Char] -&gt; Contract w s Text ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;Updated oracle datum: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; [Char] -&gt; [Char]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Data -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Data
+</span><a href="#local-6989586621679284200"><span class="hs-identifier hs-var">datum</span></a></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; [Char] -&gt; [Char]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;.&quot;</span></span><span>
+</span><span id="line-104"></span><span>    </span><span class="annot"><span class="annottext">Contract w s Text ()
+-&gt; ((TxOutRef, TxOutTx, Data) -&gt; Contract w s Text ())
+-&gt; Maybe (TxOutRef, TxOutTx, Data)
+-&gt; Contract w s Text ()
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="annot"><span class="annottext">Contract w s Text ()
+</span><a href="#local-6989586621679284195"><span class="hs-identifier hs-var">notFound</span></a></span><span> </span><span class="annot"><span class="annottext">(TxOutRef, TxOutTx, Data) -&gt; Contract w s Text ()
+</span><a href="#local-6989586621679284193"><span class="hs-identifier hs-var">found</span></a></span><span>
+</span><span id="line-105"></span><span>      </span><span class="annot"><span class="annottext">(Maybe (TxOutRef, TxOutTx, Data) -&gt; Contract w s Text ())
+-&gt; Contract w s Text (Maybe (TxOutRef, TxOutTx, Data))
+-&gt; Contract w s Text ()
+forall (m :: * -&gt; *) a b. Monad m =&gt; (a -&gt; m b) -&gt; m a -&gt; m b
+</span><span class="hs-operator hs-var">=&lt;&lt;</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; Contract w s Text (Maybe (TxOutRef, TxOutTx, Data))
+forall (s :: Row *) w.
+HasBlockchainActions s =&gt;
+Oracle -&gt; Contract w s Text (Maybe (TxOutRef, TxOutTx, Data))
+</span><a href="Mantis.Oracle.html#findOracle"><span class="hs-identifier hs-var">findOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284208"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><span id="line-106"></span><span>
+</span><span id="line-107"></span><span>
+</span><span id="line-108"></span><span class="hs-comment">-- | Endpoint for deleting (closing) the oracle.</span><span>
+</span><span id="line-109"></span><span id="local-6989586621679284252"><span id="local-6989586621679284253"><span class="annot"><a href="Mantis.Oracle.Controller.html#deleteOracle"><span class="hs-identifier hs-type">deleteOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HasBlockchainActions</span></span><span> </span><span class="annot"><a href="#local-6989586621679284253"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-110"></span><span>             </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>               </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-111"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Contract</span></span><span> </span><span class="annot"><a href="#local-6989586621679284252"><span class="hs-identifier hs-type">w</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679284253"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ Action to close the oracle.</span></span></span><span>
+</span><span id="line-112"></span><span id="deleteOracle"><span class="annot"><span class="annottext">deleteOracle :: Oracle -&gt; Contract w s Text ()
+</span><a href="Mantis.Oracle.Controller.html#deleteOracle"><span class="hs-identifier hs-var hs-var">deleteOracle</span></a></span></span><span> </span><span id="local-6989586621679284183"><span class="annot"><span class="annottext">oracle :: Oracle
+</span><a href="#local-6989586621679284183"><span class="hs-identifier hs-var">oracle</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span class="hs-special">{</span><span id="local-6989586621679284180"><span id="local-6989586621679284181"><span id="local-6989586621679284182"><span class="annot"><span class="annottext">AssetClass
+Value
+requiredFee :: Value
+datumToken :: AssetClass
+controlToken :: AssetClass
+requiredFee :: Oracle -&gt; Value
+datumToken :: Oracle -&gt; AssetClass
+controlToken :: Oracle -&gt; AssetClass
+</span><a href="#local-6989586621679284180"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-113"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-114"></span><span>    </span><span id="local-6989586621679284179"><span class="annot"><span class="annottext">PubKeyHash
+</span><a href="#local-6989586621679284179"><span class="hs-identifier hs-var">owner</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">PubKey -&gt; PubKeyHash
+</span><span class="hs-identifier hs-var">pubKeyHash</span></span><span> </span><span class="annot"><span class="annottext">(PubKey -&gt; PubKeyHash)
+-&gt; Contract w s Text PubKey -&gt; Contract w s Text PubKeyHash
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Contract w s Text PubKey
+forall w (s :: Row *) e.
+(AsContractError e, HasOwnPubKey s) =&gt;
+Contract w s e PubKey
+</span><span class="hs-identifier hs-var">ownPubKey</span></span><span>
+</span><span id="line-115"></span><span>    </span><span class="hs-keyword">let</span><span>
+</span><span id="line-116"></span><span>      </span><span id="local-6989586621679284178"><span class="annot"><span class="annottext">mustControl :: TxConstraints Action Data
+</span><a href="#local-6989586621679284178"><span class="hs-identifier hs-var hs-var">mustControl</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PubKeyHash -&gt; Value -&gt; TxConstraints Action Data
+forall i o. PubKeyHash -&gt; Value -&gt; TxConstraints i o
+</span><span class="hs-identifier hs-var">mustPayToPubKey</span></span><span>    </span><span class="annot"><span class="annottext">PubKeyHash
+</span><a href="#local-6989586621679284179"><span class="hs-identifier hs-var">owner</span></a></span><span> </span><span class="annot"><span class="annottext">(Value -&gt; TxConstraints Action Data)
+-&gt; Value -&gt; TxConstraints Action Data
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">AssetClass -&gt; Integer -&gt; Value
+</span><span class="hs-identifier hs-var">assetClassValue</span></span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679284182"><span class="hs-identifier hs-var">controlToken</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-117"></span><span>      </span><span id="local-6989586621679284177"><span class="annot"><span class="annottext">notFound :: Contract w s e ()
+</span><a href="#local-6989586621679284177"><span class="hs-identifier hs-var hs-var">notFound</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a w (s :: Row *) e. ToJSON a =&gt; a -&gt; Contract w s e ()
+forall w (s :: Row *) e.
+ToJSON [Char] =&gt;
+[Char] -&gt; Contract w s e ()
+</span><span class="hs-identifier hs-var">logError</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Contract w s e ()) -&gt; [Char] -&gt; Contract w s e ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;Oracle not found.&quot;</span></span><span>
+</span><span id="line-118"></span><span>      </span><span id="local-6989586621679284176"><span class="annot"><span class="annottext">found :: (TxOutRef, TxOutTx, Data) -&gt; Contract w s Text ()
+</span><a href="#local-6989586621679284176"><span class="hs-identifier hs-var hs-var">found</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679284175"><span class="annot"><span class="annottext">TxOutRef
+</span><a href="#local-6989586621679284175"><span class="hs-identifier hs-var">outputRef</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679284174"><span class="annot"><span class="annottext">TxOutTx
+</span><a href="#local-6989586621679284174"><span class="hs-identifier hs-var">output</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Data
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-119"></span><span>        </span><span class="hs-keyword">do</span><span>
+</span><span id="line-120"></span><span>          </span><span class="hs-keyword">let</span><span>
+</span><span id="line-121"></span><span>            </span><span id="local-6989586621679284173"><span class="annot"><span class="annottext">lookups :: ScriptLookups OracleScript
+</span><a href="#local-6989586621679284173"><span class="hs-identifier hs-var hs-var">lookups</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Validator -&gt; ScriptLookups OracleScript
+forall a. Validator -&gt; ScriptLookups a
+</span><span class="hs-identifier hs-var">otherScript</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Oracle -&gt; Validator
+</span><a href="Mantis.Oracle.html#oracleValidator"><span class="hs-identifier hs-var">oracleValidator</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284183"><span class="hs-identifier hs-var">oracle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-122"></span><span>                   </span><span class="annot"><span class="annottext">ScriptLookups OracleScript
+-&gt; ScriptLookups OracleScript -&gt; ScriptLookups OracleScript
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Map TxOutRef TxOutTx -&gt; ScriptLookups OracleScript
+forall a. Map TxOutRef TxOutTx -&gt; ScriptLookups a
+</span><span class="hs-identifier hs-var">unspentOutputs</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxOutRef -&gt; TxOutTx -&gt; Map TxOutRef TxOutTx
+forall k a. k -&gt; a -&gt; Map k a
+</span><span class="hs-identifier hs-var">M.singleton</span></span><span> </span><span class="annot"><span class="annottext">TxOutRef
+</span><a href="#local-6989586621679284175"><span class="hs-identifier hs-var">outputRef</span></a></span><span> </span><span class="annot"><span class="annottext">TxOutTx
+</span><a href="#local-6989586621679284174"><span class="hs-identifier hs-var">output</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-123"></span><span>                   </span><span class="annot"><span class="annottext">ScriptLookups OracleScript
+-&gt; ScriptLookups OracleScript -&gt; ScriptLookups OracleScript
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">ScriptInstance OracleScript -&gt; ScriptLookups OracleScript
+forall a. ScriptInstance a -&gt; ScriptLookups a
+</span><span class="hs-identifier hs-var">scriptInstanceLookups</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Oracle -&gt; ScriptInstance OracleScript
+</span><a href="Mantis.Oracle.html#oracleInstance"><span class="hs-identifier hs-var">oracleInstance</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284183"><span class="hs-identifier hs-var">oracle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-124"></span><span>            </span><span id="local-6989586621679284172"><span class="annot"><span class="annottext">tx :: TxConstraints Action Data
+</span><a href="#local-6989586621679284172"><span class="hs-identifier hs-var hs-var">tx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxConstraints Action Data
+</span><a href="#local-6989586621679284178"><span class="hs-identifier hs-var">mustControl</span></a></span><span>
+</span><span id="line-125"></span><span>              </span><span class="annot"><span class="annottext">TxConstraints Action Data
+-&gt; TxConstraints Action Data -&gt; TxConstraints Action Data
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">TxOutRef -&gt; Redeemer -&gt; TxConstraints Action Data
+forall i o. TxOutRef -&gt; Redeemer -&gt; TxConstraints i o
+</span><span class="hs-identifier hs-var">mustSpendScriptOutput</span></span><span> </span><span class="annot"><span class="annottext">TxOutRef
+</span><a href="#local-6989586621679284175"><span class="hs-identifier hs-var">outputRef</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Data -&gt; Redeemer
+</span><span class="hs-identifier hs-var">Redeemer</span></span><span> </span><span class="annot"><span class="annottext">(Data -&gt; Redeemer) -&gt; Data -&gt; Redeemer
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Action -&gt; Data
+forall a. IsData a =&gt; a -&gt; Data
+</span><span class="hs-identifier hs-var">toData</span></span><span> </span><span class="annot"><span class="annottext">Action
+</span><a href="Mantis.Oracle.Types.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-126"></span><span>          </span><span id="local-6989586621679284170"><span class="annot"><span class="annottext">Tx
+</span><a href="#local-6989586621679284170"><span class="hs-identifier hs-var">ledgerTx</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ScriptLookups OracleScript
+-&gt; TxConstraints
+     (RedeemerType OracleScript) (DatumType OracleScript)
+-&gt; Contract w s Text Tx
+forall a w (s :: Row *) e.
+(HasWriteTx s, IsData (RedeemerType a), IsData (DatumType a),
+ AsContractError e) =&gt;
+ScriptLookups a
+-&gt; TxConstraints (RedeemerType a) (DatumType a)
+-&gt; Contract w s e Tx
+</span><span class="hs-identifier hs-var">submitTxConstraintsWith</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span> </span><span class="annot"><span class="annottext">ScriptLookups OracleScript
+</span><a href="#local-6989586621679284173"><span class="hs-identifier hs-var">lookups</span></a></span><span> </span><span class="annot"><span class="annottext">TxConstraints Action Data
+TxConstraints (RedeemerType OracleScript) (DatumType OracleScript)
+</span><a href="#local-6989586621679284172"><span class="hs-identifier hs-var">tx</span></a></span><span>
+</span><span id="line-127"></span><span>          </span><span class="annot"><span class="annottext">TxId -&gt; Contract w s Text ()
+forall w (s :: Row *) e.
+(AsContractError e, HasTxConfirmation s) =&gt;
+TxId -&gt; Contract w s e ()
+</span><span class="hs-identifier hs-var">awaitTxConfirmed</span></span><span> </span><span class="annot"><span class="annottext">(TxId -&gt; Contract w s Text ()) -&gt; TxId -&gt; Contract w s Text ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Tx -&gt; TxId
+</span><span class="hs-identifier hs-var">txId</span></span><span> </span><span class="annot"><span class="annottext">Tx
+</span><a href="#local-6989586621679284170"><span class="hs-identifier hs-var">ledgerTx</span></a></span><span>
+</span><span id="line-128"></span><span>          </span><span class="annot"><span class="annottext">forall a w (s :: Row *) e. ToJSON a =&gt; a -&gt; Contract w s e ()
+forall w (s :: Row *) e.
+ToJSON [Char] =&gt;
+[Char] -&gt; Contract w s e ()
+</span><span class="hs-identifier hs-var">logInfo</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Contract w s Text ()) -&gt; [Char] -&gt; Contract w s Text ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;Deleted oracle datum.&quot;</span></span><span>
+</span><span id="line-129"></span><span>    </span><span class="annot"><span class="annottext">Contract w s Text ()
+-&gt; ((TxOutRef, TxOutTx, Data) -&gt; Contract w s Text ())
+-&gt; Maybe (TxOutRef, TxOutTx, Data)
+-&gt; Contract w s Text ()
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="annot"><span class="annottext">Contract w s Text ()
+forall w (s :: Row *) e. Contract w s e ()
+</span><a href="#local-6989586621679284177"><span class="hs-identifier hs-var">notFound</span></a></span><span> </span><span class="annot"><span class="annottext">(TxOutRef, TxOutTx, Data) -&gt; Contract w s Text ()
+</span><a href="#local-6989586621679284176"><span class="hs-identifier hs-var">found</span></a></span><span>
+</span><span id="line-130"></span><span>      </span><span class="annot"><span class="annottext">(Maybe (TxOutRef, TxOutTx, Data) -&gt; Contract w s Text ())
+-&gt; Contract w s Text (Maybe (TxOutRef, TxOutTx, Data))
+-&gt; Contract w s Text ()
+forall (m :: * -&gt; *) a b. Monad m =&gt; (a -&gt; m b) -&gt; m a -&gt; m b
+</span><span class="hs-operator hs-var">=&lt;&lt;</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; Contract w s Text (Maybe (TxOutRef, TxOutTx, Data))
+forall (s :: Row *) w.
+HasBlockchainActions s =&gt;
+Oracle -&gt; Contract w s Text (Maybe (TxOutRef, TxOutTx, Data))
+</span><a href="Mantis.Oracle.html#findOracle"><span class="hs-identifier hs-var">findOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284183"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><span id="line-131"></span><span>
+</span><span id="line-132"></span><span>
+</span><span id="line-133"></span><span class="hs-comment">-- | Create the oracle and run its control endpoints.</span><span>
+</span><span id="line-134"></span><span class="annot"><a href="Mantis.Oracle.Controller.html#runOracleController"><span class="hs-identifier hs-type">runOracleController</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Parameters"><span class="hs-identifier hs-type">Parameters</span></a></span><span>                                  </span><span class="hs-comment">-- ^ The oracle's parameters.</span><span>
+</span><span id="line-135"></span><span>                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Contract</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Last</span></span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="Mantis.Oracle.Controller.html#OracleSchema"><span class="hs-identifier hs-type">OracleSchema</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ Action for creating and running the oracle.</span><span>
+</span><span id="line-136"></span><span id="runOracleController"><span class="annot"><span class="annottext">runOracleController :: Parameters -&gt; Contract (Last Oracle) OracleSchema Text ()
+</span><a href="Mantis.Oracle.Controller.html#runOracleController"><span class="hs-identifier hs-var hs-var">runOracleController</span></a></span></span><span> </span><span id="local-6989586621679284169"><span class="annot"><span class="annottext">Parameters
+</span><a href="#local-6989586621679284169"><span class="hs-identifier hs-var">parameters</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-137"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-138"></span><span>    </span><span id="local-6989586621679284168"><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284168"><span class="hs-identifier hs-var">oracle</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parameters
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     Oracle
+forall (s :: Row *) w.
+HasBlockchainActions s =&gt;
+Parameters -&gt; Contract w s Text Oracle
+</span><a href="Mantis.Oracle.Controller.html#createOracle"><span class="hs-identifier hs-var">createOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Parameters
+</span><a href="#local-6989586621679284169"><span class="hs-identifier hs-var">parameters</span></a></span><span>
+</span><span id="line-139"></span><span>    </span><span class="annot"><span class="annottext">Last Oracle
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+forall w (s :: Row *) e. w -&gt; Contract w s e ()
+</span><span class="hs-identifier hs-var">tell</span></span><span> </span><span class="annot"><span class="annottext">(Last Oracle
+ -&gt; Contract
+      (Last Oracle)
+      ('R
+         '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+            &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+            &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+            &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+            &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+            &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+            &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+            &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+            &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+            &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+            &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+      Text
+      ())
+-&gt; (Maybe Oracle -&gt; Last Oracle)
+-&gt; Maybe Oracle
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Maybe Oracle -&gt; Last Oracle
+forall a. Maybe a -&gt; Last a
+</span><span class="hs-identifier hs-var">Last</span></span><span> </span><span class="annot"><span class="annottext">(Maybe Oracle
+ -&gt; Contract
+      (Last Oracle)
+      ('R
+         '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+            &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+            &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+            &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+            &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+            &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+            &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+            &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+            &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+            &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+            &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+      Text
+      ())
+-&gt; Maybe Oracle
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; Maybe Oracle
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284168"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><span id="line-140"></span><span>    </span><span class="hs-keyword">let</span><span>
+</span><span id="line-141"></span><span>      </span><span id="local-6989586621679284165"><span class="annot"><span class="annottext">write' :: Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+</span><a href="#local-6989586621679284165"><span class="hs-identifier hs-var hs-var">write'</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a w (s :: Row *) e.
+(HasEndpoint &quot;write&quot; a s, AsContractError e) =&gt;
+Contract w s e a
+forall (l :: Symbol) a w (s :: Row *) e.
+(HasEndpoint l a s, AsContractError e) =&gt;
+Contract w s e a
+</span><span class="hs-identifier hs-var">endpoint</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><span class="hs-string">&quot;write&quot;</span></span><span>  </span><span class="annot"><span class="annottext">Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  Data
+-&gt; (Data
+    -&gt; Contract
+         (Last Oracle)
+         ('R
+            '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+               &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+               &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+               &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+               &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+               &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+               &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+               &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+               &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+               &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+               &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+         Text
+         ())
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">Oracle
+-&gt; Data
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+forall (s :: Row *) w.
+HasBlockchainActions s =&gt;
+Oracle -&gt; Data -&gt; Contract w s Text ()
+</span><a href="Mantis.Oracle.Controller.html#writeOracle"><span class="hs-identifier hs-var">writeOracle</span></a></span><span>  </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284168"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><span id="line-142"></span><span>      </span><span id="local-6989586621679284164"><span class="annot"><span class="annottext">read' :: Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+</span><a href="#local-6989586621679284164"><span class="hs-identifier hs-var hs-var">read'</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a w (s :: Row *) e.
+(HasEndpoint &quot;read&quot; a s, AsContractError e) =&gt;
+Contract w s e a
+forall (l :: Symbol) a w (s :: Row *) e.
+(HasEndpoint l a s, AsContractError e) =&gt;
+Contract w s e a
+</span><span class="hs-identifier hs-var">endpoint</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><span class="hs-string">&quot;read&quot;</span></span><span>   </span><span class="annot"><span class="annottext">Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     (Maybe Data)
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     (Maybe Data)
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;</span></span><span>  </span><span class="annot"><span class="annottext">Oracle
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     (Maybe Data)
+forall (s :: Row *) w.
+HasBlockchainActions s =&gt;
+Oracle -&gt; Contract w s Text (Maybe Data)
+</span><a href="Mantis.Oracle.Client.html#readOracle"><span class="hs-identifier hs-var">readOracle</span></a></span><span>   </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284168"><span class="hs-identifier hs-var">oracle</span></a></span><span> </span><span class="annot"><span class="annottext">Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  (Maybe Data)
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">()
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-143"></span><span>      </span><span id="local-6989586621679284163"><span class="annot"><span class="annottext">delete' :: Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+</span><a href="#local-6989586621679284163"><span class="hs-identifier hs-var hs-var">delete'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">forall a w (s :: Row *) e.
+(HasEndpoint &quot;delete&quot; a s, AsContractError e) =&gt;
+Contract w s e a
+forall (l :: Symbol) a w (s :: Row *) e.
+(HasEndpoint l a s, AsContractError e) =&gt;
+Contract w s e a
+</span><span class="hs-identifier hs-var">endpoint</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><span class="hs-string">&quot;delete&quot;</span></span><span> </span><span class="annot"><span class="annottext">Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;</span></span><span>  </span><span class="annot"><span class="annottext">Oracle
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+forall (s :: Row *) w.
+HasBlockchainActions s =&gt;
+Oracle -&gt; Contract w s Text ()
+</span><a href="Mantis.Oracle.Controller.html#deleteOracle"><span class="hs-identifier hs-var">deleteOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679284168"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><span id="line-144"></span><span>      </span><span id="local-6989586621679284162"><span class="annot"><span class="annottext">go :: Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+</span><a href="#local-6989586621679284162"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+</span><a href="#local-6989586621679284165"><span class="hs-identifier hs-var">write'</span></a></span><span> </span><span class="annot"><span class="annottext">Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+forall w (s :: Row *) e a.
+Contract w s e a -&gt; Contract w s e a -&gt; Contract w s e a
+</span><span class="hs-operator hs-var">`select`</span></span><span> </span><span class="annot"><span class="annottext">Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+</span><a href="#local-6989586621679284164"><span class="hs-identifier hs-var">read'</span></a></span><span> </span><span class="annot"><span class="annottext">Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+forall w (s :: Row *) e a.
+Contract w s e a -&gt; Contract w s e a -&gt; Contract w s e a
+</span><span class="hs-operator hs-var">`select`</span></span><span> </span><span class="annot"><span class="annottext">Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+</span><a href="#local-6989586621679284163"><span class="hs-identifier hs-var">delete'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+-&gt; Contract
+     (Last Oracle)
+     ('R
+        '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+           &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+           &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+           &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+           &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+           &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+           &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+           &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+           &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+           &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+     Text
+     ()
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+</span><a href="#local-6989586621679284162"><span class="hs-identifier hs-var">go</span></a></span><span>
+</span><span id="line-145"></span><span>    </span><span class="annot"><span class="annottext">Contract
+  (Last Oracle)
+  ('R
+     '[ &quot;address&quot; ':-&gt; (AddressChangeResponse, AddressChangeRequest),
+        &quot;delete&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;notify-instance&quot; ':-&gt; (Maybe NotificationError, Notification),
+        &quot;own-instance-id&quot; ':-&gt; (ContractInstanceId, OwnIdRequest),
+        &quot;own-pubkey&quot; ':-&gt; (PubKey, OwnPubKeyRequest),
+        &quot;read&quot; ':-&gt; (EndpointValue (), ActiveEndpoint),
+        &quot;slot&quot; ':-&gt; (Slot, WaitingForSlot),
+        &quot;tx&quot; ':-&gt; (WriteTxResponse, UnbalancedTx),
+        &quot;tx-confirmation&quot; ':-&gt; (TxConfirmed, TxId),
+        &quot;utxo-at&quot; ':-&gt; (UtxoAtAddress, Address),
+        &quot;write&quot; ':-&gt; (EndpointValue Data, ActiveEndpoint)])
+  Text
+  ()
+</span><a href="#local-6989586621679284162"><span class="hs-identifier hs-var">go</span></a></span><span>
+</span><span id="line-146"></span></pre></body></html>

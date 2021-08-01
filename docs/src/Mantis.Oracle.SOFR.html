@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-----------------------------------------------------------------------------</span><span>
+</span><span id="line-2"></span><span class="hs-comment">--</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Module      :  $Headers</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Copyright   :  (c) 2021 Brian W Bush</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- License     :  MIT</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Maintainer  :  Brian W Bush &lt;code@functionally.io&gt;</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Stability   :  Experimental</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Portability :  Portable</span><span>
+</span><span id="line-10"></span><span class="hs-comment">--</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- | Oracle for NY Federal Reserver SOFR spot data.</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-----------------------------------------------------------------------------</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings  #-}</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Mantis.Oracle.SOFR</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-20"></span><span class="annot"><span class="hs-comment">-- * Data sources</span></span><span>
+</span><span id="line-21"></span><span>  </span><span class="annot"><a href="Mantis.Oracle.SOFR.html#fetchSOFR"><span class="hs-identifier">fetchSOFR</span></a></span><span>
+</span><span id="line-22"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad</span></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">guard</span></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.IO.Class</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">liftIO</span></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Aeson</span></span><span>             </span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(.:)</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">withObject</span></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Aeson.Types</span></span><span>       </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Parser</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">parseMaybe</span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Network.HTTP.Req</span></span><span>       </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">GET</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">NoReqBody</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(/:)</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">defaultHttpConfig</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">https</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">jsonResponse</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">req</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">responseBody</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">runReq</span></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">PlutusTx</span></span><span>               </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.ByteString.Char8</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">BS</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">pack</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Vector</span></span><span>           </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">V</span></span><span>  </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="hs-glyph">!</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">null</span></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-comment">-- | Fetch the latest SOFR percent rate from the NY Federal Reserve API.</span><span>
+</span><span id="line-37"></span><span class="annot"><a href="Mantis.Oracle.SOFR.html#fetchSOFR"><span class="hs-identifier hs-type">fetchSOFR</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Data</span></span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ Action for fetching the latest SOFR.</span><span>
+</span><span id="line-38"></span><span id="fetchSOFR"><span class="annot"><span class="annottext">fetchSOFR :: IO (Maybe Data)
+</span><a href="Mantis.Oracle.SOFR.html#fetchSOFR"><span class="hs-identifier hs-var hs-var">fetchSOFR</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-39"></span><span>  </span><span class="annot"><span class="annottext">HttpConfig -&gt; Req (Maybe Data) -&gt; IO (Maybe Data)
+forall (m :: * -&gt; *) a. MonadIO m =&gt; HttpConfig -&gt; Req a -&gt; m a
+</span><span class="hs-identifier hs-var">runReq</span></span><span> </span><span class="annot"><span class="annottext">HttpConfig
+</span><span class="hs-identifier hs-var">defaultHttpConfig</span></span><span>
+</span><span id="line-40"></span><span>    </span><span class="annot"><span class="annottext">(Req (Maybe Data) -&gt; IO (Maybe Data))
+-&gt; Req (Maybe Data) -&gt; IO (Maybe Data)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-41"></span><span>      </span><span id="local-6989586621679283530"><span class="annot"><span class="annottext">JsonResponse Object
+</span><a href="#local-6989586621679283530"><span class="hs-identifier hs-var">result</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-42"></span><span>        </span><span class="annot"><span class="annottext">GET
+-&gt; Url 'Https
+-&gt; NoReqBody
+-&gt; Proxy (JsonResponse Object)
+-&gt; Option 'Https
+-&gt; Req (JsonResponse Object)
+forall (m :: * -&gt; *) method body response (scheme :: Scheme).
+(MonadHttp m, HttpMethod method, HttpBody body,
+ HttpResponse response,
+ HttpBodyAllowed (AllowsBody method) (ProvidesBody body)) =&gt;
+method
+-&gt; Url scheme
+-&gt; body
+-&gt; Proxy response
+-&gt; Option scheme
+-&gt; m response
+</span><span class="hs-identifier hs-var">req</span></span><span>
+</span><span id="line-43"></span><span>          </span><span class="annot"><span class="annottext">GET
+</span><span class="hs-identifier hs-var">GET</span></span><span>
+</span><span id="line-44"></span><span>          </span><span class="hs-special">(</span><span>
+</span><span id="line-45"></span><span>            </span><span class="annot"><span class="annottext">Text -&gt; Url 'Https
+</span><span class="hs-identifier hs-var">https</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;markets.newyorkfed.org&quot;</span></span><span>
+</span><span id="line-46"></span><span>              </span><span class="annot"><span class="annottext">Url 'Https -&gt; Text -&gt; Url 'Https
+forall (scheme :: Scheme). Url scheme -&gt; Text -&gt; Url scheme
+</span><span class="hs-operator hs-var">/:</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;api&quot;</span></span><span>
+</span><span id="line-47"></span><span>              </span><span class="annot"><span class="annottext">Url 'Https -&gt; Text -&gt; Url 'Https
+forall (scheme :: Scheme). Url scheme -&gt; Text -&gt; Url scheme
+</span><span class="hs-operator hs-var">/:</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;rates&quot;</span></span><span>
+</span><span id="line-48"></span><span>              </span><span class="annot"><span class="annottext">Url 'Https -&gt; Text -&gt; Url 'Https
+forall (scheme :: Scheme). Url scheme -&gt; Text -&gt; Url scheme
+</span><span class="hs-operator hs-var">/:</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;secured&quot;</span></span><span>
+</span><span id="line-49"></span><span>              </span><span class="annot"><span class="annottext">Url 'Https -&gt; Text -&gt; Url 'Https
+forall (scheme :: Scheme). Url scheme -&gt; Text -&gt; Url scheme
+</span><span class="hs-operator hs-var">/:</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;sofr&quot;</span></span><span>
+</span><span id="line-50"></span><span>              </span><span class="annot"><span class="annottext">Url 'Https -&gt; Text -&gt; Url 'Https
+forall (scheme :: Scheme). Url scheme -&gt; Text -&gt; Url scheme
+</span><span class="hs-operator hs-var">/:</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;last&quot;</span></span><span>
+</span><span id="line-51"></span><span>              </span><span class="annot"><span class="annottext">Url 'Https -&gt; Text -&gt; Url 'Https
+forall (scheme :: Scheme). Url scheme -&gt; Text -&gt; Url scheme
+</span><span class="hs-operator hs-var">/:</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;1.json&quot;</span></span><span>
+</span><span id="line-52"></span><span>          </span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>          </span><span class="annot"><span class="annottext">NoReqBody
+</span><span class="hs-identifier hs-var">NoReqBody</span></span><span>
+</span><span id="line-54"></span><span>          </span><span class="annot"><span class="annottext">Proxy (JsonResponse Object)
+forall a. Proxy (JsonResponse a)
+</span><span class="hs-identifier hs-var">jsonResponse</span></span><span>
+</span><span id="line-55"></span><span>          </span><span class="annot"><span class="annottext">Option 'Https
+forall a. Monoid a =&gt; a
+</span><span class="hs-identifier hs-var">mempty</span></span><span>
+</span><span id="line-56"></span><span>      </span><span class="hs-keyword">let</span><span>
+</span><span id="line-57"></span><span>        </span><span id="local-6989586621679283527"><span class="annot"><span class="annottext">sofr :: Maybe Data
+</span><a href="#local-6989586621679283527"><span class="hs-identifier hs-var hs-var">sofr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-58"></span><span>          </span><span class="annot"><span class="annottext">((Object -&gt; Parser Data) -&gt; Object -&gt; Maybe Data)
+-&gt; Object -&gt; (Object -&gt; Parser Data) -&gt; Maybe Data
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">(Object -&gt; Parser Data) -&gt; Object -&gt; Maybe Data
+forall a b. (a -&gt; Parser b) -&gt; a -&gt; Maybe b
+</span><span class="hs-identifier hs-var">parseMaybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">JsonResponse Object -&gt; HttpResponseBody (JsonResponse Object)
+forall response.
+HttpResponse response =&gt;
+response -&gt; HttpResponseBody response
+</span><span class="hs-identifier hs-var">responseBody</span></span><span> </span><span class="annot"><span class="annottext">JsonResponse Object
+</span><a href="#local-6989586621679283530"><span class="hs-identifier hs-var">result</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-59"></span><span>            </span><span class="annot"><span class="annottext">((Object -&gt; Parser Data) -&gt; Maybe Data)
+-&gt; (Object -&gt; Parser Data) -&gt; Maybe Data
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679283525"><span class="annot"><span class="annottext">Object
+</span><a href="#local-6989586621679283525"><span class="hs-identifier hs-var">o</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-60"></span><span>              </span><span class="hs-keyword">do</span><span>
+</span><span id="line-61"></span><span>                </span><span id="local-6989586621679283524"><span class="annot"><span class="annottext">Vector Value
+</span><a href="#local-6989586621679283524"><span class="hs-identifier hs-var">refRates</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Object
+</span><a href="#local-6989586621679283525"><span class="hs-identifier hs-var">o</span></a></span><span> </span><span class="annot"><span class="annottext">Object -&gt; Text -&gt; Parser (Vector Value)
+forall a. FromJSON a =&gt; Object -&gt; Text -&gt; Parser a
+</span><span class="hs-operator hs-var">.:</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;refRates&quot;</span></span><span>
+</span><span id="line-62"></span><span>                </span><span class="annot"><span class="annottext">Bool -&gt; Parser ()
+forall (f :: * -&gt; *). Alternative f =&gt; Bool -&gt; f ()
+</span><span class="hs-identifier hs-var">guard</span></span><span>
+</span><span id="line-63"></span><span>                  </span><span class="annot"><span class="annottext">(Bool -&gt; Parser ()) -&gt; (Bool -&gt; Bool) -&gt; Bool -&gt; Parser ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Parser ()) -&gt; Bool -&gt; Parser ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Vector Value -&gt; Bool
+forall a. Vector a -&gt; Bool
+</span><span class="hs-identifier hs-var">V.null</span></span><span> </span><span class="annot"><span class="annottext">Vector Value
+</span><a href="#local-6989586621679283524"><span class="hs-identifier hs-var">refRates</span></a></span><span>
+</span><span id="line-64"></span><span>                </span><span class="annot"><span class="annottext">((Object -&gt; Parser Data) -&gt; Value -&gt; Parser Data)
+-&gt; Value -&gt; (Object -&gt; Parser Data) -&gt; Parser Data
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; (Object -&gt; Parser Data) -&gt; Value -&gt; Parser Data
+forall a. String -&gt; (Object -&gt; Parser a) -&gt; Value -&gt; Parser a
+</span><span class="hs-identifier hs-var">withObject</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;refRate&quot;</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Vector Value
+</span><a href="#local-6989586621679283524"><span class="hs-identifier hs-var">refRates</span></a></span><span> </span><span class="annot"><span class="annottext">Vector Value -&gt; Int -&gt; Value
+forall a. Vector a -&gt; Int -&gt; a
+</span><span class="hs-operator hs-var">V.!</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((Object -&gt; Parser Data) -&gt; Parser Data)
+-&gt; (Object -&gt; Parser Data) -&gt; Parser Data
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679283521"><span class="annot"><span class="annottext">Object
+</span><a href="#local-6989586621679283521"><span class="hs-identifier hs-var">o'</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-65"></span><span>                  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-66"></span><span>                    </span><span id="local-6989586621679283520"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679283520"><span class="hs-identifier hs-var">effectiveDate</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Object
+</span><a href="#local-6989586621679283521"><span class="hs-identifier hs-var">o'</span></a></span><span> </span><span class="annot"><span class="annottext">Object -&gt; Text -&gt; Parser String
+forall a. FromJSON a =&gt; Object -&gt; Text -&gt; Parser a
+</span><span class="hs-operator hs-var">.:</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;effectiveDate&quot;</span></span><span>
+</span><span id="line-67"></span><span>                    </span><span id="local-6989586621679283519"><span class="annot"><span class="annottext">Double
+</span><a href="#local-6989586621679283519"><span class="hs-identifier hs-var">percentRate</span></a></span></span><span>   </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Object
+</span><a href="#local-6989586621679283521"><span class="hs-identifier hs-var">o'</span></a></span><span> </span><span class="annot"><span class="annottext">Object -&gt; Text -&gt; Parser Double
+forall a. FromJSON a =&gt; Object -&gt; Text -&gt; Parser a
+</span><span class="hs-operator hs-var">.:</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;percentRate&quot;</span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Parser</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Double</span></span><span>
+</span><span id="line-68"></span><span>                    </span><span class="annot"><span class="annottext">Data -&gt; Parser Data
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span>
+</span><span id="line-69"></span><span>                      </span><span class="annot"><span class="annottext">(Data -&gt; Parser Data) -&gt; Data -&gt; Parser Data
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[(Data, Data)] -&gt; Data
+</span><span class="hs-identifier hs-var">Map</span></span><span>
+</span><span id="line-70"></span><span>                      </span><span class="hs-special">[</span><span>
+</span><span id="line-71"></span><span>                        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; Data
+</span><span class="hs-identifier hs-var">B</span></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><span class="hs-string">&quot;effectiveDate&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Data
+</span><span class="hs-identifier hs-var">B</span></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; Data) -&gt; ByteString -&gt; Data
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ByteString
+</span><span class="hs-identifier hs-var">BS.pack</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679283520"><span class="hs-identifier hs-var">effectiveDate</span></a></span><span>     </span><span class="hs-special">)</span><span>
+</span><span id="line-72"></span><span>                      </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ByteString -&gt; Data
+</span><span class="hs-identifier hs-var">B</span></span><span> </span><span class="annot"><span class="annottext">ByteString
+</span><span class="hs-string">&quot;percentRate&quot;</span></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; Data
+</span><span class="hs-identifier hs-var">B</span></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; Data) -&gt; (String -&gt; ByteString) -&gt; String -&gt; Data
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ByteString
+</span><span class="hs-identifier hs-var">BS.pack</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Data) -&gt; String -&gt; Data
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Double -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Double
+</span><a href="#local-6989586621679283519"><span class="hs-identifier hs-var">percentRate</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>                      </span><span class="hs-special">]</span><span>
+</span><span id="line-74"></span><span>      </span><span class="annot"><span class="annottext">IO () -&gt; Req ()
+forall (m :: * -&gt; *) a. MonadIO m =&gt; IO a -&gt; m a
+</span><span class="hs-identifier hs-var">liftIO</span></span><span> </span><span class="annot"><span class="annottext">(IO () -&gt; Req ()) -&gt; (String -&gt; IO ()) -&gt; String -&gt; Req ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; IO ()
+</span><span class="hs-identifier hs-var">putStrLn</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Req ()) -&gt; String -&gt; Req ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Got SOFR: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Maybe Data -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Maybe Data
+</span><a href="#local-6989586621679283527"><span class="hs-identifier hs-var">sofr</span></a></span><span>
+</span><span id="line-75"></span><span>      </span><span class="annot"><span class="annottext">Maybe Data -&gt; Req (Maybe Data)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Maybe Data
+</span><a href="#local-6989586621679283527"><span class="hs-identifier hs-var">sofr</span></a></span><span>
+</span><span id="line-76"></span></pre></body></html>

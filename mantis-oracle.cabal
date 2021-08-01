@@ -48,7 +48,7 @@ library
                   , uuid
                   , vector
   default-language: Haskell2010
-  ghc-options     : -fobject-code -fno-ignore-interface-pragmas -fno-omit-interface-pragmas -fno-strictness -fno-spec-constr -fno-specialise -Wall
+  ghc-options     : -fplugin-opt PlutusTx.Plugin:defer-errors -fobject-code -fno-ignore-interface-pragmas -fno-omit-interface-pragmas -fno-strictness -fno-spec-constr -fno-specialise -Wall
 
 executable mantis-oracle
    hs-source-dirs  : app
@@ -64,4 +64,4 @@ executable mantis-oracle
                    , plutus-ledger
                    , text
    default-language: Haskell2010
-   ghc-options     : -Wall
+   ghc-options     : -fplugin-opt PlutusTx.Plugin:defer-errors -Wall

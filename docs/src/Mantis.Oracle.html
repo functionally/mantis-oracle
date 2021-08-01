@@ -1,0 +1,532 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-----------------------------------------------------------------------------</span><span>
+</span><span id="line-2"></span><span class="hs-comment">--</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Module      :  $Headers</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Copyright   :  (c) 2021 Brian W Bush</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- License     :  MIT</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Maintainer  :  Brian W Bush &lt;code@functionally.io&gt;</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Stability   :  Experimental</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Portability :  Portable</span><span>
+</span><span id="line-10"></span><span class="hs-comment">--</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- | Oracle for general data.</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-----------------------------------------------------------------------------</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-pragma">{-# LANGUAGE AllowAmbiguousTypes   #-}</span><span>
+</span><span id="line-17"></span><span class="hs-pragma">{-# LANGUAGE DataKinds             #-}</span><span>
+</span><span id="line-18"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts      #-}</span><span>
+</span><span id="line-19"></span><span class="hs-pragma">{-# LANGUAGE MultiParamTypeClasses #-}</span><span>
+</span><span id="line-20"></span><span class="hs-pragma">{-# LANGUAGE NoImplicitPrelude     #-}</span><span>
+</span><span id="line-21"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings     #-}</span><span>
+</span><span id="line-22"></span><span class="hs-pragma">{-# LANGUAGE RecordWildCards       #-}</span><span>
+</span><span id="line-23"></span><span class="hs-pragma">{-# LANGUAGE ScopedTypeVariables   #-}</span><span>
+</span><span id="line-24"></span><span class="hs-pragma">{-# LANGUAGE TemplateHaskell       #-}</span><span>
+</span><span id="line-25"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications      #-}</span><span>
+</span><span id="line-26"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies          #-}</span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-orphans #-}</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Mantis.Oracle</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-32"></span><span class="annot"><span class="hs-comment">-- * Oracle</span></span><span>
+</span><span id="line-33"></span><span>  </span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier">OracleScript</span></a></span><span>
+</span><span id="line-34"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#oracleInstance"><span class="hs-identifier">oracleInstance</span></a></span><span>
+</span><span id="line-35"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#oracleValidator"><span class="hs-identifier">oracleValidator</span></a></span><span>
+</span><span id="line-36"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#oracleAddress"><span class="hs-identifier">oracleAddress</span></a></span><span>
+</span><span id="line-37"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#exportOracle"><span class="hs-identifier">exportOracle</span></a></span><span>
+</span><span id="line-38"></span><span class="annot"><span class="hs-comment">-- * Access</span></span><span>
+</span><span id="line-39"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#findOracle"><span class="hs-identifier">findOracle</span></a></span><span>
+</span><span id="line-40"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#fetchDatum"><span class="hs-identifier">fetchDatum</span></a></span><span>
+</span><span id="line-41"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">PlutusTx.Prelude</span></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(&lt;&gt;)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Codec.Serialise</span></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">serialise</span></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ledger</span></span><span>               </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Address</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Datum</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">DatumHash</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ScriptContext</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">TxOut</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">TxOutRef</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">TxOutTx</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Validator</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">findDatum</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">findOwnInput</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">getContinuingOutputs</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">scriptAddress</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">txInInfoResolved</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">txData</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">txOutValue</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">valueSpent</span></span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ledger.Typed.Scripts</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">DatumType</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">RedeemerType</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ScriptInstance</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ScriptType</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">validator</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">validatorScript</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">wrapValidator</span></span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ledger.Value</span></span><span>         </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">assetClassValueOf</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">geq</span></span><span class="hs-special">)</span><span>
+</span><span id="line-51"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html"><span class="hs-identifier">Mantis.Oracle.Types</span></a></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier">Action</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier">Oracle</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-52"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Prelude</span></span><span>              </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">FilePath</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">IO</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(&lt;&gt;)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Plutus.Contract</span></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Contract</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">HasBlockchainActions</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">utxoAt</span></span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">PlutusTx</span></span><span>             </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Data</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">applyCode</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">compile</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">fromData</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">liftCode</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">makeLift</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">unstableMakeIsData</span></span><span class="hs-special">)</span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.ByteString.Lazy</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">LBS</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">writeFile</span></span><span class="hs-special">)</span><span>
+</span><span id="line-57"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span>      </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">filter</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">lookup</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">toList</span></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span id="local-6989586621679283814"><span id="local-6989586621679283816"><span class="hs-identifier">makeLift</span><span> </span><span class="hs-special">''</span><span class="hs-identifier">Oracle</span></span></span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span id="local-6989586621679283806"><span id="local-6989586621679283808"><span class="hs-identifier">unstableMakeIsData</span><span> </span><span class="hs-special">''</span><span class="hs-identifier">Action</span></span></span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span class="hs-pragma">{-# INLINABLE</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#makeValidator"><span class="hs-pragma hs-type">makeValidator</span></a></span><span> </span><span class="hs-pragma">#-}</span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span class="hs-comment">-- | Make the validator for the oracle.</span><span>
+</span><span id="line-68"></span><span class="annot"><a href="Mantis.Oracle.html#makeValidator"><span class="hs-identifier hs-type">makeValidator</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>         </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-69"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Data</span></span><span>           </span><span class="hs-comment">-- ^ The datum.</span><span>
+</span><span id="line-70"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>         </span><span class="hs-comment">-- ^ The redeemer.</span><span>
+</span><span id="line-71"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ScriptContext</span></span><span>  </span><span class="hs-comment">-- ^ The context.</span><span>
+</span><span id="line-72"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>           </span><span class="hs-comment">-- ^ Whether the transaction is valid.</span><span>
+</span><span id="line-73"></span><span id="makeValidator"><span class="annot"><span class="annottext">makeValidator :: Oracle -&gt; Data -&gt; Action -&gt; ScriptContext -&gt; Bool
+</span><a href="Mantis.Oracle.html#makeValidator"><span class="hs-identifier hs-var hs-var">makeValidator</span></a></span></span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span class="hs-special">{</span><span id="local-6989586621679283799"><span id="local-6989586621679283800"><span id="local-6989586621679283801"><span class="annot"><span class="annottext">AssetClass
+Value
+requiredFee :: Oracle -&gt; Value
+datumToken :: Oracle -&gt; AssetClass
+controlToken :: Oracle -&gt; AssetClass
+requiredFee :: Value
+datumToken :: AssetClass
+controlToken :: AssetClass
+</span><a href="Mantis.Oracle.Types.html#requiredFee"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679283795"><span class="annot"><span class="annottext">Data
+</span><a href="#local-6989586621679283795"><span class="hs-identifier hs-var">inputDatum</span></a></span></span><span> </span><span id="local-6989586621679283794"><span class="annot"><span class="annottext">Action
+</span><a href="#local-6989586621679283794"><span class="hs-identifier hs-var">redeemer</span></a></span></span><span> </span><span id="local-6989586621679283793"><span class="annot"><span class="annottext">context :: ScriptContext
+</span><a href="#local-6989586621679283793"><span class="hs-identifier hs-var">context</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><span class="hs-identifier hs-type">ScriptContext</span></span><span class="hs-special">{</span><span id="local-6989586621679283790"><span id="local-6989586621679283791"><span class="annot"><span class="annottext">ScriptPurpose
+TxInfo
+scriptContextTxInfo :: ScriptContext -&gt; TxInfo
+scriptContextPurpose :: ScriptContext -&gt; ScriptPurpose
+scriptContextPurpose :: ScriptPurpose
+scriptContextTxInfo :: TxInfo
+</span><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span>  </span><span class="hs-keyword">let</span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span>    </span><span class="hs-comment">-- Oracle input and output.</span><span>
+</span><span id="line-78"></span><span>    </span><span id="local-6989586621679283787"><span class="annot"><span class="annottext">continuingOutputs :: [TxOut]
+</span><a href="#local-6989586621679283787"><span class="hs-identifier hs-var hs-var">continuingOutputs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ScriptContext -&gt; [TxOut]
+</span><span class="hs-identifier hs-var">getContinuingOutputs</span></span><span> </span><span class="annot"><span class="annottext">ScriptContext
+</span><a href="#local-6989586621679283793"><span class="hs-identifier hs-var">context</span></a></span><span>
+</span><span id="line-79"></span><span>    </span><span id="local-6989586621679283786"><span class="annot"><span class="annottext">oracleInput :: TxOut
+</span><a href="#local-6989586621679283786"><span class="hs-identifier hs-var hs-var">oracleInput</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-80"></span><span>      </span><span class="annot"><span class="annottext">TxOut -&gt; (TxInInfo -&gt; TxOut) -&gt; Maybe TxInInfo -&gt; TxOut
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; TxOut
+forall a. String -&gt; a
+</span><span class="hs-identifier hs-var">traceError</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Missing oracle input.&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TxInInfo -&gt; TxOut
+</span><span class="hs-identifier hs-var hs-var">txInInfoResolved</span></span><span>
+</span><span id="line-81"></span><span>        </span><span class="annot"><span class="annottext">(Maybe TxInInfo -&gt; TxOut) -&gt; Maybe TxInInfo -&gt; TxOut
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ScriptContext -&gt; Maybe TxInInfo
+</span><span class="hs-identifier hs-var">findOwnInput</span></span><span> </span><span class="annot"><span class="annottext">ScriptContext
+</span><a href="#local-6989586621679283793"><span class="hs-identifier hs-var">context</span></a></span><span>
+</span><span id="line-82"></span><span>    </span><span id="local-6989586621679283782"><span class="annot"><span class="annottext">oracleOutput :: TxOut
+</span><a href="#local-6989586621679283782"><span class="hs-identifier hs-var hs-var">oracleOutput</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-83"></span><span>      </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[TxOut]
+</span><a href="#local-6989586621679283787"><span class="hs-identifier hs-var">continuingOutputs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-84"></span><span>        </span><span class="hs-special">[</span><span id="local-6989586621679283781"><span class="annot"><span class="annottext">TxOut
+</span><a href="#local-6989586621679283781"><span class="hs-identifier hs-var">output</span></a></span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TxOut
+</span><a href="#local-6989586621679283781"><span class="hs-identifier hs-var">output</span></a></span><span>
+</span><span id="line-85"></span><span>        </span><span class="annot"><span class="annottext">[TxOut]
+</span><span class="hs-identifier">_</span></span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; TxOut
+forall a. String -&gt; a
+</span><span class="hs-identifier hs-var">traceError</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Not exactly one oracle output.&quot;</span></span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span>    </span><span class="hs-comment">-- Datum token.</span><span>
+</span><span id="line-88"></span><span>    </span><span id="local-6989586621679283780"><span class="annot"><span class="annottext">datumTokenInput :: Bool
+</span><a href="#local-6989586621679283780"><span class="hs-identifier hs-var hs-var">datumTokenInput</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetClass -&gt; Integer
+</span><span class="hs-identifier hs-var">assetClassValueOf</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxOut -&gt; Value
+</span><span class="hs-identifier hs-var hs-var">txOutValue</span></span><span> </span><span class="annot"><span class="annottext">TxOut
+</span><a href="#local-6989586621679283786"><span class="hs-identifier hs-var">oracleInput</span></a></span><span> </span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679283800"><span class="hs-identifier hs-var">datumToken</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-89"></span><span>    </span><span id="local-6989586621679283778"><span class="annot"><span class="annottext">datumTokenOutput :: Bool
+</span><a href="#local-6989586621679283778"><span class="hs-identifier hs-var hs-var">datumTokenOutput</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetClass -&gt; Integer
+</span><span class="hs-identifier hs-var">assetClassValueOf</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxOut -&gt; Value
+</span><span class="hs-identifier hs-var hs-var">txOutValue</span></span><span> </span><span class="annot"><span class="annottext">TxOut
+</span><a href="#local-6989586621679283782"><span class="hs-identifier hs-var">oracleOutput</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679283800"><span class="hs-identifier hs-var">datumToken</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-90"></span><span>    </span><span id="local-6989586621679283777"><span class="annot"><span class="annottext">singleDatum :: Bool
+</span><a href="#local-6989586621679283777"><span class="hs-identifier hs-var hs-var">singleDatum</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-91"></span><span>         </span><span class="annot"><span class="annottext">String -&gt; Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Missing single oracle token input.&quot;</span></span><span>  </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679283780"><span class="hs-identifier hs-var">datumTokenInput</span></a></span><span>
+</span><span id="line-92"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Missing single oracle token output.&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679283778"><span class="hs-identifier hs-var">datumTokenOutput</span></a></span><span>
+</span><span id="line-93"></span><span>
+</span><span id="line-94"></span><span>    </span><span class="hs-comment">-- Datum value.</span><span>
+</span><span id="line-95"></span><span>    </span><span id="local-6989586621679283774"><span class="annot"><span class="annottext">outputDatum :: Maybe Data
+</span><a href="#local-6989586621679283774"><span class="hs-identifier hs-var hs-var">outputDatum</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxOut -&gt; (DatumHash -&gt; Maybe Datum) -&gt; Maybe Data
+</span><a href="Mantis.Oracle.html#fetchDatum"><span class="hs-identifier hs-var">fetchDatum</span></a></span><span> </span><span class="annot"><span class="annottext">TxOut
+</span><a href="#local-6989586621679283782"><span class="hs-identifier hs-var">oracleOutput</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">DatumHash -&gt; TxInfo -&gt; Maybe Datum
+</span><span class="hs-operator hs-var">`findDatum`</span></span><span> </span><span class="annot"><span class="annottext">TxInfo
+</span><a href="#local-6989586621679283791"><span class="hs-identifier hs-var">scriptContextTxInfo</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-96"></span><span>    </span><span id="local-6989586621679283773"><span class="annot"><span class="annottext">datumPresent :: Bool
+</span><a href="#local-6989586621679283773"><span class="hs-identifier hs-var hs-var">datumPresent</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-97"></span><span>      </span><span class="annot"><span class="annottext">String -&gt; Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Missing output datum.&quot;</span></span><span>
+</span><span id="line-98"></span><span>        </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Maybe Data -&gt; Bool
+forall a. Maybe a -&gt; Bool
+</span><span class="hs-identifier hs-var">isJust</span></span><span> </span><span class="annot"><span class="annottext">Maybe Data
+</span><a href="#local-6989586621679283774"><span class="hs-identifier hs-var">outputDatum</span></a></span><span>
+</span><span id="line-99"></span><span>    </span><span id="local-6989586621679283771"><span class="annot"><span class="annottext">unchangedDatum :: Bool
+</span><a href="#local-6989586621679283771"><span class="hs-identifier hs-var hs-var">unchangedDatum</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-100"></span><span>      </span><span class="annot"><span class="annottext">String -&gt; Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Datum illegally changed.&quot;</span></span><span>
+</span><span id="line-101"></span><span>        </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Maybe Data
+</span><a href="#local-6989586621679283774"><span class="hs-identifier hs-var">outputDatum</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe Data -&gt; Maybe Data -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Data -&gt; Maybe Data
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Data
+</span><a href="#local-6989586621679283795"><span class="hs-identifier hs-var">inputDatum</span></a></span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span>    </span><span class="hs-comment">-- Control token.</span><span>
+</span><span id="line-104"></span><span>    </span><span id="local-6989586621679283770"><span class="annot"><span class="annottext">controlTokenInput :: Integer
+</span><a href="#local-6989586621679283770"><span class="hs-identifier hs-var hs-var">controlTokenInput</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetClass -&gt; Integer
+</span><span class="hs-identifier hs-var">assetClassValueOf</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxInfo -&gt; Value
+</span><span class="hs-identifier hs-var">valueSpent</span></span><span> </span><span class="annot"><span class="annottext">TxInfo
+</span><a href="#local-6989586621679283791"><span class="hs-identifier hs-var">scriptContextTxInfo</span></a></span><span>        </span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679283801"><span class="hs-identifier hs-var">controlToken</span></a></span><span>
+</span><span id="line-105"></span><span>    </span><span id="local-6989586621679283769"><span class="annot"><span class="annottext">controlTokenOutput :: Integer
+</span><a href="#local-6989586621679283769"><span class="hs-identifier hs-var hs-var">controlTokenOutput</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetClass -&gt; Integer
+</span><span class="hs-identifier hs-var">assetClassValueOf</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Value] -&gt; Value
+forall (t :: * -&gt; *) a. (Foldable t, AdditiveMonoid a) =&gt; t a -&gt; a
+</span><span class="hs-identifier hs-var">sum</span></span><span> </span><span class="annot"><span class="annottext">([Value] -&gt; Value) -&gt; [Value] -&gt; Value
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">TxOut -&gt; Value
+</span><span class="hs-identifier hs-var hs-var">txOutValue</span></span><span> </span><span class="annot"><span class="annottext">(TxOut -&gt; Value) -&gt; [TxOut] -&gt; [Value]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[TxOut]
+</span><a href="#local-6989586621679283787"><span class="hs-identifier hs-var">continuingOutputs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679283801"><span class="hs-identifier hs-var">controlToken</span></a></span><span>
+</span><span id="line-106"></span><span>    </span><span id="local-6989586621679283766"><span class="annot"><span class="annottext">signedByControl :: Bool
+</span><a href="#local-6989586621679283766"><span class="hs-identifier hs-var hs-var">signedByControl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Not accompanied by control token.&quot;</span></span><span>
+</span><span id="line-107"></span><span>      </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679283770"><span class="hs-identifier hs-var">controlTokenInput</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-108"></span><span>    </span><span id="local-6989586621679283764"><span class="annot"><span class="annottext">noScriptControl :: Bool
+</span><a href="#local-6989586621679283764"><span class="hs-identifier hs-var hs-var">noScriptControl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Control token may not be sent to script.&quot;</span></span><span>
+</span><span id="line-109"></span><span>      </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679283769"><span class="hs-identifier hs-var">controlTokenOutput</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-110"></span><span>    </span><span id="local-6989586621679283763"><span class="annot"><span class="annottext">controlled :: Bool
+</span><a href="#local-6989586621679283763"><span class="hs-identifier hs-var hs-var">controlled</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679283766"><span class="hs-identifier hs-var">signedByControl</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679283764"><span class="hs-identifier hs-var">noScriptControl</span></a></span><span>
+</span><span id="line-111"></span><span>
+</span><span id="line-112"></span><span>    </span><span class="hs-comment">-- Deletion.</span><span>
+</span><span id="line-113"></span><span>    </span><span id="local-6989586621679283762"><span class="annot"><span class="annottext">deleting :: Bool
+</span><a href="#local-6989586621679283762"><span class="hs-identifier hs-var hs-var">deleting</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-114"></span><span>         </span><span class="annot"><span class="annottext">String -&gt; Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Missing single oracle token input.&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679283780"><span class="hs-identifier hs-var">datumTokenInput</span></a></span><span>
+</span><span id="line-115"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;No continuing outputs allowed.&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[TxOut] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">[TxOut]
+</span><a href="#local-6989586621679283787"><span class="hs-identifier hs-var">continuingOutputs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span>    </span><span class="hs-comment">-- Fee amount.</span><span>
+</span><span id="line-118"></span><span>    </span><span id="local-6989586621679283760"><span class="annot"><span class="annottext">feePaid :: Bool
+</span><a href="#local-6989586621679283760"><span class="hs-identifier hs-var hs-var">feePaid</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-119"></span><span>      </span><span class="annot"><span class="annottext">String -&gt; Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Insufficient fee.&quot;</span></span><span>
+</span><span id="line-120"></span><span>        </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">TxOut -&gt; Value
+</span><span class="hs-identifier hs-var hs-var">txOutValue</span></span><span> </span><span class="annot"><span class="annottext">TxOut
+</span><a href="#local-6989586621679283782"><span class="hs-identifier hs-var">oracleOutput</span></a></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Value -&gt; Bool
+</span><span class="hs-operator hs-var">`geq`</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxOut -&gt; Value
+</span><span class="hs-identifier hs-var hs-var">txOutValue</span></span><span> </span><span class="annot"><span class="annottext">TxOut
+</span><a href="#local-6989586621679283786"><span class="hs-identifier hs-var">oracleInput</span></a></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Value -&gt; Value
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283799"><span class="hs-identifier hs-var">requiredFee</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-121"></span><span>
+</span><span id="line-122"></span><span>  </span><span class="hs-keyword">in</span><span>
+</span><span id="line-123"></span><span>
+</span><span id="line-124"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Action
+</span><a href="#local-6989586621679283794"><span class="hs-identifier hs-var">redeemer</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-125"></span><span>      </span><span class="annot"><span class="annottext">Action
+</span><a href="Mantis.Oracle.Types.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679283762"><span class="hs-identifier hs-var">deleting</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679283763"><span class="hs-identifier hs-var">controlled</span></a></span><span>
+</span><span id="line-126"></span><span>      </span><span class="annot"><span class="annottext">Action
+</span><a href="Mantis.Oracle.Types.html#Read"><span class="hs-identifier hs-var">Read</span></a></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679283777"><span class="hs-identifier hs-var">singleDatum</span></a></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679283771"><span class="hs-identifier hs-var">unchangedDatum</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679283760"><span class="hs-identifier hs-var">feePaid</span></a></span><span>
+</span><span id="line-127"></span><span>      </span><span class="annot"><span class="annottext">Action
+</span><a href="Mantis.Oracle.Types.html#Write"><span class="hs-identifier hs-var">Write</span></a></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679283777"><span class="hs-identifier hs-var">singleDatum</span></a></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679283763"><span class="hs-identifier hs-var">controlled</span></a></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679283773"><span class="hs-identifier hs-var">datumPresent</span></a></span><span>
+</span><span id="line-128"></span><span>
+</span><span id="line-129"></span><span>
+</span><span id="line-130"></span><span class="hs-comment">-- | Type for the script.</span><span>
+</span><span id="line-131"></span><span class="hs-keyword">data</span><span> </span><span id="OracleScript"><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-var">OracleScript</span></a></span></span><span>
+</span><span id="line-132"></span><span>
+</span><span id="line-133"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ScriptType</span></span><span> </span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-134"></span><span>    </span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="DatumType"><span class="annot"><span class="hs-identifier hs-var">DatumType</span></span></span><span>    </span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Data</span></span><span>
+</span><span id="line-135"></span><span>    </span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="RedeemerType"><span class="annot"><span class="hs-identifier hs-var">RedeemerType</span></span></span><span> </span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>
+</span><span id="line-136"></span><span>
+</span><span id="line-137"></span><span>
+</span><span id="line-138"></span><span class="hs-comment">-- | Compute the instance for an oracle.</span><span>
+</span><span id="line-139"></span><span class="annot"><a href="Mantis.Oracle.html#oracleInstance"><span class="hs-identifier hs-type">oracleInstance</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                      </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-140"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ScriptInstance</span></span><span> </span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span> </span><span class="hs-comment">-- ^ The instance.</span><span>
+</span><span id="line-141"></span><span id="oracleInstance"><span class="annot"><span class="annottext">oracleInstance :: Oracle -&gt; ScriptInstance OracleScript
+</span><a href="Mantis.Oracle.html#oracleInstance"><span class="hs-identifier hs-var hs-var">oracleInstance</span></a></span></span><span> </span><span id="local-6989586621679283755"><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679283755"><span class="hs-identifier hs-var">oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span>
+</span><span id="line-142"></span><span>  </span><span class="annot"><span class="annottext">CompiledCode (ValidatorType OracleScript)
+-&gt; CompiledCode
+     (ValidatorType OracleScript -&gt; WrappedValidatorType)
+-&gt; ScriptInstance OracleScript
+forall a.
+CompiledCode (ValidatorType a)
+-&gt; CompiledCode (ValidatorType a -&gt; WrappedValidatorType)
+-&gt; ScriptInstance a
+</span><span class="hs-identifier hs-var">validator</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span>
+</span><span id="line-143"></span><span>    </span><span class="hs-special">(</span><span class="hs-special">$$(</span><span class="annot"><span class="hs-identifier hs-type">compile</span></span><span> </span><span class="hs-special">[||</span><span> </span><span class="hs-identifier">makeValidator</span><span> </span><span class="hs-special">||]</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">CompiledCode (Oracle -&gt; Data -&gt; Action -&gt; ScriptContext -&gt; Bool)
+-&gt; CompiledCodeIn DefaultUni DefaultFun Oracle
+-&gt; CompiledCodeIn
+     DefaultUni DefaultFun (Data -&gt; Action -&gt; ScriptContext -&gt; Bool)
+forall (uni :: * -&gt; *) fun a b.
+(Closed uni, Everywhere uni Flat, Flat fun) =&gt;
+CompiledCodeIn uni fun (a -&gt; b)
+-&gt; CompiledCodeIn uni fun a -&gt; CompiledCodeIn uni fun b
+</span><span class="hs-operator hs-var">`applyCode`</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; CompiledCodeIn DefaultUni DefaultFun Oracle
+forall (uni :: * -&gt; *) a fun.
+(Lift uni a, Throwable uni fun, Typecheckable uni fun) =&gt;
+a -&gt; CompiledCodeIn uni fun a
+</span><span class="hs-identifier hs-var">liftCode</span></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679283755"><span class="hs-identifier hs-var">oracle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-144"></span><span>      </span><span class="hs-special">$$(</span><span class="annot"><span class="hs-identifier hs-type">compile</span></span><span> </span><span class="hs-special">[||</span><span> </span><span class="hs-identifier">wrap</span><span> </span><span class="hs-special">||]</span><span class="hs-special">)</span><span>
+</span><span id="line-145"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-146"></span><span>      </span><span id="local-6989586621679283752"><span class="annot"><span class="annottext">wrap :: (Data -&gt; Action -&gt; ScriptContext -&gt; Bool) -&gt; WrappedValidatorType
+</span><a href="#local-6989586621679283752"><span class="hs-identifier hs-var hs-var">wrap</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(IsData Data, IsData Action) =&gt;
+(Data -&gt; Action -&gt; ScriptContext -&gt; Bool) -&gt; WrappedValidatorType
+forall d r.
+(IsData d, IsData r) =&gt;
+(d -&gt; r -&gt; ScriptContext -&gt; Bool) -&gt; WrappedValidatorType
+</span><span class="hs-identifier hs-var">wrapValidator</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><span class="hs-identifier hs-type">Data</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>
+</span><span id="line-147"></span><span>
+</span><span id="line-148"></span><span>
+</span><span id="line-149"></span><span class="hs-comment">-- | Compute the validator for an oracle.</span><span>
+</span><span id="line-150"></span><span class="annot"><a href="Mantis.Oracle.html#oracleValidator"><span class="hs-identifier hs-type">oracleValidator</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>    </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-151"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Validator</span></span><span> </span><span class="hs-comment">-- ^ The validator.</span><span>
+</span><span id="line-152"></span><span id="oracleValidator"><span class="annot"><span class="annottext">oracleValidator :: Oracle -&gt; Validator
+</span><a href="Mantis.Oracle.html#oracleValidator"><span class="hs-identifier hs-var hs-var">oracleValidator</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ScriptInstance OracleScript -&gt; Validator
+forall a. ScriptInstance a -&gt; Validator
+</span><span class="hs-identifier hs-var">validatorScript</span></span><span> </span><span class="annot"><span class="annottext">(ScriptInstance OracleScript -&gt; Validator)
+-&gt; (Oracle -&gt; ScriptInstance OracleScript) -&gt; Oracle -&gt; Validator
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; ScriptInstance OracleScript
+</span><a href="Mantis.Oracle.html#oracleInstance"><span class="hs-identifier hs-var">oracleInstance</span></a></span><span>
+</span><span id="line-153"></span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span class="hs-comment">-- | Compute the address for an oracle.</span><span>
+</span><span id="line-156"></span><span class="annot"><a href="Mantis.Oracle.html#oracleAddress"><span class="hs-identifier hs-type">oracleAddress</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>  </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-157"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Address</span></span><span> </span><span class="hs-comment">-- ^ The script address.</span><span>
+</span><span id="line-158"></span><span id="oracleAddress"><span class="annot"><span class="annottext">oracleAddress :: Oracle -&gt; Address
+</span><a href="Mantis.Oracle.html#oracleAddress"><span class="hs-identifier hs-var hs-var">oracleAddress</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Validator -&gt; Address
+</span><span class="hs-identifier hs-var">scriptAddress</span></span><span> </span><span class="annot"><span class="annottext">(Validator -&gt; Address)
+-&gt; (Oracle -&gt; Validator) -&gt; Oracle -&gt; Address
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; Validator
+</span><a href="Mantis.Oracle.html#oracleValidator"><span class="hs-identifier hs-var">oracleValidator</span></a></span><span>
+</span><span id="line-159"></span><span>
+</span><span id="line-160"></span><span>
+</span><span id="line-161"></span><span class="hs-comment">-- | Find an oracle on the blockchain.</span><span>
+</span><span id="line-162"></span><span id="local-6989586621679283749"><span id="local-6989586621679283750"><span class="annot"><a href="Mantis.Oracle.html#findOracle"><span class="hs-identifier hs-type">findOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">HasBlockchainActions</span></span><span> </span><span class="annot"><a href="#local-6989586621679283750"><span class="hs-identifier hs-type">s</span></a></span><span>
+</span><span id="line-163"></span><span>           </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                                              </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-164"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Contract</span></span><span> </span><span class="annot"><a href="#local-6989586621679283749"><span class="hs-identifier hs-type">w</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679283750"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxOutRef</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOutTx</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Data</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ Action for finding the oracle's UTxO and datum.</span></span></span><span>
+</span><span id="line-165"></span><span id="findOracle"><span class="annot"><span class="annottext">findOracle :: Oracle -&gt; Contract w s Text (Maybe (TxOutRef, TxOutTx, Data))
+</span><a href="Mantis.Oracle.html#findOracle"><span class="hs-identifier hs-var hs-var">findOracle</span></a></span></span><span> </span><span id="local-6989586621679283748"><span class="annot"><span class="annottext">oracle :: Oracle
+</span><a href="#local-6989586621679283748"><span class="hs-identifier hs-var">oracle</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span class="hs-special">{</span><span id="local-6989586621679283745"><span id="local-6989586621679283746"><span id="local-6989586621679283747"><span class="annot"><span class="annottext">AssetClass
+Value
+requiredFee :: Value
+datumToken :: AssetClass
+controlToken :: AssetClass
+requiredFee :: Oracle -&gt; Value
+datumToken :: Oracle -&gt; AssetClass
+controlToken :: Oracle -&gt; AssetClass
+</span><a href="#local-6989586621679283745"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-166"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-167"></span><span>    </span><span id="local-6989586621679283744"><span class="annot"><span class="annottext">Map TxOutRef TxOutTx
+</span><a href="#local-6989586621679283744"><span class="hs-identifier hs-var">utxos</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-168"></span><span>      </span><span class="annot"><span class="annottext">(TxOutTx -&gt; Bool) -&gt; Map TxOutRef TxOutTx -&gt; Map TxOutRef TxOutTx
+forall a k. (a -&gt; Bool) -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">M.filter</span></span><span> </span><span>
+</span><span id="line-169"></span><span>        </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679283743"><span class="annot"><span class="annottext">TxOutTx
+</span><a href="#local-6989586621679283743"><span class="hs-identifier hs-var">o</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetClass -&gt; Integer
+</span><span class="hs-identifier hs-var">assetClassValueOf</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxOut -&gt; Value
+</span><span class="hs-identifier hs-var hs-var">txOutValue</span></span><span> </span><span class="annot"><span class="annottext">(TxOut -&gt; Value) -&gt; TxOut -&gt; Value
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">TxOutTx -&gt; TxOut
+</span><span class="hs-identifier hs-var hs-var">txOutTxOut</span></span><span> </span><span class="annot"><span class="annottext">TxOutTx
+</span><a href="#local-6989586621679283743"><span class="hs-identifier hs-var">o</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679283746"><span class="hs-identifier hs-var">datumToken</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span>
+</span><span id="line-170"></span><span>        </span><span class="annot"><span class="annottext">(Map TxOutRef TxOutTx -&gt; Map TxOutRef TxOutTx)
+-&gt; Contract w s Text (Map TxOutRef TxOutTx)
+-&gt; Contract w s Text (Map TxOutRef TxOutTx)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Address -&gt; Contract w s Text (Map TxOutRef TxOutTx)
+forall w (s :: Row *) e.
+(AsContractError e, HasUtxoAt s) =&gt;
+Address -&gt; Contract w s e (Map TxOutRef TxOutTx)
+</span><span class="hs-identifier hs-var">utxoAt</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Oracle -&gt; Address
+</span><a href="Mantis.Oracle.html#oracleAddress"><span class="hs-identifier hs-var">oracleAddress</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679283748"><span class="hs-identifier hs-var">oracle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-171"></span><span>    </span><span class="annot"><span class="annottext">Maybe (TxOutRef, TxOutTx, Data)
+-&gt; Contract w s Text (Maybe (TxOutRef, TxOutTx, Data))
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span>
+</span><span id="line-172"></span><span>      </span><span class="annot"><span class="annottext">(Maybe (TxOutRef, TxOutTx, Data)
+ -&gt; Contract w s Text (Maybe (TxOutRef, TxOutTx, Data)))
+-&gt; Maybe (TxOutRef, TxOutTx, Data)
+-&gt; Contract w s Text (Maybe (TxOutRef, TxOutTx, Data))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Map TxOutRef TxOutTx -&gt; [(TxOutRef, TxOutTx)]
+forall k a. Map k a -&gt; [(k, a)]
+</span><span class="hs-identifier hs-var">M.toList</span></span><span> </span><span class="annot"><span class="annottext">Map TxOutRef TxOutTx
+</span><a href="#local-6989586621679283744"><span class="hs-identifier hs-var">utxos</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-173"></span><span>          </span><span class="hs-special">[</span><span class="hs-special">(</span><span id="local-6989586621679283741"><span class="annot"><span class="annottext">TxOutRef
+</span><a href="#local-6989586621679283741"><span class="hs-identifier hs-var">oref</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679283740"><span class="annot"><span class="annottext">o :: TxOutTx
+</span><a href="#local-6989586621679283740"><span class="hs-identifier hs-var">o</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><span class="hs-identifier hs-type">TxOutTx</span></span><span class="hs-special">{</span><span id="local-6989586621679283737"><span id="local-6989586621679283738"><span class="annot"><span class="annottext">Tx
+TxOut
+txOutTxTx :: TxOutTx -&gt; Tx
+txOutTxOut :: TxOut
+txOutTxTx :: Tx
+txOutTxOut :: TxOutTx -&gt; TxOut
+</span><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-174"></span><span>                                       </span><span id="local-6989586621679283735"><span class="annot"><span class="annottext">Data
+</span><a href="#local-6989586621679283735"><span class="hs-identifier hs-var">datum</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-175"></span><span>                                         </span><span class="annot"><span class="annottext">TxOut -&gt; (DatumHash -&gt; Maybe Datum) -&gt; Maybe Data
+</span><a href="Mantis.Oracle.html#fetchDatum"><span class="hs-identifier hs-var">fetchDatum</span></a></span><span> </span><span class="annot"><span class="annottext">TxOut
+</span><a href="#local-6989586621679283737"><span class="hs-identifier hs-var">txOutTxOut</span></a></span><span>
+</span><span id="line-176"></span><span>                                            </span><span class="annot"><span class="annottext">((DatumHash -&gt; Maybe Datum) -&gt; Maybe Data)
+-&gt; (Map DatumHash Datum -&gt; DatumHash -&gt; Maybe Datum)
+-&gt; Map DatumHash Datum
+-&gt; Maybe Data
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(DatumHash -&gt; Map DatumHash Datum -&gt; Maybe Datum)
+-&gt; Map DatumHash Datum -&gt; DatumHash -&gt; Maybe Datum
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">DatumHash -&gt; Map DatumHash Datum -&gt; Maybe Datum
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">M.lookup</span></span><span>
+</span><span id="line-177"></span><span>                                            </span><span class="annot"><span class="annottext">(Map DatumHash Datum -&gt; Maybe Data)
+-&gt; Map DatumHash Datum -&gt; Maybe Data
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Tx -&gt; Map DatumHash Datum
+</span><span class="hs-identifier hs-var hs-var">txData</span></span><span> </span><span class="annot"><span class="annottext">Tx
+</span><a href="#local-6989586621679283738"><span class="hs-identifier hs-var">txOutTxTx</span></a></span><span>
+</span><span id="line-178"></span><span>                                       </span><span class="annot"><span class="annottext">(TxOutRef, TxOutTx, Data) -&gt; Maybe (TxOutRef, TxOutTx, Data)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxOutRef
+</span><a href="#local-6989586621679283741"><span class="hs-identifier hs-var">oref</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">TxOutTx
+</span><a href="#local-6989586621679283740"><span class="hs-identifier hs-var">o</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Data
+</span><a href="#local-6989586621679283735"><span class="hs-identifier hs-var">datum</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-179"></span><span>          </span><span class="annot"><span class="annottext">[(TxOutRef, TxOutTx)]
+</span><span class="hs-identifier">_</span></span><span>                       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe (TxOutRef, TxOutTx, Data)
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-180"></span><span>
+</span><span id="line-181"></span><span>
+</span><span id="line-182"></span><span class="hs-pragma">{-# INLINABLE</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#fetchDatum"><span class="hs-pragma hs-type">fetchDatum</span></a></span><span> </span><span class="hs-pragma">#-}</span><span>
+</span><span id="line-183"></span><span>
+</span><span id="line-184"></span><span class="hs-comment">-- | Retrieve the oracle's datum from a transaction output.</span><span>
+</span><span id="line-185"></span><span class="annot"><a href="Mantis.Oracle.html#fetchDatum"><span class="hs-identifier hs-type">fetchDatum</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span>                      </span><span class="hs-comment">-- ^ The transaction output.</span><span>
+</span><span id="line-186"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">DatumHash</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Datum</span></span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ Function for looking up the datum, given its hash.</span><span>
+</span><span id="line-187"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Data</span></span><span>                 </span><span class="hs-comment">-- ^ The datum, if it was found.</span><span>
+</span><span id="line-188"></span><span id="fetchDatum"><span class="annot"><span class="annottext">fetchDatum :: TxOut -&gt; (DatumHash -&gt; Maybe Datum) -&gt; Maybe Data
+</span><a href="Mantis.Oracle.html#fetchDatum"><span class="hs-identifier hs-var hs-var">fetchDatum</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span class="hs-special">{</span><span id="local-6989586621679283730"><span id="local-6989586621679283731"><span id="local-6989586621679283732"><span class="annot"><span class="annottext">Maybe DatumHash
+Value
+Address
+txOutDatumHash :: TxOut -&gt; Maybe DatumHash
+txOutAddress :: TxOut -&gt; Address
+txOutDatumHash :: Maybe DatumHash
+txOutValue :: Value
+txOutAddress :: Address
+txOutValue :: TxOut -&gt; Value
+</span><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></span></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679283727"><span class="annot"><span class="annottext">DatumHash -&gt; Maybe Datum
+</span><a href="#local-6989586621679283727"><span class="hs-identifier hs-var">fetch</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-189"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-190"></span><span>    </span><span id="local-6989586621679283726"><span class="annot"><span class="annottext">DatumHash
+</span><a href="#local-6989586621679283726"><span class="hs-identifier hs-var">hash</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Maybe DatumHash
+</span><a href="#local-6989586621679283730"><span class="hs-identifier hs-var">txOutDatumHash</span></a></span><span>
+</span><span id="line-191"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Datum</span></span><span> </span><span id="local-6989586621679283724"><span class="annot"><span class="annottext">Data
+</span><a href="#local-6989586621679283724"><span class="hs-identifier hs-var">datum</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">DatumHash -&gt; Maybe Datum
+</span><a href="#local-6989586621679283727"><span class="hs-identifier hs-var">fetch</span></a></span><span> </span><span class="annot"><span class="annottext">DatumHash
+</span><a href="#local-6989586621679283726"><span class="hs-identifier hs-var">hash</span></a></span><span>
+</span><span id="line-192"></span><span>    </span><span class="annot"><span class="annottext">Data -&gt; Maybe Data
+forall a. IsData a =&gt; Data -&gt; Maybe a
+</span><span class="hs-identifier hs-var">fromData</span></span><span> </span><span class="annot"><span class="annottext">Data
+</span><a href="#local-6989586621679283724"><span class="hs-identifier hs-var">datum</span></a></span><span>
+</span><span id="line-193"></span><span>
+</span><span id="line-194"></span><span>
+</span><span id="line-195"></span><span class="hs-comment">-- | Export the validator for an oracle and compute its address.</span><span>
+</span><span id="line-196"></span><span class="annot"><a href="Mantis.Oracle.html#exportOracle"><span class="hs-identifier hs-type">exportOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span>   </span><span class="hs-comment">-- ^ The filename for writing the validator bytes.</span><span>
+</span><span id="line-197"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>     </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-198"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Address</span></span><span> </span><span class="hs-comment">-- ^ Action writing the validator and returning its address.</span><span>
+</span><span id="line-199"></span><span id="exportOracle"><span class="annot"><span class="annottext">exportOracle :: FilePath -&gt; Oracle -&gt; IO Address
+</span><a href="Mantis.Oracle.html#exportOracle"><span class="hs-identifier hs-var hs-var">exportOracle</span></a></span></span><span> </span><span id="local-6989586621679283723"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679283723"><span class="hs-identifier hs-var">filename</span></a></span></span><span> </span><span id="local-6989586621679283722"><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679283722"><span class="hs-identifier hs-var">oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-200"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-201"></span><span>    </span><span class="hs-keyword">let</span><span>
+</span><span id="line-202"></span><span>      </span><span id="local-6989586621679283721"><span class="annot"><span class="annottext">a :: Address
+</span><a href="#local-6989586621679283721"><span class="hs-identifier hs-var hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; Address
+</span><a href="Mantis.Oracle.html#oracleAddress"><span class="hs-identifier hs-var">oracleAddress</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679283722"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><span id="line-203"></span><span>      </span><span id="local-6989586621679283720"><span class="annot"><span class="annottext">v :: Validator
+</span><a href="#local-6989586621679283720"><span class="hs-identifier hs-var hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; Validator
+</span><a href="Mantis.Oracle.html#oracleValidator"><span class="hs-identifier hs-var">oracleValidator</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679283722"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><span id="line-204"></span><span>    </span><span class="annot"><span class="annottext">FilePath -&gt; ByteString -&gt; IO ()
+</span><span class="hs-identifier hs-var">LBS.writeFile</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679283723"><span class="hs-identifier hs-var">filename</span></a></span><span>
+</span><span id="line-205"></span><span>      </span><span class="annot"><span class="annottext">(ByteString -&gt; IO ()) -&gt; ByteString -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Validator -&gt; ByteString
+forall a. Serialise a =&gt; a -&gt; ByteString
+</span><span class="hs-identifier hs-var">serialise</span></span><span> </span><span class="annot"><span class="annottext">Validator
+</span><a href="#local-6989586621679283720"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><span id="line-206"></span><span>    </span><span class="annot"><span class="annottext">Address -&gt; IO Address
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Address
+</span><a href="#local-6989586621679283721"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-207"></span></pre></body></html>

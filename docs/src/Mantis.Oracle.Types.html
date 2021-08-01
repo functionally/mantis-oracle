@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-----------------------------------------------------------------------------</span><span>
+</span><span id="line-2"></span><span class="hs-comment">--</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Module      :  $Headers</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Copyright   :  (c) 2021 Brian W Bush</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- License     :  MIT</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Maintainer  :  Brian W Bush &lt;code@functionally.io&gt;</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Stability   :  Experimental</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Portability :  Portable</span><span>
+</span><span id="line-10"></span><span class="hs-comment">--</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- | Types describing the general-purpose datum oracle.</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-----------------------------------------------------------------------------</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-pragma">{-# LANGUAGE DeriveAnyClass    #-}</span><span>
+</span><span id="line-17"></span><span class="hs-pragma">{-# LANGUAGE DeriveGeneric     #-}</span><span>
+</span><span id="line-18"></span><span class="hs-pragma">{-# LANGUAGE NoImplicitPrelude #-}</span><span>
+</span><span id="line-19"></span><span class="hs-pragma">{-# LANGUAGE RecordWildCards   #-}</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Mantis.Oracle.Types</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-23"></span><span class="annot"><span class="hs-comment">-- * Types</span></span><span>
+</span><span id="line-24"></span><span>  </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier">Oracle</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Parameters"><span class="hs-identifier">Parameters</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier">Action</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="annot"><span class="hs-comment">-- * Constructors</span></span><span>
+</span><span id="line-28"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#makeOracle"><span class="hs-identifier">makeOracle</span></a></span><span>
+</span><span id="line-29"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">PlutusTx.Prelude</span></span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Aeson</span></span><span>   </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">FromJSON</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ToJSON</span></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Generic</span></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ledger.Value</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">AssetClass</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Value</span></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Ledger.Value</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Value</span></span><span>   </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">singleton</span></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Prelude</span></span><span>      </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Haskell</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Eq</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Show</span></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="hs-comment">-- | An oracle controlled by one token, holding another token, and requiring a fee for its use.</span><span>
+</span><span id="line-43"></span><span id="local-6989586621679283691"><span id="local-6989586621679283692"></span></span><span class="hs-keyword">data</span><span> </span><span id="Oracle"><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-var">Oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-44"></span><span>  </span><span id="Oracle"><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-var">Oracle</span></a></span></span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-special">{</span><span>
+</span><span id="line-46"></span><span>    </span><span id="controlToken"><span class="annot"><span class="annottext">Oracle -&gt; AssetClass
+</span><a href="Mantis.Oracle.Types.html#controlToken"><span class="hs-identifier hs-var hs-var">controlToken</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">AssetClass</span></span><span> </span><span class="hs-comment">-- ^ The token needed for writing or deleting the oracle.</span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="datumToken"><span class="annot"><span class="annottext">Oracle -&gt; AssetClass
+</span><a href="Mantis.Oracle.Types.html#datumToken"><span class="hs-identifier hs-var hs-var">datumToken</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">AssetClass</span></span><span> </span><span class="hs-comment">-- ^ The token with which the oracle datum is always associated.</span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="requiredFee"><span class="annot"><span class="annottext">Oracle -&gt; Value
+</span><a href="Mantis.Oracle.Types.html#requiredFee"><span class="hs-identifier hs-var hs-var">requiredFee</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">Value</span></span><span>      </span><span class="hs-comment">-- ^ The minimum fee required to read the oracle on-chain.</span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-50"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679283683"><span id="local-6989586621679283685"><span class="annot"><span class="annottext">Oracle -&gt; Oracle -&gt; Bool
+(Oracle -&gt; Oracle -&gt; Bool)
+-&gt; (Oracle -&gt; Oracle -&gt; Bool) -&gt; Eq Oracle
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Oracle -&gt; Oracle -&gt; Bool
+$c/= :: Oracle -&gt; Oracle -&gt; Bool
+== :: Oracle -&gt; Oracle -&gt; Bool
+$c== :: Oracle -&gt; Oracle -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Haskell.Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. Oracle -&gt; Rep Oracle x)
+-&gt; (forall x. Rep Oracle x -&gt; Oracle) -&gt; Generic Oracle
+forall x. Rep Oracle x -&gt; Oracle
+forall x. Oracle -&gt; Rep Oracle x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep Oracle x -&gt; Oracle
+$cfrom :: forall x. Oracle -&gt; Rep Oracle x
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679283675"><span id="local-6989586621679283677"><span class="annot"><span class="annottext">Value -&gt; Parser [Oracle]
+Value -&gt; Parser Oracle
+(Value -&gt; Parser Oracle)
+-&gt; (Value -&gt; Parser [Oracle]) -&gt; FromJSON Oracle
+forall a.
+(Value -&gt; Parser a) -&gt; (Value -&gt; Parser [a]) -&gt; FromJSON a
+parseJSONList :: Value -&gt; Parser [Oracle]
+$cparseJSONList :: Value -&gt; Parser [Oracle]
+parseJSON :: Value -&gt; Parser Oracle
+$cparseJSON :: Value -&gt; Parser Oracle
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">FromJSON</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679283668"><span id="local-6989586621679283670"><span id="local-6989586621679283672"><span class="annot"><span class="annottext">Int -&gt; Oracle -&gt; ShowS
+[Oracle] -&gt; ShowS
+Oracle -&gt; String
+(Int -&gt; Oracle -&gt; ShowS)
+-&gt; (Oracle -&gt; String) -&gt; ([Oracle] -&gt; ShowS) -&gt; Show Oracle
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Oracle] -&gt; ShowS
+$cshowList :: [Oracle] -&gt; ShowS
+show :: Oracle -&gt; String
+$cshow :: Oracle -&gt; String
+showsPrec :: Int -&gt; Oracle -&gt; ShowS
+$cshowsPrec :: Int -&gt; Oracle -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Haskell.Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679283659"><span id="local-6989586621679283661"><span id="local-6989586621679283663"><span id="local-6989586621679283665"><span class="annot"><span class="annottext">[Oracle] -&gt; Value
+[Oracle] -&gt; Encoding
+Oracle -&gt; Value
+Oracle -&gt; Encoding
+(Oracle -&gt; Value)
+-&gt; (Oracle -&gt; Encoding)
+-&gt; ([Oracle] -&gt; Value)
+-&gt; ([Oracle] -&gt; Encoding)
+-&gt; ToJSON Oracle
+forall a.
+(a -&gt; Value)
+-&gt; (a -&gt; Encoding)
+-&gt; ([a] -&gt; Value)
+-&gt; ([a] -&gt; Encoding)
+-&gt; ToJSON a
+toEncodingList :: [Oracle] -&gt; Encoding
+$ctoEncodingList :: [Oracle] -&gt; Encoding
+toJSONList :: [Oracle] -&gt; Value
+$ctoJSONList :: [Oracle] -&gt; Value
+toEncoding :: Oracle -&gt; Encoding
+$ctoEncoding :: Oracle -&gt; Encoding
+toJSON :: Oracle -&gt; Value
+$ctoJSON :: Oracle -&gt; Value
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">ToJSON</span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span class="hs-comment">-- | Parameters defining the oracle.</span><span>
+</span><span id="line-54"></span><span id="local-6989586621679283656"><span id="local-6989586621679283657"></span></span><span class="hs-keyword">data</span><span> </span><span id="Parameters"><span class="annot"><a href="Mantis.Oracle.Types.html#Parameters"><span class="hs-identifier hs-var">Parameters</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-55"></span><span>  </span><span id="Parameters"><span class="annot"><a href="Mantis.Oracle.Types.html#Parameters"><span class="hs-identifier hs-var">Parameters</span></a></span></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-special">{</span><span>
+</span><span id="line-57"></span><span>    </span><span id="controlParameter"><span class="annot"><span class="annottext">Parameters -&gt; AssetClass
+</span><a href="Mantis.Oracle.Types.html#controlParameter"><span class="hs-identifier hs-var hs-var">controlParameter</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AssetClass</span></span><span> </span><span class="hs-comment">-- ^ The token needed for writing or deleting the oracle.</span><span>
+</span><span id="line-58"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="datumParameter"><span class="annot"><span class="annottext">Parameters -&gt; AssetClass
+</span><a href="Mantis.Oracle.Types.html#datumParameter"><span class="hs-identifier hs-var hs-var">datumParameter</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AssetClass</span></span><span> </span><span class="hs-comment">-- ^ The token with which the oracle datum is always associated.</span><span>
+</span><span id="line-59"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="feeToken"><span class="annot"><span class="annottext">Parameters -&gt; AssetClass
+</span><a href="Mantis.Oracle.Types.html#feeToken"><span class="hs-identifier hs-var hs-var">feeToken</span></a></span></span><span>         </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AssetClass</span></span><span> </span><span class="hs-comment">-- ^ The token in which the fee must be paid for reading the oracle.</span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="feeAmount"><span class="annot"><span class="annottext">Parameters -&gt; Integer
+</span><a href="Mantis.Oracle.Types.html#feeAmount"><span class="hs-identifier hs-var hs-var">feeAmount</span></a></span></span><span>        </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span>    </span><span class="hs-comment">-- ^ The amount of the fee tokend needed for reading the oracle.</span><span>
+</span><span id="line-61"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-62"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679283647"><span id="local-6989586621679283649"><span class="annot"><span class="annottext">Parameters -&gt; Parameters -&gt; Bool
+(Parameters -&gt; Parameters -&gt; Bool)
+-&gt; (Parameters -&gt; Parameters -&gt; Bool) -&gt; Eq Parameters
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+/= :: Parameters -&gt; Parameters -&gt; Bool
+$c/= :: Parameters -&gt; Parameters -&gt; Bool
+== :: Parameters -&gt; Parameters -&gt; Bool
+$c== :: Parameters -&gt; Parameters -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Haskell.Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(forall x. Parameters -&gt; Rep Parameters x)
+-&gt; (forall x. Rep Parameters x -&gt; Parameters) -&gt; Generic Parameters
+forall x. Rep Parameters x -&gt; Parameters
+forall x. Parameters -&gt; Rep Parameters x
+forall a.
+(forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
+$cto :: forall x. Rep Parameters x -&gt; Parameters
+$cfrom :: forall x. Parameters -&gt; Rep Parameters x
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679283641"><span id="local-6989586621679283643"><span class="annot"><span class="annottext">Value -&gt; Parser [Parameters]
+Value -&gt; Parser Parameters
+(Value -&gt; Parser Parameters)
+-&gt; (Value -&gt; Parser [Parameters]) -&gt; FromJSON Parameters
+forall a.
+(Value -&gt; Parser a) -&gt; (Value -&gt; Parser [a]) -&gt; FromJSON a
+parseJSONList :: Value -&gt; Parser [Parameters]
+$cparseJSONList :: Value -&gt; Parser [Parameters]
+parseJSON :: Value -&gt; Parser Parameters
+$cparseJSON :: Value -&gt; Parser Parameters
+</span><a href="#local-6989586621679283641"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">FromJSON</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679283635"><span id="local-6989586621679283637"><span id="local-6989586621679283639"><span class="annot"><span class="annottext">Int -&gt; Parameters -&gt; ShowS
+[Parameters] -&gt; ShowS
+Parameters -&gt; String
+(Int -&gt; Parameters -&gt; ShowS)
+-&gt; (Parameters -&gt; String)
+-&gt; ([Parameters] -&gt; ShowS)
+-&gt; Show Parameters
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Parameters] -&gt; ShowS
+$cshowList :: [Parameters] -&gt; ShowS
+show :: Parameters -&gt; String
+$cshow :: Parameters -&gt; String
+showsPrec :: Int -&gt; Parameters -&gt; ShowS
+$cshowsPrec :: Int -&gt; Parameters -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Haskell.Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679283627"><span id="local-6989586621679283629"><span id="local-6989586621679283631"><span id="local-6989586621679283633"><span class="annot"><span class="annottext">[Parameters] -&gt; Value
+[Parameters] -&gt; Encoding
+Parameters -&gt; Value
+Parameters -&gt; Encoding
+(Parameters -&gt; Value)
+-&gt; (Parameters -&gt; Encoding)
+-&gt; ([Parameters] -&gt; Value)
+-&gt; ([Parameters] -&gt; Encoding)
+-&gt; ToJSON Parameters
+forall a.
+(a -&gt; Value)
+-&gt; (a -&gt; Encoding)
+-&gt; ([a] -&gt; Value)
+-&gt; ([a] -&gt; Encoding)
+-&gt; ToJSON a
+toEncodingList :: [Parameters] -&gt; Encoding
+$ctoEncodingList :: [Parameters] -&gt; Encoding
+toJSONList :: [Parameters] -&gt; Value
+$ctoJSONList :: [Parameters] -&gt; Value
+toEncoding :: Parameters -&gt; Encoding
+$ctoEncoding :: Parameters -&gt; Encoding
+toJSON :: Parameters -&gt; Value
+$ctoJSON :: Parameters -&gt; Value
+</span><a href="#local-6989586621679283627"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">ToJSON</span></a></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span class="hs-comment">-- | Construct an oracle.</span><span>
+</span><span id="line-66"></span><span class="annot"><a href="Mantis.Oracle.Types.html#makeOracle"><span class="hs-identifier hs-type">makeOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Parameters"><span class="hs-identifier hs-type">Parameters</span></a></span><span> </span><span class="hs-comment">-- ^ Parameters describing the oracle.</span><span>
+</span><span id="line-67"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>     </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-68"></span><span id="makeOracle"><span class="annot"><span class="annottext">makeOracle :: Parameters -&gt; Oracle
+</span><a href="Mantis.Oracle.Types.html#makeOracle"><span class="hs-identifier hs-var hs-var">makeOracle</span></a></span></span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Parameters"><span class="hs-identifier hs-type">Parameters</span></a></span><span class="hs-special">{</span><span id="local-6989586621679283623"><span id="local-6989586621679283624"><span id="local-6989586621679283625"><span id="local-6989586621679283626"><span class="annot"><span class="annottext">Integer
+AssetClass
+feeAmount :: Integer
+feeToken :: AssetClass
+datumParameter :: AssetClass
+controlParameter :: AssetClass
+feeAmount :: Parameters -&gt; Integer
+feeToken :: Parameters -&gt; AssetClass
+datumParameter :: Parameters -&gt; AssetClass
+controlParameter :: Parameters -&gt; AssetClass
+</span><a href="#local-6989586621679283623"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-keyword">let</span><span>
+</span><span id="line-70"></span><span>    </span><span id="local-6989586621679283622"><span class="annot"><span class="annottext">controlToken :: AssetClass
+</span><a href="#local-6989586621679283622"><span class="hs-identifier hs-var hs-var">controlToken</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679283626"><span class="hs-identifier hs-var">controlParameter</span></a></span><span>
+</span><span id="line-71"></span><span>    </span><span id="local-6989586621679283621"><span class="annot"><span class="annottext">datumToken :: AssetClass
+</span><a href="#local-6989586621679283621"><span class="hs-identifier hs-var hs-var">datumToken</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679283625"><span class="hs-identifier hs-var">datumParameter</span></a></span><span>
+</span><span id="line-72"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679283620"><span class="annot"><span class="annottext">CurrencySymbol
+</span><a href="#local-6989586621679283620"><span class="hs-identifier hs-var">symbol</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679283619"><span class="annot"><span class="annottext">TokenName
+</span><a href="#local-6989586621679283619"><span class="hs-identifier hs-var">name</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AssetClass -&gt; (CurrencySymbol, TokenName)
+</span><span class="hs-identifier hs-var hs-var">unAssetClass</span></span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679283624"><span class="hs-identifier hs-var">feeToken</span></a></span><span>
+</span><span id="line-73"></span><span>    </span><span id="local-6989586621679283617"><span class="annot"><span class="annottext">requiredFee :: Value
+</span><a href="#local-6989586621679283617"><span class="hs-identifier hs-var hs-var">requiredFee</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CurrencySymbol -&gt; TokenName -&gt; Integer -&gt; Value
+</span><span class="hs-identifier hs-var">Value.singleton</span></span><span> </span><span class="annot"><span class="annottext">CurrencySymbol
+</span><a href="#local-6989586621679283620"><span class="hs-identifier hs-var">symbol</span></a></span><span> </span><span class="annot"><span class="annottext">TokenName
+</span><a href="#local-6989586621679283619"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679283623"><span class="hs-identifier hs-var">feeAmount</span></a></span><span>
+</span><span id="line-74"></span><span>  </span><span class="hs-keyword">in</span><span>
+</span><span id="line-75"></span><span>    </span><span class="annot"><span class="annottext">Oracle :: AssetClass -&gt; AssetClass -&gt; Value -&gt; Oracle
+</span><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">AssetClass
+Value
+requiredFee :: Value
+datumToken :: AssetClass
+controlToken :: AssetClass
+requiredFee :: Value
+datumToken :: AssetClass
+controlToken :: AssetClass
+</span><a href="#local-6989586621679283617"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-76"></span><span>
+</span><span id="line-77"></span><span>
+</span><span id="line-78"></span><span class="hs-comment">-- | Redeemers for the oracle.</span><span>
+</span><span id="line-79"></span><span class="hs-keyword">data</span><span> </span><span id="Action"><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-var">Action</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-80"></span><span>    </span><span id="Delete"><span class="annot"><a href="Mantis.Oracle.Types.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span></span><span> </span><span class="hs-comment">-- ^ Delete (close) the oracle.</span><span>
+</span><span id="line-81"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Read"><span class="annot"><a href="Mantis.Oracle.Types.html#Read"><span class="hs-identifier hs-var">Read</span></a></span></span><span>   </span><span class="hs-comment">-- ^ Read the oracle's datum.</span><span>
+</span><span id="line-82"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Write"><span class="annot"><a href="Mantis.Oracle.Types.html#Write"><span class="hs-identifier hs-var">Write</span></a></span></span><span>  </span><span class="hs-comment">-- ^ Set or update the oracel's datum.</span><span>
+</span><span id="line-83"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679283608"><span id="local-6989586621679283610"><span id="local-6989586621679283612"><span class="annot"><span class="annottext">Int -&gt; Action -&gt; ShowS
+[Action] -&gt; ShowS
+Action -&gt; String
+(Int -&gt; Action -&gt; ShowS)
+-&gt; (Action -&gt; String) -&gt; ([Action] -&gt; ShowS) -&gt; Show Action
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+showList :: [Action] -&gt; ShowS
+$cshowList :: [Action] -&gt; ShowS
+show :: Action -&gt; String
+$cshow :: Action -&gt; String
+showsPrec :: Int -&gt; Action -&gt; ShowS
+$cshowsPrec :: Int -&gt; Action -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Haskell.Show</span></span></span></span></span><span>
+</span><span id="line-84"></span></pre></body></html>

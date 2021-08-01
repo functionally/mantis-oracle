@@ -188,7 +188,7 @@ peekDatum oracle =
       >> peekDatum oracle
 
 
--- } Log the funds in a wallet or in the oracle script.
+-- | Log the funds in a wallet or in the oracle script.
 peekFunds :: Oracle                                              -- ^ The oracle.
           -> Maybe Integer                                       -- ^ The wallet number, or `Nothing` for the oracle script.
           -> C.Contract (Last Value) C.BlockchainActions Text () -- ^ Action for logging the funds.
