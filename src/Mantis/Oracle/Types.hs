@@ -79,5 +79,5 @@ makeOracle Parameters{..} =
 data Action =
     Delete -- ^ Delete (close) the oracle.
   | Read   -- ^ Read the oracle's datum.
-  | Write  -- ^ Set or update the oracel's datum.
+  | Write  -- ^ Set or update the oracle's datum.
     deriving Haskell.Show

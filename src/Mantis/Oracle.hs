@@ -36,8 +36,10 @@ module Mantis.Oracle (
 , oracleAddress
 , exportOracle
 -- * Access
-, findOracle
+--, findOracle
 , fetchDatum
+
+, printRedeemers
 ) where
 
 
@@ -45,29 +47,42 @@ import PlutusTx.Prelude hiding ((<>))
 
 import Codec.Serialise      (serialise)
 import Data.Text            (Text)
-import Ledger               (Address, Datum(..), DatumHash, ScriptContext(..), TxOut(..), TxOutRef(..), TxOutTx(..), Validator, findDatum, findOwnInput, getContinuingOutputs, scriptAddress, txInInfoResolved, txData, txOutValue, valueSpent)
-import Ledger.Typed.Scripts (DatumType, RedeemerType, ScriptInstance, ScriptType, validator, validatorScript, wrapValidator)
+import Ledger     --          (Address, Datum(..), DatumHash, ScriptContext(..), TxOut(..), TxOutRef(..), TxOutTx(..), Validator, findDatum, findOwnInput, getContinuingOutputs, scriptAddress, txInInfoResolved, txData, txOutValue, valueSpent)
+import Ledger.Typed.Scripts -- (DatumType, RedeemerType, ScriptInstance, ScriptType, validator, validatorScript, wrapValidator)
 import Ledger.Value         (assetClassValueOf, geq)
 import Mantis.Oracle.Types  (Action(..), Oracle(..))
 import Prelude              (FilePath, IO, (<>))
-import Plutus.Contract      (Contract, HasBlockchainActions, utxoAt)
-import PlutusTx             (Data, applyCode, compile, fromData, liftCode, makeLift, unstableMakeIsData)
+--import Plutus.Contract      (Contract, HasBlockchainActions, utxoAt)
+import PlutusTx --            (Data, applyCode, compile, fromData, liftCode, makeLift, unstableMakeIsData)
+import System.IO (writeFile)
+import           Cardano.Api.Shelley (PlutusScript (..), PlutusScriptV1)
 
-import qualified Data.ByteString.Lazy as LBS (writeFile)
+import qualified Data.ByteString.Short as SBS
+import qualified Data.ByteString.Lazy as LBS (toStrict, writeFile)
 import qualified Data.Map.Strict      as M (filter, lookup, toList)
+import Prelude (show)
+import Cardano.Api.Shelley (writeFileTextEnvelope)
+import System.IO (print)
 
+import qualified Data.ByteString.Base16 as Base16 
 
 makeLift ''Oracle
 
 unstableMakeIsData ''Action
 
 
+printRedeemers :: IO ()
+printRedeemers =
+  do
+    print $ Base16.encode $ LBS.toStrict $ serialise $ builtinDataToData $ toBuiltinData Write
+
+
 {-# INLINABLE makeValidator #-}
 
 -- | Make the validator for the oracle.
 makeValidator :: Oracle         -- ^ The oracle.
-              -> Data           -- ^ The datum.
-              -> Action         -- ^ The redeemer.
+              -> BuiltinData           -- ^ The datum.
+              -> Integer        -- ^ The redeemer.
               -> ScriptContext  -- ^ The context.
               -> Bool           -- ^ Whether the transaction is valid.
 makeValidator Oracle{..} inputDatum redeemer context@ScriptContext{..} =
@@ -121,29 +136,53 @@ makeValidator Oracle{..} inputDatum redeemer context@ScriptContext{..} =
 
   in
 
-    case redeemer of
-      Delete -> deleting && controlled
-      Read   -> singleDatum  && unchangedDatum && feePaid
-      Write  -> singleDatum  && controlled  && datumPresent
+    if redeemer == 0
+    then deleting && controlled
+    else if redeemer == 1 
+    then singleDatum && unchangedDatum && feePaid
+    else if redeemer == 2
+    then singleDatum && controlled && datumPresent
+    else if redeemer == -1
+    then datumTokenInput
+    else if redeemer == -2
+    then datumTokenOutput
+    else if redeemer == -3
+    then singleDatum
+    else if redeemer == -4
+    then datumPresent
+    else if redeemer == -5
+    then unchangedDatum
+    else if redeemer == -6
+    then signedByControl
+    else if redeemer == -7
+    then noScriptControl
+    else if redeemer == -8
+    then controlled
+    else if redeemer == -9
+    then deleting
+    else if redeemer == -10
+    then feePaid
+    else False
+
 
 
 -- | Type for the script.
 data OracleScript
 
-instance ScriptType OracleScript  where
-    type instance DatumType    OracleScript  = Data
-    type instance RedeemerType OracleScript  = Action
+instance ValidatorTypes OracleScript  where
+    type instance DatumType    OracleScript  = BuiltinData
+    type instance RedeemerType OracleScript  = Integer
 
 
 -- | Compute the instance for an oracle.
 oracleInstance :: Oracle                      -- ^ The oracle.
-               -> ScriptInstance OracleScript -- ^ The instance.
+               -> TypedValidator OracleScript -- ^ The instance.
 oracleInstance oracle = 
-  validator @OracleScript
+  mkTypedValidator @OracleScript
     ($$(compile [|| makeValidator ||]) `applyCode` liftCode oracle)
       $$(compile [|| wrap ||])
     where
-      wrap = wrapValidator @Data @Action
+      wrap = wrapValidator @BuiltinData @Integer
 
 
 -- | Compute the validator for an oracle.
@@ -158,25 +197,25 @@ oracleAddress :: Oracle  -- ^ The oracle.
 oracleAddress = scriptAddress . oracleValidator
 
 
--- | Find an oracle on the blockchain.
-findOracle :: HasBlockchainActions s
-           => Oracle                                              -- ^ The oracle.
-           -> Contract w s Text (Maybe (TxOutRef, TxOutTx, Data)) -- ^ Action for finding the oracle's UTxO and datum.
-findOracle oracle@Oracle{..} =
-  do
-    utxos <-
-      M.filter 
-        (\o -> assetClassValueOf (txOutValue $ txOutTxOut o) datumToken == 1)
-        <$> utxoAt (oracleAddress oracle)
-    return
-      $ case M.toList utxos of
-          [(oref, o@TxOutTx{..})] -> do
-                                       datum <-
-                                         fetchDatum txOutTxOut
-                                            . flip M.lookup
-                                            $ txData txOutTxTx
-                                       return (oref, o, datum)
-          _                       -> Nothing
+-- -- | Find an oracle on the blockchain.
+-- findOracle :: HasBlockchainActions s
+--            => Oracle                                              -- ^ The oracle.
+--            -> Contract w s Text (Maybe (TxOutRef, TxOutTx, Data)) -- ^ Action for finding the oracle's UTxO and datum.
+-- findOracle oracle@Oracle{..} =
+--   do
+--     utxos <-
+--       M.filter 
+--         (\o -> assetClassValueOf (txOutValue $ txOutTxOut o) datumToken == 1)
+--         <$> utxoAt (oracleAddress oracle)
+--     return
+--       $ case M.toList utxos of
+--           [(oref, o@TxOutTx{..})] -> do
+--                                        datum <-
+--                                          fetchDatum txOutTxOut
+--                                             . flip M.lookup
+--                                             $ txData txOutTxTx
+--                                        return (oref, o, datum)
+--           _                       -> Nothing
 
 
 {-# INLINABLE fetchDatum #-}
@@ -184,12 +223,17 @@ findOracle oracle@Oracle{..} =
 -- | Retrieve the oracle's datum from a transaction output.
 fetchDatum :: TxOut                      -- ^ The transaction output.
            -> (DatumHash -> Maybe Datum) -- ^ Function for looking up the datum, given its hash.
-           -> Maybe Data                 -- ^ The datum, if it was found.
+           -> Maybe BuiltinData                 -- ^ The datum, if it was found.
 fetchDatum TxOut{..} fetch =
   do
     hash <- txOutDatumHash
     Datum datum <- fetch hash
-    fromData datum
+    fromBuiltinData datum
+
+
+serialiseOracle :: Oracle
+                -> SBS.ShortByteString
+serialiseOracle = SBS.toShort . LBS.toStrict . serialise . unValidatorScript . oracleValidator
 
 
 -- | Export the validator for an oracle and compute its address.
@@ -200,7 +244,6 @@ exportOracle filename oracle =
   do
     let
       a = oracleAddress oracle
-      v = oracleValidator oracle
-    LBS.writeFile filename
-      $ serialise v
+      s = serialiseOracle oracle
+    writeFileTextEnvelope filename Nothing ( PlutusScriptSerialised s :: PlutusScript PlutusScriptV1)
     return a
