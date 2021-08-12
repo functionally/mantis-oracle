@@ -15,74 +15,77 @@ source-repository head
   type    : git
   location: https://github.com/functionally/mantis-oracle.git
 
---  library
---    hs-source-dirs  : src
---    exposed-modules : Mantis.Oracle
---                      Mantis.Oracle.Client
---                      Mantis.Oracle.Client.PAB
---                      Mantis.Oracle.Controller
---                      Mantis.Oracle.Controller.PAB
---                      Mantis.Oracle.Simulate
---                      Mantis.Oracle.Simulate.PAB
---                      Mantis.Oracle.SOFR
---                      Mantis.Oracle.Types
---                      Mantis.Orphans
---    build-depends   : base ^>=4.14.1.0
---                    , aeson
---                    , bytestring
---                    , containers
---                    , data-default
---                    , freer-extras
---                    , freer-simple
---                    , playground-common
---                    , plutus-contract
---                    , plutus-ledger
---                    , plutus-pab
---                    , plutus-tx
---                    , plutus-tx-plugin
---                    , plutus-use-cases
---                    , prettyprinter
---                    , req ^>= 3.9.0
---                    , serialise
---                    , text
---                    , uuid
---                    , vector
---    default-language: Haskell2010
---    ghc-options     : -fplugin-opt PlutusTx.Plugin:defer-errors -fobject-code -fno-ignore-interface-pragmas -fno-omit-interface-pragmas -fno-strictness -fno-spec-constr -fno-specialise -Wall
---  
---  executable mantis-oracle
---     hs-source-dirs  : app
---     main-is         : Main.hs
---     other-modules   : Paths_mantis_oracle
---     autogen-modules : Paths_mantis_oracle
---     build-depends   : base ^>=4.14.1.0
---                     , base16-bytestring
---                     , bytestring
---                     , mantis-oracle
---                     , optparse-applicative
---                     , plutus-contract
---                     , plutus-ledger
---                     , text
---     default-language: Haskell2010
---     ghc-options     : -fplugin-opt PlutusTx.Plugin:defer-errors -Wall
 
-executable mantis-oracle-purple
-   hs-source-dirs  : src
-   main-is         : Main.hs
-   other-modules   : Mantis.Oracle
-                     Mantis.Oracle.Types
-   build-depends   : base ^>=4.14.1.0
-                   , aeson
-                   , base16-bytestring
-                   , bytestring
-                   , containers
-                   , cardano-api
-                   , plutus-ledger
-                   , plutus-tx
-                   , plutus-tx-plugin
-                   , serialise
-                   , text
-                   , uuid
-                   , vector
-   default-language: Haskell2010
-   ghc-options     : -fplugin-opt PlutusTx.Plugin:defer-errors -Wall
+flag USE_PAB
+  description: Compile for use with the Plutus Application Backend (PAB).
+  default    : False
+
+
+if flag(USE_PAB)
+  library
+    hs-source-dirs  : src
+    exposed-modules : Mantis.Oracle
+                      Mantis.Oracle.Client
+                      Mantis.Oracle.Client.PAB
+                      Mantis.Oracle.Controller
+                      Mantis.Oracle.Controller.PAB
+                      Mantis.Oracle.Simulate
+                      Mantis.Oracle.Simulate.PAB
+                      Mantis.Oracle.SOFR
+                      Mantis.Oracle.Types
+                      Mantis.Orphans
+    build-depends   : base ^>=4.14.1.0
+                    , aeson
+                    , bytestring
+                    , containers
+                    , data-default
+                    , freer-extras
+                    , freer-simple
+                    , playground-common
+                    , plutus-contract
+                    , plutus-ledger
+                    , plutus-pab
+                    , plutus-tx
+                    , plutus-tx-plugin
+                    , plutus-use-cases
+                    , prettyprinter
+                    , req ^>= 3.9.0
+                    , serialise
+                    , text
+                    , uuid
+                    , vector
+    default-language: Haskell2010
+    ghc-options     : -fplugin-opt PlutusTx.Plugin:defer-errors -fobject-code -fno-ignore-interface-pragmas -fno-omit-interface-pragmas -fno-strictness -fno-spec-constr -fno-specialise -Wall
+
+executable mantis-oracle
+  if flag(USE_PAB)
+     hs-source-dirs  : app
+     main-is         : Main.hs
+     other-modules   : Paths_mantis_oracle
+     autogen-modules : Paths_mantis_oracle
+     build-depends   : base ^>=4.14.1.0
+                     , base16-bytestring
+                     , bytestring
+                     , mantis-oracle
+                     , optparse-applicative
+                     , plutus-contract
+                     , plutus-ledger
+                     , text
+     default-language: Haskell2010
+     ghc-options     : -fplugin-opt PlutusTx.Plugin:defer-errors -Wall
+  else
+     hs-source-dirs  : src
+     main-is         : Main.hs
+     other-modules   : Mantis.Oracle
+                       Mantis.Oracle.Types
+     build-depends   : base ^>=4.14.1.0
+                     , aeson
+                     , base16-bytestring
+                     , bytestring
+                     , cardano-api
+                     , plutus-ledger
+                     , plutus-tx
+                     , plutus-tx-plugin
+                     , serialise
+     default-language: Haskell2010
+     ghc-options     : -fplugin-opt PlutusTx.Plugin:defer-errors -Wall

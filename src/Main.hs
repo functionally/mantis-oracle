@@ -13,9 +13,7 @@
 -----------------------------------------------------------------------------
 
 
-{-# LANGUAGE NumericUnderscores #-}
-{-# LANGUAGE OverloadedStrings  #-}
-{-# LANGUAGE RecordWildCards    #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 
 module Main (
@@ -24,12 +22,11 @@ module Main (
 ) where
 
 
-import Cardano.Api
-import Ledger.Value
-import Mantis.Oracle -- (exportOracle)
-import Mantis.Oracle.Types
+import Ledger.Value        (AssetClass(..), CurrencySymbol(..), TokenName(..))
+import Mantis.Oracle       (exportOracle)
+import Mantis.Oracle.Types (Parameters(..), makeOracle)
 
-import qualified Data.ByteString.Base16 as Base16 (decode, encode)
+import qualified Data.ByteString.Base16 as Base16 (decode)
 
 
 main :: IO ()
