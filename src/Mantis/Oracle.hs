@@ -162,6 +162,10 @@ makeValidator Oracle{..} inputDatum redeemer context@ScriptContext{..} =
     then deleting
     else if redeemer == -10
     then feePaid
+    else if redeemer == -11
+    then length continuingOutputs == 1
+    else if redeemer == -12
+    then isNothing outputDatum
     else False
 
 
