@@ -13,6 +13,7 @@
 -----------------------------------------------------------------------------
 
 
+{-# LANGUAGE CPP               #-}
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE NoImplicitPrelude #-}
@@ -77,7 +78,28 @@ makeOracle Parameters{..} =
 
 -- | Redeemers for the oracle.
 data Action =
-    Delete -- ^ Delete (close) the oracle.
-  | Read   -- ^ Read the oracle's datum.
-  | Write  -- ^ Set or update the oracel's datum.
+    Delete        -- ^ Delete (close) the oracle.
+  | Read          -- ^ Read the oracle's datum.
+  | Write         -- ^ Set or update the oracle's datum.
+  | Debug Integer -- ^ Reserved for debugging the validator.
     deriving Haskell.Show
+
+-- FIXME: Temporarily map actions to integers, in order to accommodate Alonzo Purple.
+#if USE_PAB
+#else
+instance Enum Action where
+  pred e = toEnum $ fromEnum e - 1
+  succ e = toEnum $ fromEnum e + 1
+  fromEnum Delete    = 0
+  fromEnum Read      = 1
+  fromEnum Write     = 2
+  fromEnum (Debug i) = i
+  toEnum i =
+    if i == 0
+      then Delete
+      else if i == 1
+        then Read
+        else if i == 2
+          then Write
+          else Debug i
+#endif
