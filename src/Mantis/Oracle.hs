@@ -88,7 +88,7 @@ instance IsData Action where
 
 -- | Make the validator for the oracle.
 makeValidator :: Oracle         -- ^ The oracle.
-              -> BuiltinData           -- ^ The datum.
+              -> BuiltinData    -- ^ The datum.
               -> Action         -- ^ The redeemer.
               -> ScriptContext  -- ^ The context.
               -> Bool           -- ^ Whether the transaction is valid.
@@ -242,8 +242,9 @@ fetchDatum TxOut{..} fetch =
     fromBuiltinData datum
 
 
-serialiseOracle :: Oracle
-                -> SBS.ShortByteString
+-- | Serialize the oracle as bytes.
+serialiseOracle :: Oracle              -- ^ The oracle.
+                -> SBS.ShortByteString -- ^ Its serialization.
 serialiseOracle = SBS.toShort . LBS.toStrict . serialise . unValidatorScript . oracleValidator
 
 

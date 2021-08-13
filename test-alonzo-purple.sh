@@ -1,3 +1,16 @@
+EXE=dist-newstyle/build/x86_64-linux/ghc-8.10.4/mantis-oracle-0.1.2.2/x/mantis-oracle/build/mantis-oracle/mantis-oracle
+
+SCRIPT_FILE=alonzo-purple.plutus; echo $SCRIPT_FILE
+
+
+$EXE export                                                         \
+     13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tBRIO \
+     13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tSOFR \
+     13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY \
+     10                                                             \
+     $SCRIPT_FILE
+
+
 MAGIC="--testnet-magic 8"
 
 
@@ -11,7 +24,6 @@ DATUM='"Hello PIGY!"'; echo $DATUM
 DATUM_HASH=$(cardano-cli transaction hash-script-data --script-data-value '"Hello PIGY!"'); echo $DATUM_HASH
 
 
-SCRIPT_FILE=/scratch/code.functionally.io/sofr-oracle/repo/oracle.plutus; echo $SCRIPT_FILE
 ADDRESS_S=$(cardano-cli address build $MAGIC --payment-script-file $SCRIPT_FILE); echo $ADDRESS_S
 
 
