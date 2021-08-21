@@ -25,15 +25,17 @@ module Main (
 ) where
 
 
+import Data.String         (fromString)
 import Data.Version        (showVersion)
 import Ledger.Value        (AssetClass, CurrencySymbol(..), TokenName(..), assetClass)
 import Mantis.Oracle       (exportOracle)
 import Mantis.Oracle.Types (Parameters(..), makeOracle)
 import Paths_mantis_oracle (version)
 
-import qualified Data.ByteString.Base16     as Base16 (decode)
-import qualified Data.ByteString.Char8      as BS     (pack, tail)
-import qualified Options.Applicative        as O
+import qualified Data.ByteString.Base16 as Base16 (decode)
+import qualified Data.ByteString.Char8  as BS     (pack)
+import qualified Options.Applicative    as O
+import qualified PlutusTx.Prelude       as P      (toBuiltin)
 
 #if USE_PAB
 
@@ -223,8 +225,8 @@ main =
 readAssetClass :: String -> AssetClass
 readAssetClass text =
   let
-    Right currency = Base16.decode . BS.pack $ takeWhile (/= '.') text
-    name           = BS.tail       . BS.pack $ dropWhile (/= '.') text
+    Right currency = fmap P.toBuiltin . Base16.decode . BS.pack $ takeWhile (/= '.') text
+    name           = fromString . tail $ dropWhile (/= '.') text
   in
     assetClass 
       (CurrencySymbol currency)

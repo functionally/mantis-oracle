@@ -54,7 +54,7 @@ import Ledger.Typed.Scripts (DatumType, RedeemerType, TypedValidator, Validator,
 import Ledger.Value         (assetClassValueOf, geq)
 import Mantis.Oracle.Types  (Action(..), Oracle(..))
 import Prelude              (FilePath, IO, (<>))
-import PlutusTx             (IsData(..), applyCode, compile, liftCode, makeLift)
+import PlutusTx             (FromData(..), ToData(..), UnsafeFromData(..), applyCode, compile, liftCode, makeLift)
 
 import qualified Data.ByteString.Short as SBS (ShortByteString, toShort)
 import qualified Data.ByteString.Lazy  as LBS (toStrict)
@@ -77,10 +77,12 @@ makeLift ''Oracle
 -- FIXME: Temporarily map actions to integers, in order to accommodate Alonzo Purple.
 #if USE_PAB
 #else
-instance IsData Action where
-  toBuiltinData = toBuiltinData . fromEnum
+instance FromData Action where
   fromBuiltinData = fmap toEnum . fromBuiltinData
+instance UnsafeFromData Action where
   unsafeFromBuiltinData = toEnum . unsafeFromBuiltinData
+instance ToData Action where
+  toBuiltinData = toBuiltinData . fromEnum
 #endif
 
 
