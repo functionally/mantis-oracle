@@ -29,6 +29,7 @@ import Data.String         (fromString)
 import Data.Version        (showVersion)
 import Ledger.Value        (AssetClass, CurrencySymbol(..), TokenName(..), assetClass)
 import Mantis.Oracle       (exportOracle)
+import Mantis.Oracle.Submit
 import Mantis.Oracle.Types (Parameters(..), makeOracle)
 import Paths_mantis_oracle (version)
 
@@ -99,6 +100,7 @@ data Command =
 main :: IO () -- ^ Action for running the example.
 main =
   do
+    test
     let
       versionOption =
         O.infoOption

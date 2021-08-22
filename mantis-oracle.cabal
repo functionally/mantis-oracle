@@ -24,6 +24,7 @@ flag USE_PAB
 library
   hs-source-dirs   : src
   exposed-modules  : Mantis.Oracle
+                     Mantis.Oracle.Submit
                      Mantis.Oracle.Types
   if flag(USE_PAB)
     exposed-modules: Mantis.Oracle.Client
@@ -38,7 +39,10 @@ library
                    , aeson
                    , bytestring
                    , cardano-api
+                   , containers
+                   , ouroboros-network
                    , plutus-ledger
+                   , plutus-ledger-api
                    , plutus-tx
                    , plutus-tx-plugin
                    , serialise

@@ -35,6 +35,7 @@ module Mantis.Oracle (
 , oracleInstance
 , oracleValidator
 , oracleAddress
+, plutusOracle
 , exportOracle
 -- * Access
 #if USE_PAB
@@ -46,10 +47,10 @@ module Mantis.Oracle (
 
 import PlutusTx.Prelude hiding ((<>))
 
-import Cardano.Api.Shelley  (PlutusScript (..), PlutusScriptV1, writeFileTextEnvelope)
+import Cardano.Api.Shelley  (PlutusScript(..), PlutusScriptVersion(..), PlutusScriptV1, Script(..), ScriptHash, hashScript, writeFileTextEnvelope)
 import Codec.Serialise      (serialise)
 import Control.Monad        (void)
-import Ledger               (Address, Datum(..), DatumHash, ScriptContext(..), TxOut(..), findOwnInput, getContinuingOutputs, scriptAddress, txInInfoResolved, txOutValue, unValidatorScript, valueSpent)
+import Ledger               (Datum(..), DatumHash, ScriptContext(..), TxOut(..), findOwnInput, getContinuingOutputs, txInInfoResolved, txOutValue, unValidatorScript, valueSpent)
 import Ledger.Typed.Scripts (DatumType, RedeemerType, TypedValidator, Validator, ValidatorTypes, mkTypedValidator, validatorScript, wrapValidator)
 import Ledger.Value         (assetClassValueOf, geq)
 import Mantis.Oracle.Types  (Action(..), Oracle(..))
@@ -202,8 +203,8 @@ oracleValidator = validatorScript . oracleInstance
 
 -- | Compute the address for an oracle.
 oracleAddress :: Oracle  -- ^ The oracle.
-              -> Address -- ^ The script address.
-oracleAddress = scriptAddress . oracleValidator
+              -> ScriptHash -- ^ The script address.
+oracleAddress = hashScript . PlutusScript PlutusScriptV1 . plutusOracle
 
 
 #if USE_PAB
@@ -250,16 +251,20 @@ serialiseOracle :: Oracle              -- ^ The oracle.
 serialiseOracle = SBS.toShort . LBS.toStrict . serialise . unValidatorScript . oracleValidator
 
 
+-- | Serialise the oracle as a Plutus script.
+plutusOracle :: Oracle                      -- ^ The oracle.
+             -> PlutusScript PlutusScriptV1 -- ^ The Plutus script.
+plutusOracle = PlutusScriptSerialised . serialiseOracle
+
+
 -- | Export the validator for an oracle and compute its address.
-exportOracle :: FilePath   -- ^ The filename for writing the validator bytes.
-             -> Oracle     -- ^ The oracle.
-             -> IO Address -- ^ Action writing the validator and returning its address.
+exportOracle :: FilePath      -- ^ The filename for writing the validator bytes.
+             -> Oracle        -- ^ The oracle.
+             -> IO ScriptHash -- ^ Action writing the validator and returning its address.
 exportOracle filename oracle =
   do
-    let
-      a = oracleAddress oracle
-      s = serialiseOracle oracle
     void
-      $ writeFileTextEnvelope filename Nothing
-          (PlutusScriptSerialised s :: PlutusScript PlutusScriptV1)
-    return a
+      . writeFileTextEnvelope filename Nothing
+      $ plutusOracle oracle
+    return
+      $ oracleAddress oracle
