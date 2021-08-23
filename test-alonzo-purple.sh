@@ -19,7 +19,7 @@ CURRENCY=$(cardano-cli transaction policyid --script-file policy-0.script); echo
 
 # Create the script address.
 
-SCRIPT_FILE=/scratch/code.functionally.io/sofr-oracle/repo/alonzo-purple.plutus; echo $SCRIPT_FILE
+SCRIPT_FILE=alonzo-purple.plutus; echo $SCRIPT_FILE
 
 cabal run exe:mantis-oracle -- export $CURRENCY.tBRIO $CURRENCY.tSOFR $CURRENCY.tPIGY 10 $SCRIPT_FILE
 
@@ -38,7 +38,7 @@ curl -v -XPOST "https://faucet.alonzo-purple.dev.cardano.org/send-money/$ADDRESS
 
 cardano-cli query utxo $MAGIC --address $ADDRESS_0
 
-TXID_0=cbbdcdd3a1ef16002f771d2fbb5b83bedcee48a49dc2dd6e6065d60b307fb162
+TXID_0=a5ff9edf4e9b7140862ca3e15ff7c612bf7071f6a2b49f99f74d75698cbe4cb8
 
 
 # Mint and distribute the tokens.
@@ -65,7 +65,7 @@ cardano-cli transaction submit $MAGIC \
 cardano-cli query utxo $MAGIC --address $ADDRESS_0
 cardano-cli query utxo $MAGIC --address $ADDRESS_1
 
-TXID_1=b59680cb9a1f9bc2ff4501289308b9cc3a35d588f63f62cec71081c40fbec3bb
+TXID_1=a649db30e00deb52a14aec2bf57272ed06698c2e842359fabb0145ceff0fe865
 
 
 # Add the datum to the oracle.
@@ -88,7 +88,7 @@ cardano-cli transaction submit $MAGIC \
 cardano-cli query utxo $MAGIC --address $ADDRESS_S
 cardano-cli query utxo $MAGIC --address $ADDRESS_1
 
-TXID_2=408c15a001fc20158a9265c53b72041db1156b46ba640ded71d5c00365dc188d
+TXID_2=acf9efae154648ecf77d511b2a0847e0a5437c827a118aea44da5b15b23690a8
 
 
 # Read the oracle.
@@ -100,9 +100,9 @@ cardano-cli transaction build $MAGIC --alonzo-era \
     --tx-in-datum-value '"Hello PIGY!"' \
     --tx-in-redeemer-value '1' \
   --tx-in $TXID_1#2 \
-  --tx-out "$ADDRESS_S+5000000+1 $CURRENCY.tSOFR+10 $CURRENCY.tPIGY" \
+  --tx-out "$ADDRESS_S+5000000+1 $CURRENCY.tSOFR+25 $CURRENCY.tPIGY" \
     --tx-out-datum-hash $(cardano-cli transaction hash-script-data --script-data-value '"Hello PIGY!"') \
-  --tx-out "$ADDRESS_1+5000000+990 $CURRENCY.tPIGY" \
+  --tx-out "$ADDRESS_1+5000000+975 $CURRENCY.tPIGY" \
   --change-address $ADDRESS_1 \
   --tx-in-collateral $TXID_2#0 \
   --out-file tx.raw
@@ -118,7 +118,7 @@ cardano-cli transaction submit $MAGIC \
 cardano-cli query utxo $MAGIC --address $ADDRESS_S
 cardano-cli query utxo $MAGIC --address $ADDRESS_1
 
-TXID_3=b96fe94f7685ba889fd9f1473cfd40130ab34306fdbc1bf244d7282ec95d79b4
+TXID_3=80561c48c1f84d8e78770d6343c49309653bdff11b9b243ab30f344a5b8f2882
 
 
 # Write the oracle.
@@ -132,7 +132,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_1#4 \
   --tx-out "$ADDRESS_S+1800000+1 $CURRENCY.tSOFR" \
     --tx-out-datum-hash $(cardano-cli transaction hash-script-data --script-data-value '"Hello, PIGY?"') \
-  --tx-out "$ADDRESS_1+5000000+10 $CURRENCY.tPIGY+1 $CURRENCY.tBRIO" \
+  --tx-out "$ADDRESS_1+5000000+25 $CURRENCY.tPIGY+1 $CURRENCY.tBRIO" \
   --change-address $ADDRESS_1 \
   --tx-in-collateral $TXID_2#0 \
   --out-file tx.raw
@@ -148,7 +148,7 @@ cardano-cli transaction submit $MAGIC \
 cardano-cli query utxo $MAGIC --address $ADDRESS_S
 cardano-cli query utxo $MAGIC --address $ADDRESS_1
 
-TXID_4=4095ea6b029f07d2d476ef7c84c4a8c9920c49b402ed8a47c51dd8dda2bb9c3d
+TXID_4=6ac2b23ad68f7faa0a3ba9be6f85274632db65f96294f76cece56ffd48ff49af
 
 
 # Delete the oracle.
@@ -160,7 +160,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
     --tx-in-datum-value '"Hello, PIGY?"' \
     --tx-in-redeemer-value 0 \
   --tx-in $TXID_4#2 \
-  --tx-out "$ADDRESS_1+1500000+10 $CURRENCY.tPIGY" \
+  --tx-out "$ADDRESS_1+1500000+25 $CURRENCY.tPIGY" \
   --tx-out "$ADDRESS_1+1500000+1 $CURRENCY.tSOFR" \
   --tx-out "$ADDRESS_1+1500000+1 $CURRENCY.tBRIO" \
   --change-address $ADDRESS_1 \
@@ -178,7 +178,7 @@ cardano-cli transaction submit $MAGIC \
 cardano-cli query utxo $MAGIC --address $ADDRESS_S
 cardano-cli query utxo $MAGIC --address $ADDRESS_1
 
-TXID_5=aa4f3c682d3f7aee372811d4b7f49dc658db53ec7627df3b830dd0029404ad65
+TXID_5=162a93d00ed6a08a39a2d5558e4b8bd394c06aa02d392901cf0867d97dad6da8
 
 
 # Clean up the example so it can be run again.
@@ -212,4 +212,4 @@ cardano-cli query utxo $MAGIC --address $ADDRESS_S
 cardano-cli query utxo $MAGIC --address $ADDRESS_0
 cardano-cli query utxo $MAGIC --address $ADDRESS_1
 
-TXID_0=80c81433724c7125694dd538f16b63e939f48438386721350c9e075bdfe0b44f
+TXID_0=b339a2748527326ebd08aa52417ff3c46c7436dd4eafb58043f43eec7041228a

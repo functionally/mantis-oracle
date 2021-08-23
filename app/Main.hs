@@ -25,16 +25,21 @@ module Main (
 ) where
 
 
-import Data.String         (fromString)
-import Data.Version        (showVersion)
-import Ledger.Value        (AssetClass, CurrencySymbol(..), TokenName(..), assetClass)
-import Mantis.Oracle       (exportOracle)
-import Mantis.Oracle.Submit
-import Mantis.Oracle.Types (Parameters(..), makeOracle)
-import Paths_mantis_oracle (version)
+import Cardano.Api          -- (ConsensusModeParams(..), EpochSlots(..), LocalNodeConnectInfo(..), NetworkId(..), NetworkMagic(..), serialiseAddress)
+import Data.String          (fromString)
+import Data.Version         (showVersion)
+import Data.Word            (Word32, Word64)
+import Ledger.Value         (AssetClass, CurrencySymbol(..), TokenName(..), assetClass)
+import Mantis.Oracle        (exportOracle)
+import Mantis.Oracle.Submit (writeOracle)
+import Mantis.Oracle.Types  (Parameters(..), makeOracle)
+import Mantis.Types
+import Paths_mantis_oracle  (version)
 
+import qualified Data.Aeson             as A
 import qualified Data.ByteString.Base16 as Base16 (decode)
 import qualified Data.ByteString.Char8  as BS     (pack)
+import qualified Data.Text              as T      (pack, unpack)
 import qualified Options.Applicative    as O
 import qualified PlutusTx.Prelude       as P      (toBuiltin)
 
@@ -52,15 +57,38 @@ import qualified Mantis.Oracle.Simulate.PAB as Simulate (runPAB)
 #endif
 
 
+data Configuration =
+  Configuration
+  {
+    socketPath     :: FilePath
+  , magic          :: Maybe Word32
+  , epochSlots     :: Word64
+  , controlAsset   :: String
+  , datumAsset     :: String
+  , feeAsset       :: String
+  , feeAmount      :: Integer
+  , lovelaceAmount :: Integer
+  }
+    deriving (Read, Show)
+
+
 -- | Available commands.
 data Command =
     Export
     {
-      controlAsset :: String
-    , datumAsset   :: String
-    , feeAsset     :: String
-    , feeAmount    :: Integer
-    , output       :: FilePath
+      configFile :: FilePath
+    , output     :: FilePath
+    }
+  | Write
+    {
+      configFile     :: FilePath
+    , signingAddress :: String
+    , signingKeyFile :: FilePath
+    , oldDataFile    :: FilePath
+    , newDataFile    :: FilePath
+    , metadataKey    :: Maybe Word64
+    , messageFile    :: Maybe FilePath
+    , minLovelace    :: Maybe Integer
     }
 #if USE_PAB
   | Test
@@ -100,7 +128,6 @@ data Command =
 main :: IO () -- ^ Action for running the example.
 main =
   do
-    test
     let
       versionOption =
         O.infoOption
@@ -117,13 +144,26 @@ main =
                       O.info
                         (
                           Export
-                            <$> O.strArgument     (O.metavar "CONTROL_ASSET" <> O.help "The asset class (<policy> ID `.` <name>) for the control token."       )
-                            <*> O.strArgument     (O.metavar "DATUM_ASSET"   <> O.help "The asset class (<policy> ID `.` <name>) for the datum token."         )
-                            <*> O.strArgument     (O.metavar "FEE_ASSET"     <> O.help "The asset class (<policy> ID `.` <name>) for the fee token."           )
-                            <*> O.argument O.auto (O.metavar "FEE_AMOUNT"    <> O.help "Number of fee tokens needed to read oracle."                           )
-                            <*> O.strArgument     (O.metavar "OUTPUT_FILE"   <> O.help "Output filename for the serialized validator."                         )
+                            <$> O.strArgument (O.metavar "CONFIG_FILE" <> O.help "The configuration file."                      )
+                            <*> O.strArgument (O.metavar "OUTPUT_FILE" <> O.help "Output filename for the serialized validator.")
                         )
                         $ O.progDesc "Export the validator code and compute its address."
+                    )
+                 <> O.command "write"
+                    (
+                      O.info
+                        (
+                          Write
+                            <$> O.strArgument               (                      O.metavar "CONFIG_FILE"     <> O.help "The configuration file."                    )
+                            <*> O.strArgument               (                      O.metavar "SIGNING_ADDRESS" <> O.help "The address for the signing key."           )
+                            <*> O.strArgument               (                      O.metavar "SIGNING_FILE"    <> O.help "The signing key file."                      )
+                            <*> O.strArgument               (                      O.metavar "OLD_JSON_FILE"   <> O.help "The JSON file for the existing oracle data.")
+                            <*> O.strArgument               (                      O.metavar "NEW_JSON_FILE"   <> O.help "The JSON file for the new oracle data."     )
+                            <*> O.optional (O.option O.auto $ O.long "metadata" <> O.metavar "INTEGER"         <> O.help "The metadata key for the oracle data."      )
+                            <*> O.optional (O.strOption     $ O.long "message"  <> O.metavar "JSON_FILE"       <> O.help "The JSON file for the message metadata."    )
+                            <*> O.optional (O.option O.auto $ O.long "lovelace" <> O.metavar "INTEGER"         <> O.help "The minimum Lovelace for outputs."          )
+                        )
+                        $ O.progDesc "Write a value to the oracle."
                     )
 #if USE_PAB
                  <> O.command "trace"
@@ -186,15 +226,73 @@ main =
     command <- O.execParser parser
     case command of
       Export{..}   -> do
+                        Configuration{..} <- read <$> readFile configFile
+                        let
+                          network = maybe Mainnet (Testnet . NetworkMagic) magic
                         address <-
-                          exportOracle output
+                          exportOracle output network
                             . makeOracle
                             $ Parameters
                               (readAssetClass controlAsset)
                               (readAssetClass datumAsset  )
                               (readAssetClass feeAsset    )
                               feeAmount
-                        print address
+                              lovelaceAmount
+                        putStrLn . T.unpack . serialiseAddress $ address
+      Write{..}    -> do
+                        Configuration{..} <- read <$> readFile configFile
+                        let
+                          network = maybe Mainnet (Testnet . NetworkMagic) magic
+                          connection =
+                            LocalNodeConnectInfo
+                            {
+                              localConsensusModeParams = CardanoModeParams (EpochSlots epochSlots)
+                            , localNodeNetworkId       = network
+                            , localNodeSocketPath      = socketPath
+                            }
+                          oracle =
+                            makeOracle
+                              $ Parameters
+                                (readAssetClass controlAsset)
+                                (readAssetClass datumAsset  )
+                                (readAssetClass feeAsset    )
+                                feeAmount
+                                lovelaceAmount
+                        result <-
+                          runMantisToIO
+                            $ do
+                                signingAddress' <-
+                                  foistMantisMaybe "Failed to read signing address"
+                                    . deserialiseAddress AsAddressAny
+                                    $ T.pack signingAddress
+                                signingKey <-
+                                  foistMantisEitherIO
+                                    $ readFileTextEnvelope (AsSigningKey AsPaymentKey) signingKeyFile
+                                oldData <-
+                                  foistMantisMaybeIO "Failed reading old data."
+                                    $ A.decodeFileStrict oldDataFile
+                                newData <-
+                                  foistMantisMaybeIO "Failed reading new data."
+                                    $ A.decodeFileStrict newDataFile
+                                message <-
+                                  maybe
+                                    (return Nothing)
+                                    (foistMantisMaybeIO "Failed reading message." . A.decodeFileStrict)
+                                    messageFile
+                                writeOracle
+                                  connection
+                                  network
+                                  oracle
+                                  signingAddress'
+                                  signingKey
+                                  (maybe 2_000_000 Quantity minLovelace)
+                                  oldData
+                                  newData
+                                  metadataKey
+                                  message
+                        case result of
+                          Right txId    -> print txId
+                          Left message' -> putStrLn message'
 #if USE_PAB
       Test{..}     -> Simulate.main
                         (CurrencySymbol $ BS.pack currency   )

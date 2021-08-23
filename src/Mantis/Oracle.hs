@@ -47,7 +47,8 @@ module Mantis.Oracle (
 
 import PlutusTx.Prelude hiding ((<>))
 
-import Cardano.Api.Shelley  (PlutusScript(..), PlutusScriptVersion(..), PlutusScriptV1, Script(..), ScriptHash, hashScript, writeFileTextEnvelope)
+import Cardano.Api          (AddressAny, NetworkId, PaymentCredential(..), StakeAddressReference(..), makeShelleyAddress, toAddressAny)
+import Cardano.Api.Shelley  (PlutusScript(..), PlutusScriptVersion(..), PlutusScriptV1, Script(..), hashScript, writeFileTextEnvelope)
 import Codec.Serialise      (serialise)
 import Control.Monad        (void)
 import Ledger               (Datum(..), DatumHash, ScriptContext(..), TxOut(..), findOwnInput, getContinuingOutputs, txInInfoResolved, txOutValue, unValidatorScript, valueSpent)
@@ -202,9 +203,19 @@ oracleValidator = validatorScript . oracleInstance
 
 
 -- | Compute the address for an oracle.
-oracleAddress :: Oracle  -- ^ The oracle.
-              -> ScriptHash -- ^ The script address.
-oracleAddress = hashScript . PlutusScript PlutusScriptV1 . plutusOracle
+oracleAddress :: NetworkId  -- ^ The network identifier.
+              -> Oracle     -- ^ The oracle.
+              -> AddressAny -- ^ The script address.
+oracleAddress network oracle = 
+  toAddressAny
+    $ makeShelleyAddress network
+      (
+        PaymentCredentialByScript 
+          . hashScript
+          . PlutusScript PlutusScriptV1
+          $ plutusOracle oracle
+      )
+      NoStakeAddress
 
 
 #if USE_PAB
@@ -259,12 +270,13 @@ plutusOracle = PlutusScriptSerialised . serialiseOracle
 
 -- | Export the validator for an oracle and compute its address.
 exportOracle :: FilePath      -- ^ The filename for writing the validator bytes.
+             -> NetworkId     -- ^ The network identifier.
              -> Oracle        -- ^ The oracle.
-             -> IO ScriptHash -- ^ Action writing the validator and returning its address.
-exportOracle filename oracle =
+             -> IO AddressAny -- ^ Action writing the validator and returning its address.
+exportOracle filename network oracle =
   do
     void
       . writeFileTextEnvelope filename Nothing
       $ plutusOracle oracle
     return
-      $ oracleAddress oracle
+      $ oracleAddress network oracle

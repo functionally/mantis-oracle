@@ -41,6 +41,7 @@ library
                    , cardano-api
                    , containers
                    , mantis
+                   , mtl
                    , ouroboros-network
                    , plutus-ledger
                    , plutus-ledger-api
@@ -48,6 +49,7 @@ library
                    , plutus-tx-plugin
                    , serialise
                    , text
+                   , unordered-containers
   if flag(USE_PAB)
     build-depends  : containers
                    , data-default
@@ -70,8 +72,11 @@ executable mantis-oracle
    other-modules   : Paths_mantis_oracle
    autogen-modules : Paths_mantis_oracle
    build-depends   : base ^>=4.14.1.0
+                   , aeson
                    , base16-bytestring
                    , bytestring
+                   , cardano-api
+                   , mantis
                    , mantis-oracle
                    , optparse-applicative
                    , plutus-ledger

@@ -1,173 +1,212 @@
 
-{-# LANGUAGE NumericUnderscores #-}
-{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TupleSections     #-}
 
 
-module Mantis.Oracle.Submit
-where
+module Mantis.Oracle.Submit (
+  writeOracle
+) where
 
 
-import Cardano.Api
-import Data.List (sortBy)
-import Ledger.Value(CurrencySymbol(..), assetClass)
-import Mantis.Oracle (oracleAddress, plutusOracle)
-import Mantis.Oracle.Types (Parameters(..), makeOracle)
+import Cardano.Api                                        -- (AddressAny, AlonzoEra, AssetId(..), AssetName(..), AsType(..), BuildTxWith(..), CardanoMode, CollateralSupportedInEra, EraInMode(..), LocalNodeConnectInfo, MultiAssetSupportedInEra(..), NetworkId, PaymentCredential(..), PaymentKey, PolicyId(..), PlutusScript, PlutusScriptV1, QueryInEra(..), QueryInShelleyBasedEra(..), QueryUTxOFilter(..), ScriptDataSupportedInEra(..), ShelleyBasedEra(..), ShelleyWitnessSigningKey(..), SigningKey, StakeAddressReference(..), TxAuxScripts(..), TxBody, TxBodyContent(..), TxCertificates(..), TxExtraKeyWitnesses(..), TxExtraScriptData(..), TxFee(..), TxId, TxIn, TxInMode(..), TxInsCollateral, TxMetadata, TxMetadataInEra(..), TxMintValue(..), TxOut(..), TxOutValue(..), TxScriptValidity(..), TxUpdateProposal(..), TxValidityLowerBound(..), TxValidityUpperBound(..), TxWithdrawals(..), UTxO(..), Value, ValidityNoUpperBoundSupportedInEra(..), anyAddressInEra, deserialiseFromRawBytesHex, getTxId, getVerificationKey, hashScriptData, makeShelleyAddress, makeTransactionBodyAutoBalance, metadataFromJson, negateValue, queryNodeLocalState, scriptDataFromJson, selectAsset, selectLovelace, signShelleyTransaction, submitTxToNodeLocal, toAddressAny, valueFromList, valueToList, verificationKeyHash)
+import Control.Monad.Except                              (throwError, liftIO)
+import Data.List                                         (sortBy)
+import Data.Maybe                                        (catMaybes)
+import Data.Word                                         (Word64)
+import Ledger.Value                                      (AssetClass(..), CurrencySymbol(..), TokenName(..))
+import Mantis.Oracle                                     (oracleAddress, plutusOracle)
+import Mantis.Oracle.Types                               (Action(..), Oracle(..))
+import Mantis.Types                                      (MantisM, foistMantisEither, foistMantisEitherIO, foistMantisMaybe)
 import Ouroboros.Network.Protocol.LocalTxSubmission.Type (SubmitResult(..))
-import PlutusTx.Prelude (toBuiltin)
+import PlutusTx.Builtins                                 (fromBuiltin)
 
-import qualified Data.Map.Strict as M
-import qualified Data.Set as S
+import qualified Data.Aeson          as A
+import qualified Data.HashMap.Strict as H
+import qualified Data.Map.Strict     as M
+import qualified Data.Set            as S
+import qualified Data.Text           as T
+import qualified PlutusTx.Prelude    as P
 
 
-test :: IO ()
-test =
+writeOracle :: LocalNodeConnectInfo CardanoMode
+            -> NetworkId
+            -> Oracle
+            -> AddressAny
+            -> SigningKey PaymentKey
+            -> Quantity
+            -> A.Value
+            -> A.Value
+            -> Maybe Word64
+            -> Maybe A.Value
+            -> MantisM IO TxId
+writeOracle connection network oracle controlAddress controlSigning minLovelace oldData newData metadataKey message =
   do
     let
-      network = Testnet $ NetworkMagic 8
-      Just policy = deserialiseFromRawBytesHex AsPolicyId "13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1"
-      policy' = CurrencySymbol . toBuiltin $ serialiseToRawBytes policy
-      oracle =
-        makeOracle
-        $ Parameters
-          {
-            controlParameter = assetClass policy' "tBRIO"
-          , datumParameter   = assetClass policy' "tSOFR"
-          , feeToken         = assetClass policy' "tPIGY"
-          , feeAmount        = 10
-          }
       script = plutusOracle oracle
-      scriptAddress =
-        toAddressAny
-          $ makeShelleyAddress
-            network
-            (PaymentCredentialByScript $ oracleAddress oracle)
-            NoStakeAddress
-      Just scriptAddress' = anyAddressInEra AlonzoEra scriptAddress
-      controlAsset = AssetId policy "tBRIO"
-      datumAsset   = AssetId policy "tSOFR"
-      Just controlAddress = deserialiseAddress AsAddressAny "addr_test1qzwcxq9nurae3hag4xl2eazvx86ugfr7zpg0n0y7zgkj7w28gu262anw6rvqr5th53h8khjhkwrdzyq3qercygw3z6yqu36wjm"
-      Just controlAddress' = anyAddressInEra AlonzoEra controlAddress
-      localConnInfo =
-        LocalNodeConnectInfo
-        {
-          localConsensusModeParams = CardanoModeParams (EpochSlots 21600)
-        , localNodeNetworkId       = network
-        , localNodeSocketPath      = "/data/alonzo.socket"
-        }
-    Right controlSigning <- readFileTextEnvelope (AsSigningKey AsPaymentKey) "/scratch/lemur.deploy.functionally.dev/alonzo/cardano-node/keys/alonzo-purple.payment-1.skey"
-    Right start <-
-      queryNodeLocalState localConnInfo Nothing
-        QuerySystemStart
-    Right history <-
-      queryNodeLocalState localConnInfo Nothing
-        $ QueryEraHistory CardanoModeIsMultiEra
-    Right (Right protocol) <-
-      queryNodeLocalState localConnInfo Nothing
-        . QueryInEra AlonzoEraInCardanoMode
-        $ QueryInShelleyBasedEra ShelleyBasedEraAlonzo QueryProtocolParameters
+      scriptAddress = oracleAddress network oracle
+      messageMetadata = ("674", ) <$> message
+      oracleMetadata = (, newData) . T.pack . show <$> metadataKey
+    controlAsset <- classToId $ controlToken oracle
+    datumAsset   <- classToId $ datumToken   oracle
+    metadata <-
+      case catMaybes [messageMetadata, oracleMetadata] of
+        []        -> return Nothing
+        metadata' -> foistMantisEither
+                       . fmap Just
+                       . metadataFromJson TxMetadataJsonNoSchema
+                       . A.Object
+                       $ H.fromList metadata'
     [(datumTxIn, TxOut _ (TxOutValue _ datumValue) _)] <-
-      findUTxO localConnInfo scriptAddress
+      findUTxO connection scriptAddress
         $ \value -> selectAsset value datumAsset > 0
-    putStrLn ""
-    putStrLn $ "Datum UTxO: " ++ show datumTxIn
     [(controlTxIn, TxOut _ (TxOutValue _ controlValue) _)] <-
-      findUTxO localConnInfo controlAddress
+      findUTxO connection controlAddress
         $ \value -> selectAsset value controlAsset > 0
-    putStrLn ""
-    putStrLn $ "Control UTxO: " ++ show controlTxIn
-    putStrLn ""
     plainUTxOs@((collateralTxIn, _) : _) <-
-      findUTxO localConnInfo controlAddress
+      findUTxO connection controlAddress
         $ \value -> length (valueToList value) == 1
-    putStrLn ""
-    putStrLn $ "Collateral UTxO: " ++ show collateralTxIn
-    putStrLn ""
-    Right (Right utxo) <-
-      queryNodeLocalState localConnInfo Nothing
-        . QueryInEra AlonzoEraInCardanoMode
-        . QueryInShelleyBasedEra ShelleyBasedEraAlonzo  
-        . QueryUTxO
-        . QueryUTxOByTxIn
-        $ S.fromList
-        $ datumTxIn
-        : controlTxIn
-        : [txIn | (txIn, _) <- plainUTxOs]
     let
       total =
            datumValue
         <> controlValue
         <> mconcat [value | (_, TxOut _ (TxOutValue _ value) _) <- plainUTxOs]
-      datumValue' = valueFromList [(AdaAssetId, 2_000_000), (datumAsset, 1)]
-      feeValue = valueFromList [(AdaAssetId, 2_000_000)]
+      datumValue' = valueFromList [(AdaAssetId, minLovelace), (datumAsset, 1)]
+      feeValue = valueFromList [(AdaAssetId, minLovelace)]
       controlValue' = total <> negateValue (datumValue' <> feeValue)
-      content =
-        TxBodyContent
-        {
-          txIns             =   (
-                                  datumTxIn
-                                , BuildTxWith
-                                    . ScriptWitness ScriptWitnessForSpending
-                                    $ PlutusScriptWitness
-                                      PlutusScriptV1InAlonzo
-                                      PlutusScriptV1
-                                      script
-                                      (ScriptDatumForTxIn $ ScriptDataBytes "Hello PIGY!")
-                                      (ScriptDataNumber 2)
-                                      (ExecutionUnits 0 0)
-                                )
-                              : (
-                                  controlTxIn
-                                , BuildTxWith
-                                    $ KeyWitness KeyWitnessForSpending
-                                )
-                              : [
-                                  (
-                                    txIn
-                                  , BuildTxWith
-                                      $ KeyWitness KeyWitnessForSpending
-                                  )
-                                |
-                                  (txIn, _) <- plainUTxOs
-                                ]
-        , txInsCollateral   = TxInsCollateral CollateralInAlonzoEra [collateralTxIn]
-        , txOuts            = [
-                                TxOut
-                                  scriptAddress' 
-                                  (
-                                    TxOutValue MultiAssetInAlonzoEra datumValue'
-                                  )
-                                  (TxOutDatumHash ScriptDataInAlonzoEra . hashScriptData $ ScriptDataBytes "Hello, PIGY?")
-                              , TxOut
-                                  controlAddress'
-                                  (
-                                    TxOutValue MultiAssetInAlonzoEra controlValue'
-                                  )
-                                  TxOutDatumHashNone
-                              ]
-        , txFee             = TxFeeExplicit TxFeesExplicitInAlonzoEra 0
-        , txValidityRange   = (TxValidityNoLowerBound, TxValidityNoUpperBound ValidityNoUpperBoundInAlonzoEra)
-        , txMetadata        = TxMetadataNone
-        , txAuxScripts      = TxAuxScriptsNone
-        , txExtraScriptData = BuildTxWith TxExtraScriptDataNone
-        , txExtraKeyWits    = TxExtraKeyWitnessesNone
-        , txProtocolParams  = BuildTxWith $ Just protocol
-        , txWithdrawals     = TxWithdrawalsNone
-        , txCertificates    = TxCertificatesNone
-        , txUpdateProposal  = TxUpdateProposalNone
-        , txMintValue       = TxMintNone
-        , txScriptValidity  = BuildTxWith TxScriptValidityNone 
-        }
-      Right body =
-        makeTransactionBodyAutoBalance
-            AlonzoEraInCardanoMode
-            start
-            history
-            protocol
-            S.empty
-            utxo
-            content
+    body <-
+      build
+        connection
+        script
+        scriptAddress
+        controlAddress
+        (datumTxIn, datumValue')
+        (controlTxIn, controlValue')
+        plainUTxOs
+        collateralTxIn
+        (oldData, newData)
+        metadata
+    submit connection body controlSigning
+
+
+build :: LocalNodeConnectInfo CardanoMode
+      -> PlutusScript PlutusScriptV1
+      -> AddressAny
+      -> AddressAny
+      -> (TxIn, Value)
+      -> (TxIn, Value)
+      -> [(TxIn, a)]
+      -> TxIn
+      -> (A.Value, A.Value)
+      -> Maybe TxMetadata
+      -> MantisM IO (TxBody AlonzoEra)
+build connection script scriptAddress controlAddress (datumTxIn,  datumValue) (controlTxIn, controlValue) plainUTxOs collateralTxIn (oldData, newData) metadata =
+  do
+    oldData' <-
+      foistMantisEither
+        $ scriptDataFromJson ScriptDataJsonNoSchema oldData
+    newData' <-
+      foistMantisEither
+        $ scriptDataFromJson ScriptDataJsonNoSchema newData
+    scriptAddress' <-
+      foistMantisMaybe "Failed to convert script address."
+        $ anyAddressInEra AlonzoEra scriptAddress
+    controlAddress' <-
+      foistMantisMaybe "Failed to convert control address."
+        $ anyAddressInEra AlonzoEra controlAddress
+    start <-
+      foistMantisEitherIO
+        $ queryNodeLocalState connection Nothing QuerySystemStart
+    history <-
+      foistMantisEitherIO
+        . queryNodeLocalState connection Nothing
+        $ QueryEraHistory CardanoModeIsMultiEra
+    protocol <-
+      foistMantisEitherIO'
+        . queryNodeLocalState connection Nothing
+        . QueryInEra AlonzoEraInCardanoMode
+        $ QueryInShelleyBasedEra ShelleyBasedEraAlonzo QueryProtocolParameters
+    utxo <-
+      foistMantisEitherIO'
+        . queryNodeLocalState connection Nothing
+        . QueryInEra AlonzoEraInCardanoMode
+        . QueryInShelleyBasedEra ShelleyBasedEraAlonzo  
+        . QueryUTxO
+        . QueryUTxOByTxIn
+        . S.fromList
+        $ datumTxIn
+        : controlTxIn
+        : [txIn | (txIn, _) <- plainUTxOs]
+    let
+      txIns =
+          (
+            datumTxIn
+          , BuildTxWith
+              . ScriptWitness ScriptWitnessForSpending
+              $ PlutusScriptWitness
+                PlutusScriptV1InAlonzo
+                PlutusScriptV1
+                script
+                (ScriptDatumForTxIn oldData')
+                (ScriptDataNumber $ P.fromEnum Write)
+                (ExecutionUnits 0 0)
+          )
+        : (
+            controlTxIn
+          , BuildTxWith $ KeyWitness KeyWitnessForSpending
+          )
+        : [
+            (
+              txIn
+            , BuildTxWith $ KeyWitness KeyWitnessForSpending
+            )
+          |
+            (txIn, _) <- plainUTxOs
+          ]
+      txOuts =
+        [
+          TxOut
+            scriptAddress'
+            (TxOutValue MultiAssetInAlonzoEra datumValue)
+            (TxOutDatumHash ScriptDataInAlonzoEra $ hashScriptData newData')
+        , TxOut
             controlAddress'
-            Nothing
+            (TxOutValue MultiAssetInAlonzoEra controlValue)
+            TxOutDatumHashNone
+        ]
+      txInsCollateral   = TxInsCollateral CollateralInAlonzoEra [collateralTxIn]
+      txFee             = TxFeeExplicit TxFeesExplicitInAlonzoEra 0
+      txValidityRange   = (TxValidityNoLowerBound, TxValidityNoUpperBound ValidityNoUpperBoundInAlonzoEra)
+      txMetadata        = maybe TxMetadataNone (TxMetadataInEra TxMetadataInAlonzoEra) metadata
+      txAuxScripts      = TxAuxScriptsNone
+      txExtraScriptData = BuildTxWith TxExtraScriptDataNone
+      txExtraKeyWits    = TxExtraKeyWitnessesNone
+      txProtocolParams  = BuildTxWith $ Just protocol
+      txWithdrawals     = TxWithdrawalsNone
+      txCertificates    = TxCertificatesNone
+      txUpdateProposal  = TxUpdateProposalNone
+      txMintValue       = TxMintNone
+      txScriptValidity  = BuildTxWith TxScriptValidityNone 
+    foistMantisEither
+      $ makeTransactionBodyAutoBalance
+          AlonzoEraInCardanoMode
+          start
+          history
+          protocol
+          S.empty
+          utxo
+          TxBodyContent{..}
+          controlAddress'
+          Nothing
+
+
+submit :: LocalNodeConnectInfo CardanoMode
+       -> TxBody AlonzoEra
+       -> SigningKey PaymentKey
+       -> MantisM IO TxId
+submit connection body controlSigning =
+  do
+    let
       tx =
         signShelleyTransaction
           body
@@ -175,17 +214,18 @@ test =
             WitnessPaymentKey controlSigning
           ]
     result <-
-      submitTxToNodeLocal localConnInfo
+      liftIO
+        . submitTxToNodeLocal connection
         $ TxInMode tx AlonzoEraInCardanoMode
     case result of
-      SubmitSuccess     -> print $ getTxId body
-      SubmitFail reason -> print reason
+      SubmitSuccess     -> return $ getTxId body
+      SubmitFail reason -> throwError $ show reason
 
 
 findUTxO :: LocalNodeConnectInfo CardanoMode
          -> AddressAny
          -> (Value -> Bool)
-         -> IO [(TxIn, TxOut AlonzoEra)]
+         -> MantisM IO [(TxIn, TxOut AlonzoEra)]
 findUTxO localConnInfo address condition =
   do
     let
@@ -198,7 +238,9 @@ findUTxO localConnInfo address condition =
       compare' (_, TxOut _ (TxOutValue _ value) _) (_, TxOut _ (TxOutValue _ value') _) =
         selectLovelace value `compare` selectLovelace value'
       compare' _ _ = EQ
-    Right (Right (UTxO utxos)) <- queryNodeLocalState localConnInfo Nothing query
+    UTxO utxos <-
+      foistMantisEitherIO'
+        $ queryNodeLocalState localConnInfo Nothing query
     return
       $ sortBy compare'
       [
@@ -207,3 +249,27 @@ findUTxO localConnInfo address condition =
         utxo@(_, TxOut _ (TxOutValue _ value) _) <- M.toList utxos
       , condition value
       ]
+
+
+classToId :: AssetClass
+          -> MantisM IO AssetId
+classToId (AssetClass (CurrencySymbol policy, TokenName name)) =
+   do
+     policy' <-
+       foistMantisMaybe "Failed to convert policy."
+         . deserialiseFromRawBytes AsPolicyId
+         $ fromBuiltin policy
+     return
+       . AssetId policy'
+       . AssetName
+       $ fromBuiltin name
+
+
+foistMantisEitherIO' :: Show e
+                     => Show e'
+                     => IO (Either e (Either e' a))
+                     -> MantisM IO a
+foistMantisEitherIO' a =
+  do
+    a' <- foistMantisEitherIO a
+    foistMantisEither a'
