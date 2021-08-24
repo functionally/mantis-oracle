@@ -72,8 +72,16 @@ writeOracle connection network oracle controlAddress controlSigning minLovelace 
         <> controlValue
         <> mconcat [value | (_, TxOut _ (TxOutValue _ value) _) <- plainUTxOs]
       datumValue' = valueFromList [(AdaAssetId, minLovelace), (datumAsset, 1)]
-      feeValue = valueFromList [(AdaAssetId, minLovelace)]
-      controlValue' = total <> negateValue (datumValue' <> feeValue)
+      Quantity change =
+        lovelaceToQuantity
+          . selectLovelace
+          $ total <> negateValue datumValue'
+      changeValue =
+        lovelaceToValue
+          . quantityToLovelace
+          . Quantity
+          $ change `div` 2
+      controlValue' = total <> negateValue (datumValue' <> changeValue)
     body <-
       build
         connection
