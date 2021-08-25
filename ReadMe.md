@@ -53,7 +53,7 @@ Installation
 
 This package uses the [`haskell.nix`](https://input-output-hk.github.io/haskell.nix/) build system. Simply clone this repository and execute the build command:
 
-	nix-build -A mantis-oracle.components.exes.mantis-oracle -o build
+    nix-build -A mantis-oracle.components.exes.mantis-oracle -o build
 
 The executable result will be in `./build/bin/mantis-oracle`.
 
@@ -138,9 +138,9 @@ First, learn about the `export` command:
 
 Now export the Plutus script for the oracle and find its address:
 
-    mantis-oracle export alonzo-purple.mantis-oracle $SCRIPT_FILE
-    
     SCRIPT_FILE=alonzo-purple.plutus; echo $SCRIPT_FILE
+    
+    mantis-oracle export alonzo-purple.mantis-oracle $SCRIPT_FILE
     
     ADDRESS_S=$(cardano-cli address build $MAGIC --payment-script-file $SCRIPT_FILE); echo $ADDRESS_S
 
@@ -151,11 +151,11 @@ Now export the Plutus script for the oracle and find its address:
     
                                TxHash                                 TxIx        Amount
     --------------------------------------------------------------------------------------
-    2ad93807236f4960bb02ca7a2b84a0d64ff3d74fd803941e0562c22b828b48d9     0        999962178869 lovelace + TxOutDatumHashNone
+    a9f0ae68e660fc463e7b134ef6e0dad5cb4bd206eab04e0df7c20be6ca9ee23e     0        999956547015 lovelace + TxOutDatumHashNone
 
 In this example, record that we have:
 
-    TXID_0=2ad93807236f4960bb02ca7a2b84a0d64ff3d74fd803941e0562c22b828b48d9
+    TXID_0=a9f0ae68e660fc463e7b134ef6e0dad5cb4bd206eab04e0df7c20be6ca9ee23e
 
 
 ### Mint and distribute the tokens.
@@ -185,14 +185,14 @@ Wait until the transaction is recorded on the blockchain and lookup the eUTxOs.
     
                                TxHash                                 TxIx        Amount
     --------------------------------------------------------------------------------------
-    8ce0abe24f89bedc052d87300573bd0ecc812a4763eeb3878ce95a25c3877f6a     1        100000000 lovelace + TxOutDatumHashNone
-    8ce0abe24f89bedc052d87300573bd0ecc812a4763eeb3878ce95a25c3877f6a     2        100000000 lovelace + 1000 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
-    8ce0abe24f89bedc052d87300573bd0ecc812a4763eeb3878ce95a25c3877f6a     3        100000000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tSOFR + TxOutDatumHashNone
-    8ce0abe24f89bedc052d87300573bd0ecc812a4763eeb3878ce95a25c3877f6a     4        100000000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tBRIO + TxOutDatumHashNone
+    65748b659a06c5284ca931614a079d0b222ae3f2637991c336ec4402072d7e33     1        100000000 lovelace + TxOutDatumHashNone
+    65748b659a06c5284ca931614a079d0b222ae3f2637991c336ec4402072d7e33     2        100000000 lovelace + 1000 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
+    65748b659a06c5284ca931614a079d0b222ae3f2637991c336ec4402072d7e33     3        100000000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tSOFR + TxOutDatumHashNone
+    65748b659a06c5284ca931614a079d0b222ae3f2637991c336ec4402072d7e33     4        100000000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tBRIO + TxOutDatumHashNone
 
 In this example, record that we have:
 
-    TXID_1=8ce0abe24f89bedc052d87300573bd0ecc812a4763eeb3878ce95a25c3877f6a
+    TXID_1=65748b659a06c5284ca931614a079d0b222ae3f2637991c336ec4402072d7e33
 
 
 ### Create the oracle.
@@ -233,18 +233,18 @@ Wait until the transaction is recorded on the blockchain and look at the eUTxOs:
     $ cardano-cli query utxo $MAGIC --address $ADDRESS_S
                                TxHash                                 TxIx        Amount
     --------------------------------------------------------------------------------------
-    fe118ef3999b85094b1f1525a13901c96173e06eadc10b972dae0a1dc10c3064     1        5000000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tSOFR + TxOutDatumHash ScriptDataInAlonzoEra "27f7dc5d54a5a5cfa25f75f200f62f5a3decce6ca05f4497ce3123d8b3f682ad"
+    91a72627f4cfeb4aa289f5ef8be6c788777891052b1f9d5034b88d4238d43d67     1        5000000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tSOFR + TxOutDatumHash ScriptDataInAlonzoEra "27f7dc5d54a5a5cfa25f75f200f62f5a3decce6ca05f4497ce3123d8b3f682ad"
     
     $ cardano-cli query utxo $MAGIC --address $ADDRESS_1
                                TxHash                                 TxIx        Amount
     --------------------------------------------------------------------------------------
-    8ce0abe24f89bedc052d87300573bd0ecc812a4763eeb3878ce95a25c3877f6a     2        100000000 lovelace + 1000 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
-    fe118ef3999b85094b1f1525a13901c96173e06eadc10b972dae0a1dc10c3064     0        147307087 lovelace + TxOutDatumHashNone
-    fe118ef3999b85094b1f1525a13901c96173e06eadc10b972dae0a1dc10c3064     2        147500000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tBRIO + TxOutDatumHashNone
+    65748b659a06c5284ca931614a079d0b222ae3f2637991c336ec4402072d7e33     2        100000000 lovelace + 1000 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
+    91a72627f4cfeb4aa289f5ef8be6c788777891052b1f9d5034b88d4238d43d67     0        147307087 lovelace + TxOutDatumHashNone
+    91a72627f4cfeb4aa289f5ef8be6c788777891052b1f9d5034b88d4238d43d67     2        147500000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tBRIO + TxOutDatumHashNone
 
 In this example, record that we have:
 
-    TXID_2=fe118ef3999b85094b1f1525a13901c96173e06eadc10b972dae0a1dc10c3064
+    TXID_2=91a72627f4cfeb4aa289f5ef8be6c788777891052b1f9d5034b88d4238d43d67
 
 The datum hash in the eUTxO should match the hash for the file:
 
@@ -255,7 +255,7 @@ The datum hash in the eUTxO should match the hash for the file:
 
 ### Read the oracle.
 
-Reading the oracle is typically done by another smart contract that needs to use the data in the oracles eUTxO. For this example, we just use `cardano-cli` to read the oracle.
+Reading the oracle is typically done by another smart contract that needs to use the data in the oracle's eUTxO. For this example, we just use `cardano-cli` to read the oracle.
 
     cardano-cli transaction build $MAGIC --alonzo-era \
       --protocol-params-file alonzo-purple.protocol \
@@ -285,21 +285,21 @@ Wait until the transaction is recorded on the blockchain and look at the eUTxOs:
     
                                TxHash                                 TxIx        Amount
     --------------------------------------------------------------------------------------
-    d72e44459324279a16b6c61821cc375bf8d306cadc755b5787955ef4a082b3ff     1        5000000 lovelace + 5 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tSOFR + TxOutDatumHash ScriptDataInAlonzoEra "27f7dc5d54a5a5cfa25f75f200f62f5a3decce6ca05f4497ce3123d8b3f682ad"
+    43ac8560e968c4141f223533962a4bf3980847f81a1142256c37b6b379f05acf     1        5000000 lovelace + 5 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tSOFR + TxOutDatumHash ScriptDataInAlonzoEra "27f7dc5d54a5a5cfa25f75f200f62f5a3decce6ca05f4497ce3123d8b3f682ad"
     
     $ cardano-cli query utxo $MAGIC --address $ADDRESS_1
                                TxHash                                 TxIx        Amount
     --------------------------------------------------------------------------------------
-    d72e44459324279a16b6c61821cc375bf8d306cadc755b5787955ef4a082b3ff     0        94319051 lovelace + TxOutDatumHashNone
-    d72e44459324279a16b6c61821cc375bf8d306cadc755b5787955ef4a082b3ff     2        5000000 lovelace + 995 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
-    fe118ef3999b85094b1f1525a13901c96173e06eadc10b972dae0a1dc10c3064     0        147307087 lovelace + TxOutDatumHashNone
-    fe118ef3999b85094b1f1525a13901c96173e06eadc10b972dae0a1dc10c3064     2        147500000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tBRIO + TxOutDatumHashNone
+    43ac8560e968c4141f223533962a4bf3980847f81a1142256c37b6b379f05acf     0        94319051 lovelace + TxOutDatumHashNone
+    43ac8560e968c4141f223533962a4bf3980847f81a1142256c37b6b379f05acf     2        5000000 lovelace + 995 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
+    91a72627f4cfeb4aa289f5ef8be6c788777891052b1f9d5034b88d4238d43d67     0        147307087 lovelace + TxOutDatumHashNone
+    91a72627f4cfeb4aa289f5ef8be6c788777891052b1f9d5034b88d4238d43d67     2        147500000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tBRIO + TxOutDatumHashNone
 
 You can see that the oracle has acquired the `5 tPIGY` fee, but no additional ADA.
 
 In this example, record that we have:
 
-  TXID_3=d72e44459324279a16b6c61821cc375bf8d306cadc755b5787955ef4a082b3ff
+    TXID_3=43ac8560e968c4141f223533962a4bf3980847f81a1142256c37b6b379f05acf
 
 
 ### Write new data to the oracle.
@@ -344,26 +344,25 @@ Wait until the transaction is recorded on the blockchain and look at the eUTxOs:
     
                                TxHash                                 TxIx        Amount
     --------------------------------------------------------------------------------------
-    d72e44459324279a16b6c61821cc375bf8d306cadc755b5787955ef4a082b3ff     1        5000000 lovelace + 5 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tSOFR + TxOutDatumHash ScriptDataInAlonzoEra "27f7dc5d54a5a5cfa25f75f200f62f5a3decce6ca05f4497ce3123d8b3f682ad"
+    040858aa9ed4cd6125884146424a72e09bc1b732416cc177758f30855b7f0d48     1        5000000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tSOFR + TxOutDatumHash ScriptDataInAlonzoEra "000448b2cf8aeea0eac22d1e7a5cb6dd286e3473be70de4c6e25e9342f1b3dff"
     
     $ cardano-cli query utxo $MAGIC --address $ADDRESS_1
     
                                TxHash                                 TxIx        Amount
     --------------------------------------------------------------------------------------
-    d72e44459324279a16b6c61821cc375bf8d306cadc755b5787955ef4a082b3ff     0        94319051 lovelace + TxOutDatumHashNone
-    d72e44459324279a16b6c61821cc375bf8d306cadc755b5787955ef4a082b3ff     2        5000000 lovelace + 995 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
-    fe118ef3999b85094b1f1525a13901c96173e06eadc10b972dae0a1dc10c3064     0        147307087 lovelace + TxOutDatumHashNone
-    fe118ef3999b85094b1f1525a13901c96173e06eadc10b972dae0a1dc10c3064     2        147500000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tBRIO + TxOutDatumHashNone
+    040858aa9ed4cd6125884146424a72e09bc1b732416cc177758f30855b7f0d48     0        193777479 lovelace + TxOutDatumHashNone
+    040858aa9ed4cd6125884146424a72e09bc1b732416cc177758f30855b7f0d48     2        194563069 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tBRIO + 5 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
+    43ac8560e968c4141f223533962a4bf3980847f81a1142256c37b6b379f05acf     2        5000000 lovelace + 995 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
 
 In this example, record that we have:
 
-    TXID_4=d72e44459324279a16b6c61821cc375bf8d306cadc755b5787955ef4a082b3ff
+    TXID_4=040858aa9ed4cd6125884146424a72e09bc1b732416cc177758f30855b7f0d48
 
 The datum hash in the eUTxO will match the hash for the new file:
 
     $ cardano-cli transaction hash-script-data --script-data-value "$(cat example-data-1.json)"
     
-    8e2a71e471278c7dcfe0b25f02d42bc97eb0dfd69d348132d7c34b5a59ff8aa3
+    000448b2cf8aeea0eac22d1e7a5cb6dd286e3473be70de4c6e25e9342f1b3dff
 
 
 ### Delete the oracle.
@@ -408,16 +407,16 @@ Wait until the transaction is recorded on the blockchain and look at the eUTxOs:
     
                                TxHash                                 TxIx        Amount
     --------------------------------------------------------------------------------------
-    4b3aa771644de7422cdddaf953d1bf8b97d2927795f1a3e34af67dc9bdaac6cf     0        193464184 lovelace + TxOutDatumHashNone
-    4b3aa771644de7422cdddaf953d1bf8b97d2927795f1a3e34af67dc9bdaac6cf     1        5000000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tSOFR + TxOutDatumHashNone
-    4b3aa771644de7422cdddaf953d1bf8b97d2927795f1a3e34af67dc9bdaac6cf     2        194170274 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tBRIO + 5 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
-    d72e44459324279a16b6c61821cc375bf8d306cadc755b5787955ef4a082b3ff     2        5000000 lovelace + 995 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
+    1bbc4e31dd96c4994085c5222e0fbcfdc47f1ee643c1ac1656f89be0428b8260     0        193464096 lovelace + TxOutDatumHashNone
+    1bbc4e31dd96c4994085c5222e0fbcfdc47f1ee643c1ac1656f89be0428b8260     1        5000000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tSOFR + TxOutDatumHashNone
+    1bbc4e31dd96c4994085c5222e0fbcfdc47f1ee643c1ac1656f89be0428b8260     2        194170274 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tBRIO + 5 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
+    43ac8560e968c4141f223533962a4bf3980847f81a1142256c37b6b379f05acf     2        5000000 lovelace + 995 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
 
 There should be no eUTxOs at the script address.
 
 In this example, record that we have:
 
-    TXID_5=4b3aa771644de7422cdddaf953d1bf8b97d2927795f1a3e34af67dc9bdaac6cf
+    TXID_5=1bbc4e31dd96c4994085c5222e0fbcfdc47f1ee643c1ac1656f89be0428b8260
 
 
 ### Clean up the example so it can be run again.
@@ -455,7 +454,7 @@ Wait until the transaction is recorded on the blockchain and look at the eUTxOs:
     
                                TxHash                                 TxIx        Amount
     --------------------------------------------------------------------------------------
-    3842cc351cd0517d21618929a430289cfafbe769a62f2a426c3a69fafb9ba36f     0        999959433837 lovelace + TxOutDatumHashNone
+    0d6882ac95a52e5ffd50c63658a5fd3f747b47dec3e06ad1146ba2633666c19a     0        999953801895 lovelace + TxOutDatumHashNone
     
     $ cardano-cli query utxo $MAGIC --address $ADDRESS_1
     
@@ -464,7 +463,7 @@ Wait until the transaction is recorded on the blockchain and look at the eUTxOs:
 
 In this example, record that we have:
 
-    TXID_0=3842cc351cd0517d21618929a430289cfafbe769a62f2a426c3a69fafb9ba36f
+    TXID_0=0d6882ac95a52e5ffd50c63658a5fd3f747b47dec3e06ad1146ba2633666c19a
 
 
 Simulation and PAB Examples
