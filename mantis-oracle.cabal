@@ -1,7 +1,7 @@
 cabal-version     : 2.4
 name              : mantis-oracle
 description       : This Cardano oracle reports structured data (namely, the `PlutuxTx.Data` type) to a transaction if the fee, as a quantity of a fungible token, is paid. It can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic.
-version           : 0.2.0.0
+version           : 0.2.0.1
 author            : Brian W Bush <code@functionally.io>
 maintainer        : Brian W Bush <code@functionally.io>
 copyright         : (c) 2021 Brian W Bush
@@ -24,6 +24,7 @@ flag USE_PAB
 library
   hs-source-dirs   : src
   exposed-modules  : Mantis.Oracle
+                     Mantis.Oracle.Submit
                      Mantis.Oracle.Types
   if flag(USE_PAB)
     exposed-modules: Mantis.Oracle.Client
@@ -38,11 +39,17 @@ library
                    , aeson
                    , bytestring
                    , cardano-api
+                   , containers
+                   , mantis
+                   , mtl
+                   , ouroboros-network
                    , plutus-ledger
+                   , plutus-ledger-api
                    , plutus-tx
                    , plutus-tx-plugin
                    , serialise
                    , text
+                   , unordered-containers
   if flag(USE_PAB)
     build-depends  : containers
                    , data-default
@@ -65,11 +72,16 @@ executable mantis-oracle
    other-modules   : Paths_mantis_oracle
    autogen-modules : Paths_mantis_oracle
    build-depends   : base ^>=4.14.1.0
+                   , aeson
                    , base16-bytestring
                    , bytestring
+                   , cardano-api
+                   , mantis
                    , mantis-oracle
+                   , mtl
                    , optparse-applicative
                    , plutus-ledger
+                   , plutus-tx
                    , text
    if flag(USE_PAB)
      build-depends : plutus-contract

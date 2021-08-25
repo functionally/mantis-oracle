@@ -34,6 +34,7 @@ import PlutusTx.Prelude
 
 import Data.Aeson   (FromJSON, ToJSON)
 import GHC.Generics (Generic)
+import Ledger.Ada   (lovelaceValueOf)
 import Ledger.Value (AssetClass(..), Value)
 
 import qualified Ledger.Value as Value   (singleton)
@@ -58,7 +59,8 @@ data Parameters =
     controlParameter :: AssetClass -- ^ The token needed for writing or deleting the oracle.
   , datumParameter   :: AssetClass -- ^ The token with which the oracle datum is always associated.
   , feeToken         :: AssetClass -- ^ The token in which the fee must be paid for reading the oracle.
-  , feeAmount        :: Integer    -- ^ The amount of the fee tokend needed for reading the oracle.
+  , feeAmount        :: Integer    -- ^ The amount of the fee token needed for reading the oracle, if any.
+  , lovelaceAmount   :: Integer    -- ^ The amount of Lovelace needed for reading the oracle, if any.
   }
     deriving (Haskell.Eq, Generic, FromJSON, Haskell.Show, ToJSON)
 
@@ -71,7 +73,12 @@ makeOracle Parameters{..} =
     controlToken = controlParameter
     datumToken   = datumParameter
     (symbol, name) = unAssetClass feeToken
-    requiredFee = Value.singleton symbol name feeAmount
+    requiredFee =
+      case (feeAmount, lovelaceAmount) of
+        (0, 0) -> mempty
+        (0, _) -> lovelaceValueOf lovelaceAmount
+        (_, 0) -> Value.singleton symbol name feeAmount
+        _      -> Value.singleton symbol name feeAmount <> lovelaceValueOf lovelaceAmount
   in
     Oracle{..}
 
@@ -94,12 +101,9 @@ instance Enum Action where
   fromEnum Read      = 1
   fromEnum Write     = 2
   fromEnum (Debug i) = i
-  toEnum i =
-    if i == 0
-      then Delete
-      else if i == 1
-        then Read
-        else if i == 2
-          then Write
-          else Debug i
+  toEnum i
+    | i == 0    = Delete
+    | i == 1    = Read
+    | i == 2    = Write
+    | otherwise = Debug i
 #endif

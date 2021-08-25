@@ -1,0 +1,1676 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-----------------------------------------------------------------------------</span><span>
+</span><span id="line-2"></span><span class="hs-comment">--</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Module      :  $Headers</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Copyright   :  (c) 2021 Brian W Bush</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- License     :  MIT</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Maintainer  :  Brian W Bush &lt;code@functionally.io&gt;</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Stability   :  Experimental</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- Portability :  Portable</span><span>
+</span><span id="line-10"></span><span class="hs-comment">--</span><span>
+</span><span id="line-11"></span><span class="hs-comment">-- | Submitting transactions to the oracle.</span><span>
+</span><span id="line-12"></span><span class="hs-comment">--</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-----------------------------------------------------------------------------</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-17"></span><span class="hs-pragma">{-# LANGUAGE RecordWildCards   #-}</span><span>
+</span><span id="line-18"></span><span class="hs-pragma">{-# LANGUAGE TupleSections     #-}</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Mantis.Oracle.Submit</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-22"></span><span>  </span><span class="annot"><a href="Mantis.Oracle.Submit.html#createOracle"><span class="hs-identifier">createOracle</span></a></span><span>
+</span><span id="line-23"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Submit.html#deleteOracle"><span class="hs-identifier">deleteOracle</span></a></span><span>
+</span><span id="line-24"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Submit.html#writeOracle"><span class="hs-identifier">writeOracle</span></a></span><span>
+</span><span id="line-25"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Cardano.Api</span></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.Except</span></span><span>                              </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">throwError</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">liftIO</span></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span>                                         </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">sortBy</span></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span>                                        </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">catMaybes</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">fromJust</span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Word</span></span><span>                                         </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Word64</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ledger.Value</span></span><span>                                      </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">AssetClass</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">CurrencySymbol</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">TokenName</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Mantis.Oracle.html"><span class="hs-identifier">Mantis.Oracle</span></a></span><span>                                     </span><span class="hs-special">(</span><span class="annot"><a href="Mantis.Oracle.html#oracleAddress"><span class="hs-identifier">oracleAddress</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#plutusOracle"><span class="hs-identifier">plutusOracle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html"><span class="hs-identifier">Mantis.Oracle.Types</span></a></span><span>                               </span><span class="hs-special">(</span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier">Action</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier">Oracle</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Mantis.Types</span></span><span>                                      </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">MantisM</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">foistMantisEither</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">foistMantisEitherIO</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">foistMantisMaybe</span></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ouroboros.Network.Protocol.LocalTxSubmission.Type</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">SubmitResult</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">PlutusTx.Builtins</span></span><span>                                 </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">fromBuiltin</span></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Aeson</span></span><span>          </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">A</span></span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.HashMap.Strict</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">H</span></span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span>     </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span>            </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">S</span></span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span>           </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">T</span></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">PlutusTx.Prelude</span></span><span>    </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">P</span></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="hs-comment">-- | Submit the transaction to create an oracle.</span><span>
+</span><span id="line-49"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#createOracle"><span class="hs-identifier hs-type">createOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                          </span><span class="hs-comment">-- ^ The initial datum.</span><span>
+</span><span id="line-50"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Word64</span></span><span>                     </span><span class="hs-comment">-- ^ The metadata key for the initial datum, if any.</span><span>
+</span><span id="line-51"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                    </span><span class="hs-comment">-- ^ The metadata message, if any.</span><span>
+</span><span id="line-52"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span> </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
+</span><span id="line-53"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NetworkId</span></span><span>                        </span><span class="hs-comment">-- ^ The network identifier.</span><span>
+</span><span id="line-54"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                           </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-55"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span>                       </span><span class="hs-comment">-- ^ The payment address.</span><span>
+</span><span id="line-56"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SigningKey</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PaymentKey</span></span><span>            </span><span class="hs-comment">-- ^ The signing key for the payment address.</span><span>
+</span><span id="line-57"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Quantity</span></span><span>                         </span><span class="hs-comment">-- ^ The Lovelace to be sent to the script.</span><span>
+</span><span id="line-58"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                  </span><span class="hs-comment">-- ^ Action to submit the creation transaction.</span><span>
+</span><span id="line-59"></span><span id="createOracle"><span class="annot"><span class="annottext">createOracle :: Value
+-&gt; Maybe Word64
+-&gt; Maybe Value
+-&gt; LocalNodeConnectInfo CardanoMode
+-&gt; NetworkId
+-&gt; Oracle
+-&gt; AddressAny
+-&gt; SigningKey PaymentKey
+-&gt; Quantity
+-&gt; MantisM IO TxId
+</span><a href="Mantis.Oracle.Submit.html#createOracle"><span class="hs-identifier hs-var hs-var">createOracle</span></a></span></span><span> </span><span id="local-6989586621679283578"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283578"><span class="hs-identifier hs-var">newData</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-60"></span><span>  </span><span class="annot"><span class="annottext">Maybe Action
+-&gt; Maybe Value
+-&gt; Maybe Value
+-&gt; Maybe Word64
+-&gt; Maybe Value
+-&gt; LocalNodeConnectInfo CardanoMode
+-&gt; NetworkId
+-&gt; Oracle
+-&gt; AddressAny
+-&gt; SigningKey PaymentKey
+-&gt; Quantity
+-&gt; MantisM IO TxId
+</span><a href="Mantis.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-var">operateOracle</span></a></span><span>
+</span><span id="line-61"></span><span>    </span><span class="annot"><span class="annottext">Maybe Action
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-62"></span><span>    </span><span class="annot"><span class="annottext">Maybe Value
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-63"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Value -&gt; Maybe Value
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283578"><span class="hs-identifier hs-var">newData</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span class="hs-comment">-- | Submit the transaction to delete an oracle.</span><span>
+</span><span id="line-67"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#deleteOracle"><span class="hs-identifier hs-type">deleteOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                           </span><span class="hs-comment">-- ^ The datum currently held in the script.</span><span>
+</span><span id="line-68"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                     </span><span class="hs-comment">-- ^ The metadata message, if any.</span><span>
+</span><span id="line-69"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span>  </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
+</span><span id="line-70"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NetworkId</span></span><span>                         </span><span class="hs-comment">-- ^ The network identifier.</span><span>
+</span><span id="line-71"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                            </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-72"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span>                        </span><span class="hs-comment">-- ^ The payment address.</span><span>
+</span><span id="line-73"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SigningKey</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PaymentKey</span></span><span>             </span><span class="hs-comment">-- ^ The signing key for the payment address.</span><span>
+</span><span id="line-74"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Quantity</span></span><span>                          </span><span class="hs-comment">-- ^ The Lovelace to be sent to the script.</span><span>
+</span><span id="line-75"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                   </span><span class="hs-comment">-- ^ Action to submit the deletion transaction.</span><span>
+</span><span id="line-76"></span><span id="deleteOracle"><span class="annot"><span class="annottext">deleteOracle :: Value
+-&gt; Maybe Value
+-&gt; LocalNodeConnectInfo CardanoMode
+-&gt; NetworkId
+-&gt; Oracle
+-&gt; AddressAny
+-&gt; SigningKey PaymentKey
+-&gt; Quantity
+-&gt; MantisM IO TxId
+</span><a href="Mantis.Oracle.Submit.html#deleteOracle"><span class="hs-identifier hs-var hs-var">deleteOracle</span></a></span></span><span> </span><span id="local-6989586621679283576"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283576"><span class="hs-identifier hs-var">oldData</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-77"></span><span>  </span><span class="annot"><span class="annottext">Maybe Action
+-&gt; Maybe Value
+-&gt; Maybe Value
+-&gt; Maybe Word64
+-&gt; Maybe Value
+-&gt; LocalNodeConnectInfo CardanoMode
+-&gt; NetworkId
+-&gt; Oracle
+-&gt; AddressAny
+-&gt; SigningKey PaymentKey
+-&gt; Quantity
+-&gt; MantisM IO TxId
+</span><a href="Mantis.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-var">operateOracle</span></a></span><span>
+</span><span id="line-78"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Action -&gt; Maybe Action
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Action
+</span><a href="Mantis.Oracle.Types.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-79"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Value -&gt; Maybe Value
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283576"><span class="hs-identifier hs-var">oldData</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-80"></span><span>    </span><span class="annot"><span class="annottext">Maybe Value
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-81"></span><span>    </span><span class="annot"><span class="annottext">Maybe Word64
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="hs-comment">-- | Submit the transaction to write new data to an oracle.</span><span>
+</span><span id="line-85"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#writeOracle"><span class="hs-identifier hs-type">writeOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                          </span><span class="hs-comment">-- ^ The datum currently held in the script. </span><span>
+</span><span id="line-86"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                          </span><span class="hs-comment">-- ^ The new datum.                              </span><span>
+</span><span id="line-87"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Word64</span></span><span>                     </span><span class="hs-comment">-- ^ The metadata key for the new datum, if any.</span><span>
+</span><span id="line-88"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                    </span><span class="hs-comment">-- ^ The metadata message, if any.              </span><span>
+</span><span id="line-89"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span> </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
+</span><span id="line-90"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NetworkId</span></span><span>                        </span><span class="hs-comment">-- ^ The network identifier.</span><span>
+</span><span id="line-91"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                           </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-92"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span>                       </span><span class="hs-comment">-- ^ The payment address.</span><span>
+</span><span id="line-93"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SigningKey</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PaymentKey</span></span><span>            </span><span class="hs-comment">-- ^ The signing key for the payment address.</span><span>
+</span><span id="line-94"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Quantity</span></span><span>                         </span><span class="hs-comment">-- ^ The Lovelace to be sent to the script.</span><span>
+</span><span id="line-95"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                  </span><span class="hs-comment">-- ^ Action to submit the writing transaction.</span><span>
+</span><span id="line-96"></span><span id="writeOracle"><span class="annot"><span class="annottext">writeOracle :: Value
+-&gt; Value
+-&gt; Maybe Word64
+-&gt; Maybe Value
+-&gt; LocalNodeConnectInfo CardanoMode
+-&gt; NetworkId
+-&gt; Oracle
+-&gt; AddressAny
+-&gt; SigningKey PaymentKey
+-&gt; Quantity
+-&gt; MantisM IO TxId
+</span><a href="Mantis.Oracle.Submit.html#writeOracle"><span class="hs-identifier hs-var hs-var">writeOracle</span></a></span></span><span> </span><span id="local-6989586621679283574"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283574"><span class="hs-identifier hs-var">oldData</span></a></span></span><span> </span><span id="local-6989586621679283573"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283573"><span class="hs-identifier hs-var">newData</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-97"></span><span>  </span><span class="annot"><span class="annottext">Maybe Action
+-&gt; Maybe Value
+-&gt; Maybe Value
+-&gt; Maybe Word64
+-&gt; Maybe Value
+-&gt; LocalNodeConnectInfo CardanoMode
+-&gt; NetworkId
+-&gt; Oracle
+-&gt; AddressAny
+-&gt; SigningKey PaymentKey
+-&gt; Quantity
+-&gt; MantisM IO TxId
+</span><a href="Mantis.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-var">operateOracle</span></a></span><span>
+</span><span id="line-98"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Action -&gt; Maybe Action
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Action
+</span><a href="Mantis.Oracle.Types.html#Write"><span class="hs-identifier hs-var">Write</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-99"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Value -&gt; Maybe Value
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283574"><span class="hs-identifier hs-var">oldData</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-100"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Value -&gt; Maybe Value
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283573"><span class="hs-identifier hs-var">newData</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="hs-comment">-- | Submit a transaction to operate the oracle.</span><span>
+</span><span id="line-104"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-type">operateOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>                     </span><span class="hs-comment">-- ^ The redeemer, if any.</span><span>
+</span><span id="line-105"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                    </span><span class="hs-comment">-- ^ The datum currently held in the script, if any.   </span><span>
+</span><span id="line-106"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                    </span><span class="hs-comment">-- ^ The new datum, if any.                         </span><span>
+</span><span id="line-107"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Word64</span></span><span>                     </span><span class="hs-comment">-- ^ The metadata key for the new datum, if any</span><span>
+</span><span id="line-108"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                    </span><span class="hs-comment">-- ^ The metadata message, if any.             </span><span>
+</span><span id="line-109"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span> </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
+</span><span id="line-110"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NetworkId</span></span><span>                        </span><span class="hs-comment">-- ^ The network identifier.          </span><span>
+</span><span id="line-111"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                           </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-112"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span>                       </span><span class="hs-comment">-- ^ The payment address.</span><span>
+</span><span id="line-113"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SigningKey</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PaymentKey</span></span><span>            </span><span class="hs-comment">-- ^ The signing key for the payment address.</span><span>
+</span><span id="line-114"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Quantity</span></span><span>                         </span><span class="hs-comment">-- ^ The Lovelace to be sent to the script.</span><span>
+</span><span id="line-115"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                  </span><span class="hs-comment">-- ^ Action to submit the deletion transaction.</span><span>
+</span><span id="line-116"></span><span id="operateOracle"><span class="annot"><span class="annottext">operateOracle :: Maybe Action
+-&gt; Maybe Value
+-&gt; Maybe Value
+-&gt; Maybe Word64
+-&gt; Maybe Value
+-&gt; LocalNodeConnectInfo CardanoMode
+-&gt; NetworkId
+-&gt; Oracle
+-&gt; AddressAny
+-&gt; SigningKey PaymentKey
+-&gt; Quantity
+-&gt; MantisM IO TxId
+</span><a href="Mantis.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-var hs-var">operateOracle</span></a></span></span><span> </span><span id="local-6989586621679283571"><span class="annot"><span class="annottext">Maybe Action
+</span><a href="#local-6989586621679283571"><span class="hs-identifier hs-var">action</span></a></span></span><span> </span><span id="local-6989586621679283570"><span class="annot"><span class="annottext">Maybe Value
+</span><a href="#local-6989586621679283570"><span class="hs-identifier hs-var">oldData</span></a></span></span><span> </span><span id="local-6989586621679283569"><span class="annot"><span class="annottext">Maybe Value
+</span><a href="#local-6989586621679283569"><span class="hs-identifier hs-var">newData</span></a></span></span><span> </span><span id="local-6989586621679283568"><span class="annot"><span class="annottext">Maybe Word64
+</span><a href="#local-6989586621679283568"><span class="hs-identifier hs-var">metadataKey</span></a></span></span><span> </span><span id="local-6989586621679283567"><span class="annot"><span class="annottext">Maybe Value
+</span><a href="#local-6989586621679283567"><span class="hs-identifier hs-var">message</span></a></span></span><span> </span><span id="local-6989586621679283566"><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283566"><span class="hs-identifier hs-var">connection</span></a></span></span><span> </span><span id="local-6989586621679283565"><span class="annot"><span class="annottext">NetworkId
+</span><a href="#local-6989586621679283565"><span class="hs-identifier hs-var">network</span></a></span></span><span> </span><span id="local-6989586621679283564"><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679283564"><span class="hs-identifier hs-var">oracle</span></a></span></span><span> </span><span id="local-6989586621679283563"><span class="annot"><span class="annottext">AddressAny
+</span><a href="#local-6989586621679283563"><span class="hs-identifier hs-var">controlAddress</span></a></span></span><span> </span><span id="local-6989586621679283562"><span class="annot"><span class="annottext">SigningKey PaymentKey
+</span><a href="#local-6989586621679283562"><span class="hs-identifier hs-var">controlSigning</span></a></span></span><span> </span><span id="local-6989586621679283561"><span class="annot"><span class="annottext">Quantity
+</span><a href="#local-6989586621679283561"><span class="hs-identifier hs-var">minLovelace</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-117"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-118"></span><span>    </span><span class="hs-keyword">let</span><span>
+</span><span id="line-119"></span><span>      </span><span id="local-6989586621679283560"><span class="annot"><span class="annottext">script :: PlutusScript PlutusScriptV1
+</span><a href="#local-6989586621679283560"><span class="hs-identifier hs-var hs-var">script</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; PlutusScript PlutusScriptV1
+</span><a href="Mantis.Oracle.html#plutusOracle"><span class="hs-identifier hs-var">plutusOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679283564"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><span id="line-120"></span><span>      </span><span id="local-6989586621679283559"><span class="annot"><span class="annottext">scriptAddress :: AddressAny
+</span><a href="#local-6989586621679283559"><span class="hs-identifier hs-var hs-var">scriptAddress</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NetworkId -&gt; Oracle -&gt; AddressAny
+</span><a href="Mantis.Oracle.html#oracleAddress"><span class="hs-identifier hs-var">oracleAddress</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkId
+</span><a href="#local-6989586621679283565"><span class="hs-identifier hs-var">network</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679283564"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><span id="line-121"></span><span>      </span><span id="local-6989586621679283558"><span class="annot"><span class="annottext">messageMetadata :: Maybe (Text, Value)
+</span><a href="#local-6989586621679283558"><span class="hs-identifier hs-var hs-var">messageMetadata</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;674&quot;</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Value -&gt; (Text, Value)) -&gt; Maybe Value -&gt; Maybe (Text, Value)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Maybe Value
+</span><a href="#local-6989586621679283567"><span class="hs-identifier hs-var">message</span></a></span><span>
+</span><span id="line-122"></span><span>      </span><span id="local-6989586621679283556"><span class="annot"><span class="annottext">oracleMetadata :: Maybe (Text, Value)
+</span><a href="#local-6989586621679283556"><span class="hs-identifier hs-var hs-var">oracleMetadata</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-123"></span><span>                         </span><span id="local-6989586621679283555"><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679283555"><span class="hs-identifier hs-var">metadataKey'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Maybe Word64
+</span><a href="#local-6989586621679283568"><span class="hs-identifier hs-var">metadataKey</span></a></span><span>
+</span><span id="line-124"></span><span>                         </span><span id="local-6989586621679283554"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283554"><span class="hs-identifier hs-var">newData'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Maybe Value
+</span><a href="#local-6989586621679283569"><span class="hs-identifier hs-var">newData</span></a></span><span>
+</span><span id="line-125"></span><span>                         </span><span class="annot"><span class="annottext">(Text, Value) -&gt; Maybe (Text, Value)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; Text
+</span><span class="hs-identifier hs-var">T.pack</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Text) -&gt; String -&gt; Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679283555"><span class="hs-identifier hs-var">metadataKey'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283554"><span class="hs-identifier hs-var">newData'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-126"></span><span>    </span><span id="local-6989586621679283551"><span class="annot"><span class="annottext">AssetId
+</span><a href="#local-6989586621679283551"><span class="hs-identifier hs-var">controlAsset</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">AssetClass -&gt; MantisM IO AssetId
+</span><a href="Mantis.Oracle.Submit.html#classToId"><span class="hs-identifier hs-var">classToId</span></a></span><span> </span><span class="annot"><span class="annottext">(AssetClass -&gt; MantisM IO AssetId)
+-&gt; AssetClass -&gt; MantisM IO AssetId
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; AssetClass
+</span><a href="Mantis.Oracle.Types.html#controlToken"><span class="hs-identifier hs-var hs-var">controlToken</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679283564"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><span id="line-127"></span><span>    </span><span id="local-6989586621679283548"><span class="annot"><span class="annottext">AssetId
+</span><a href="#local-6989586621679283548"><span class="hs-identifier hs-var">datumAsset</span></a></span></span><span>   </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">AssetClass -&gt; MantisM IO AssetId
+</span><a href="Mantis.Oracle.Submit.html#classToId"><span class="hs-identifier hs-var">classToId</span></a></span><span> </span><span class="annot"><span class="annottext">(AssetClass -&gt; MantisM IO AssetId)
+-&gt; AssetClass -&gt; MantisM IO AssetId
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; AssetClass
+</span><a href="Mantis.Oracle.Types.html#datumToken"><span class="hs-identifier hs-var hs-var">datumToken</span></a></span><span>   </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679283564"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><span id="line-128"></span><span>    </span><span id="local-6989586621679283546"><span class="annot"><span class="annottext">Maybe TxMetadata
+</span><a href="#local-6989586621679283546"><span class="hs-identifier hs-var">metadata</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-129"></span><span>      </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[Maybe (Text, Value)] -&gt; [(Text, Value)]
+forall a. [Maybe a] -&gt; [a]
+</span><span class="hs-identifier hs-var">catMaybes</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Maybe (Text, Value)
+</span><a href="#local-6989586621679283558"><span class="hs-identifier hs-var">messageMetadata</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Maybe (Text, Value)
+</span><a href="#local-6989586621679283556"><span class="hs-identifier hs-var">oracleMetadata</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-130"></span><span>        </span><span class="hs-special">[</span><span class="hs-special">]</span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe TxMetadata -&gt; MantisM IO (Maybe TxMetadata)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Maybe TxMetadata
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-131"></span><span>        </span><span id="local-6989586621679283545"><span class="annot"><span class="annottext">[(Text, Value)]
+</span><a href="#local-6989586621679283545"><span class="hs-identifier hs-var">metadata'</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Either TxMetadataJsonError (Maybe TxMetadata)
+-&gt; MantisM IO (Maybe TxMetadata)
+forall (m :: * -&gt; *) e a.
+(Monad m, Show e) =&gt;
+Either e a -&gt; MantisM m a
+</span><span class="hs-identifier hs-var">foistMantisEither</span></span><span>
+</span><span id="line-132"></span><span>                       </span><span class="annot"><span class="annottext">(Either TxMetadataJsonError (Maybe TxMetadata)
+ -&gt; MantisM IO (Maybe TxMetadata))
+-&gt; (Object -&gt; Either TxMetadataJsonError (Maybe TxMetadata))
+-&gt; Object
+-&gt; MantisM IO (Maybe TxMetadata)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(TxMetadata -&gt; Maybe TxMetadata)
+-&gt; Either TxMetadataJsonError TxMetadata
+-&gt; Either TxMetadataJsonError (Maybe TxMetadata)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">TxMetadata -&gt; Maybe TxMetadata
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span>
+</span><span id="line-133"></span><span>                       </span><span class="annot"><span class="annottext">(Either TxMetadataJsonError TxMetadata
+ -&gt; Either TxMetadataJsonError (Maybe TxMetadata))
+-&gt; (Object -&gt; Either TxMetadataJsonError TxMetadata)
+-&gt; Object
+-&gt; Either TxMetadataJsonError (Maybe TxMetadata)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">TxMetadataJsonSchema
+-&gt; Value -&gt; Either TxMetadataJsonError TxMetadata
+</span><span class="hs-identifier hs-var">metadataFromJson</span></span><span> </span><span class="annot"><span class="annottext">TxMetadataJsonSchema
+</span><span class="hs-identifier hs-var">TxMetadataJsonNoSchema</span></span><span>
+</span><span id="line-134"></span><span>                       </span><span class="annot"><span class="annottext">(Value -&gt; Either TxMetadataJsonError TxMetadata)
+-&gt; (Object -&gt; Value)
+-&gt; Object
+-&gt; Either TxMetadataJsonError TxMetadata
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Object -&gt; Value
+</span><span class="hs-identifier hs-var">A.Object</span></span><span>
+</span><span id="line-135"></span><span>                       </span><span class="annot"><span class="annottext">(Object -&gt; MantisM IO (Maybe TxMetadata))
+-&gt; Object -&gt; MantisM IO (Maybe TxMetadata)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[(Text, Value)] -&gt; Object
+forall k v. (Eq k, Hashable k) =&gt; [(k, v)] -&gt; HashMap k v
+</span><span class="hs-identifier hs-var">H.fromList</span></span><span> </span><span class="annot"><span class="annottext">[(Text, Value)]
+</span><a href="#local-6989586621679283545"><span class="hs-identifier hs-var">metadata'</span></a></span><span>
+</span><span id="line-136"></span><span>    </span><span class="hs-special">[</span><span class="hs-special">(</span><span id="local-6989586621679283539"><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283539"><span class="hs-identifier hs-var">datumTxIn</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span> </span><span class="annot"><span class="annottext">AddressInEra AlonzoEra
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxOutValue</span></span><span> </span><span class="annot"><span class="annottext">MultiAssetSupportedInEra AlonzoEra
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679283536"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283536"><span class="hs-identifier hs-var">datumValue</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TxOutDatumHash AlonzoEra
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-137"></span><span>      </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; AddressAny
+-&gt; (Value -&gt; Bool)
+-&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+</span><a href="Mantis.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-var">findUTxO</span></a></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283566"><span class="hs-identifier hs-var">connection</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AddressAny -&gt; (Value -&gt; AddressAny) -&gt; Maybe Value -&gt; AddressAny
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="annot"><span class="annottext">AddressAny
+</span><a href="#local-6989586621679283563"><span class="hs-identifier hs-var">controlAddress</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AddressAny -&gt; Value -&gt; AddressAny
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">AddressAny
+</span><a href="#local-6989586621679283559"><span class="hs-identifier hs-var">scriptAddress</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Maybe Value
+</span><a href="#local-6989586621679283570"><span class="hs-identifier hs-var">oldData</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-138"></span><span>        </span><span class="annot"><span class="annottext">((Value -&gt; Bool) -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)])
+-&gt; (Value -&gt; Bool) -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679283532"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283532"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetId -&gt; Quantity
+</span><span class="hs-identifier hs-var">selectAsset</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283532"><span class="hs-identifier hs-var">value</span></a></span><span> </span><span class="annot"><span class="annottext">AssetId
+</span><a href="#local-6989586621679283548"><span class="hs-identifier hs-var">datumAsset</span></a></span><span> </span><span class="annot"><span class="annottext">Quantity -&gt; Quantity -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Quantity
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-139"></span><span>    </span><span class="hs-special">[</span><span class="hs-special">(</span><span id="local-6989586621679283529"><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283529"><span class="hs-identifier hs-var">controlTxIn</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span> </span><span class="annot"><span class="annottext">AddressInEra AlonzoEra
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxOutValue</span></span><span> </span><span class="annot"><span class="annottext">MultiAssetSupportedInEra AlonzoEra
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679283528"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283528"><span class="hs-identifier hs-var">controlValue</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TxOutDatumHash AlonzoEra
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-140"></span><span>      </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; AddressAny
+-&gt; (Value -&gt; Bool)
+-&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+</span><a href="Mantis.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-var">findUTxO</span></a></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283566"><span class="hs-identifier hs-var">connection</span></a></span><span> </span><span class="annot"><span class="annottext">AddressAny
+</span><a href="#local-6989586621679283563"><span class="hs-identifier hs-var">controlAddress</span></a></span><span>
+</span><span id="line-141"></span><span>        </span><span class="annot"><span class="annottext">((Value -&gt; Bool) -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)])
+-&gt; (Value -&gt; Bool) -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679283527"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283527"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetId -&gt; Quantity
+</span><span class="hs-identifier hs-var">selectAsset</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283527"><span class="hs-identifier hs-var">value</span></a></span><span> </span><span class="annot"><span class="annottext">AssetId
+</span><a href="#local-6989586621679283551"><span class="hs-identifier hs-var">controlAsset</span></a></span><span> </span><span class="annot"><span class="annottext">Quantity -&gt; Quantity -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Quantity
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-142"></span><span>    </span><span id="local-6989586621679283526"><span class="annot"><span class="annottext">plainUTxOs :: [(TxIn, TxOut AlonzoEra)]
+</span><a href="#local-6989586621679283526"><span class="hs-identifier hs-var">plainUTxOs</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679283525"><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283525"><span class="hs-identifier hs-var">collateralTxIn</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">TxOut AlonzoEra
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span class="annot"><span class="annottext">[(TxIn, TxOut AlonzoEra)]
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-143"></span><span>      </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; AddressAny
+-&gt; (Value -&gt; Bool)
+-&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+</span><a href="Mantis.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-var">findUTxO</span></a></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283566"><span class="hs-identifier hs-var">connection</span></a></span><span> </span><span class="annot"><span class="annottext">AddressAny
+</span><a href="#local-6989586621679283563"><span class="hs-identifier hs-var">controlAddress</span></a></span><span>
+</span><span id="line-144"></span><span>        </span><span class="annot"><span class="annottext">((Value -&gt; Bool) -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)])
+-&gt; (Value -&gt; Bool) -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679283524"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283524"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[(AssetId, Quantity)] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Value -&gt; [(AssetId, Quantity)]
+</span><span class="hs-identifier hs-var">valueToList</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283524"><span class="hs-identifier hs-var">value</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-145"></span><span>    </span><span class="hs-keyword">let</span><span>
+</span><span id="line-146"></span><span>      </span><span id="local-6989586621679283521"><span class="annot"><span class="annottext">total :: Value
+</span><a href="#local-6989586621679283521"><span class="hs-identifier hs-var hs-var">total</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-147"></span><span>           </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283536"><span class="hs-identifier hs-var">datumValue</span></a></span><span>
+</span><span id="line-148"></span><span>        </span><span class="annot"><span class="annottext">Value -&gt; Value -&gt; Value
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283528"><span class="hs-identifier hs-var">controlValue</span></a></span><span>
+</span><span id="line-149"></span><span>        </span><span class="annot"><span class="annottext">Value -&gt; Value -&gt; Value
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Value] -&gt; Value
+forall a. Monoid a =&gt; [a] -&gt; a
+</span><span class="hs-identifier hs-var">mconcat</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283520"><span class="hs-identifier hs-var">value</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxIn
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span> </span><span class="annot"><span class="annottext">AddressInEra AlonzoEra
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxOutValue</span></span><span> </span><span class="annot"><span class="annottext">MultiAssetSupportedInEra AlonzoEra
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679283520"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283520"><span class="hs-identifier hs-var">value</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TxOutDatumHash AlonzoEra
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[(TxIn, TxOut AlonzoEra)]
+</span><a href="#local-6989586621679283526"><span class="hs-identifier hs-var">plainUTxOs</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-150"></span><span>      </span><span id="local-6989586621679283519"><span class="annot"><span class="annottext">datumValue' :: Value
+</span><a href="#local-6989586621679283519"><span class="hs-identifier hs-var hs-var">datumValue'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(AssetId, Quantity)] -&gt; Value
+</span><span class="hs-identifier hs-var">valueFromList</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">AssetId
+</span><span class="hs-identifier hs-var">AdaAssetId</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Quantity
+</span><a href="#local-6989586621679283561"><span class="hs-identifier hs-var">minLovelace</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AssetId
+</span><a href="#local-6989586621679283548"><span class="hs-identifier hs-var">datumAsset</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Quantity
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-151"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">Quantity</span></span><span> </span><span id="local-6989586621679283515"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679283515"><span class="hs-identifier hs-var">change</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-152"></span><span>        </span><span class="annot"><span class="annottext">Lovelace -&gt; Quantity
+</span><span class="hs-identifier hs-var">lovelaceToQuantity</span></span><span>
+</span><span id="line-153"></span><span>          </span><span class="annot"><span class="annottext">(Lovelace -&gt; Quantity) -&gt; (Value -&gt; Lovelace) -&gt; Value -&gt; Quantity
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Lovelace
+</span><span class="hs-identifier hs-var">selectLovelace</span></span><span>
+</span><span id="line-154"></span><span>          </span><span class="annot"><span class="annottext">(Value -&gt; Quantity) -&gt; Value -&gt; Quantity
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283521"><span class="hs-identifier hs-var">total</span></a></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Value -&gt; Value
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Value
+</span><span class="hs-identifier hs-var">negateValue</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283519"><span class="hs-identifier hs-var">datumValue'</span></a></span><span>
+</span><span id="line-155"></span><span>      </span><span id="local-6989586621679283511"><span class="annot"><span class="annottext">changeValue :: Value
+</span><a href="#local-6989586621679283511"><span class="hs-identifier hs-var hs-var">changeValue</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-156"></span><span>        </span><span class="annot"><span class="annottext">Lovelace -&gt; Value
+</span><span class="hs-identifier hs-var">lovelaceToValue</span></span><span>
+</span><span id="line-157"></span><span>          </span><span class="annot"><span class="annottext">(Lovelace -&gt; Value) -&gt; (Integer -&gt; Lovelace) -&gt; Integer -&gt; Value
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Quantity -&gt; Lovelace
+</span><span class="hs-identifier hs-var">quantityToLovelace</span></span><span>
+</span><span id="line-158"></span><span>          </span><span class="annot"><span class="annottext">(Quantity -&gt; Lovelace)
+-&gt; (Integer -&gt; Quantity) -&gt; Integer -&gt; Lovelace
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Quantity
+</span><span class="hs-identifier hs-var">Quantity</span></span><span>
+</span><span id="line-159"></span><span>          </span><span class="annot"><span class="annottext">(Integer -&gt; Value) -&gt; Integer -&gt; Value
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679283515"><span class="hs-identifier hs-var">change</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
+forall a. Integral a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">`div`</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-number">2</span></span><span>
+</span><span id="line-160"></span><span>      </span><span id="local-6989586621679283507"><span class="annot"><span class="annottext">controlValue' :: Value
+</span><a href="#local-6989586621679283507"><span class="hs-identifier hs-var hs-var">controlValue'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283521"><span class="hs-identifier hs-var">total</span></a></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Value -&gt; Value
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Value
+</span><span class="hs-identifier hs-var">negateValue</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283519"><span class="hs-identifier hs-var">datumValue'</span></a></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Value -&gt; Value
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283511"><span class="hs-identifier hs-var">changeValue</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-161"></span><span>    </span><span id="local-6989586621679283506"><span class="annot"><span class="annottext">TxBody AlonzoEra
+</span><a href="#local-6989586621679283506"><span class="hs-identifier hs-var">body</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-162"></span><span>      </span><span class="annot"><span class="annottext">Maybe Action
+-&gt; LocalNodeConnectInfo CardanoMode
+-&gt; PlutusScript PlutusScriptV1
+-&gt; AddressAny
+-&gt; AddressAny
+-&gt; (TxIn, Value)
+-&gt; (TxIn, Value)
+-&gt; [(TxIn, TxOut AlonzoEra)]
+-&gt; TxIn
+-&gt; (Maybe Value, Maybe Value)
+-&gt; Maybe TxMetadata
+-&gt; MantisM IO (TxBody AlonzoEra)
+forall a.
+Maybe Action
+-&gt; LocalNodeConnectInfo CardanoMode
+-&gt; PlutusScript PlutusScriptV1
+-&gt; AddressAny
+-&gt; AddressAny
+-&gt; (TxIn, Value)
+-&gt; (TxIn, Value)
+-&gt; [(TxIn, a)]
+-&gt; TxIn
+-&gt; (Maybe Value, Maybe Value)
+-&gt; Maybe TxMetadata
+-&gt; MantisM IO (TxBody AlonzoEra)
+</span><a href="Mantis.Oracle.Submit.html#build"><span class="hs-identifier hs-var">build</span></a></span><span>
+</span><span id="line-163"></span><span>        </span><span class="annot"><span class="annottext">Maybe Action
+</span><a href="#local-6989586621679283571"><span class="hs-identifier hs-var">action</span></a></span><span>
+</span><span id="line-164"></span><span>        </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283566"><span class="hs-identifier hs-var">connection</span></a></span><span>
+</span><span id="line-165"></span><span>        </span><span class="annot"><span class="annottext">PlutusScript PlutusScriptV1
+</span><a href="#local-6989586621679283560"><span class="hs-identifier hs-var">script</span></a></span><span>
+</span><span id="line-166"></span><span>        </span><span class="annot"><span class="annottext">AddressAny
+</span><a href="#local-6989586621679283559"><span class="hs-identifier hs-var">scriptAddress</span></a></span><span>
+</span><span id="line-167"></span><span>        </span><span class="annot"><span class="annottext">AddressAny
+</span><a href="#local-6989586621679283563"><span class="hs-identifier hs-var">controlAddress</span></a></span><span>
+</span><span id="line-168"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283539"><span class="hs-identifier hs-var">datumTxIn</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283519"><span class="hs-identifier hs-var">datumValue'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-169"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283529"><span class="hs-identifier hs-var">controlTxIn</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283507"><span class="hs-identifier hs-var">controlValue'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-170"></span><span>        </span><span class="annot"><span class="annottext">[(TxIn, TxOut AlonzoEra)]
+</span><a href="#local-6989586621679283526"><span class="hs-identifier hs-var">plainUTxOs</span></a></span><span>
+</span><span id="line-171"></span><span>        </span><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283525"><span class="hs-identifier hs-var">collateralTxIn</span></a></span><span>
+</span><span id="line-172"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe Value
+</span><a href="#local-6989586621679283570"><span class="hs-identifier hs-var">oldData</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Maybe Value
+</span><a href="#local-6989586621679283569"><span class="hs-identifier hs-var">newData</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-173"></span><span>        </span><span class="annot"><span class="annottext">Maybe TxMetadata
+</span><a href="#local-6989586621679283546"><span class="hs-identifier hs-var">metadata</span></a></span><span>
+</span><span id="line-174"></span><span>    </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; TxBody AlonzoEra -&gt; SigningKey PaymentKey -&gt; MantisM IO TxId
+</span><a href="Mantis.Oracle.Submit.html#submit"><span class="hs-identifier hs-var">submit</span></a></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283566"><span class="hs-identifier hs-var">connection</span></a></span><span> </span><span class="annot"><span class="annottext">TxBody AlonzoEra
+</span><a href="#local-6989586621679283506"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">SigningKey PaymentKey
+</span><a href="#local-6989586621679283562"><span class="hs-identifier hs-var">controlSigning</span></a></span><span>
+</span><span id="line-175"></span><span>
+</span><span id="line-176"></span><span>
+</span><span id="line-177"></span><span class="hs-comment">-- | Build an oracle transaction.</span><span>
+</span><span id="line-178"></span><span id="local-6989586621679283753"><span class="annot"><a href="Mantis.Oracle.Submit.html#build"><span class="hs-identifier hs-type">build</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>                     </span><span class="hs-comment">-- ^ The redeemer, if any.</span><span>
+</span><span id="line-179"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span> </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
+</span><span id="line-180"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">PlutusScript</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PlutusScriptV1</span></span><span>      </span><span class="hs-comment">-- ^ The Plutus script.</span><span>
+</span><span id="line-181"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span>                       </span><span class="hs-comment">-- ^ The address of the Plutus script.</span><span>
+</span><span id="line-182"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span>                       </span><span class="hs-comment">-- ^ The payment address.</span><span>
+</span><span id="line-183"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxIn</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Value</span></span><span class="hs-special">)</span><span>                    </span><span class="hs-comment">-- ^ The UTxO with containing the datum token.</span><span>
+</span><span id="line-184"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxIn</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Value</span></span><span class="hs-special">)</span><span>                    </span><span class="hs-comment">-- ^ The UTxO containing the control token.</span><span>
+</span><span id="line-185"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxIn</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679283753"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>                      </span><span class="hs-comment">-- ^ The UTxOs to be consumed by the transaction.</span><span>
+</span><span id="line-186"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxIn</span></span><span>                             </span><span class="hs-comment">-- ^ The UTxO for collateral.</span><span>
+</span><span id="line-187"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span class="hs-special">)</span><span>   </span><span class="hs-comment">-- ^ The existing datum and the datum to replace it, if any.</span><span>
+</span><span id="line-188"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxMetadata</span></span><span>                 </span><span class="hs-comment">-- ^ The message metadata, if any.</span><span>
+</span><span id="line-189"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxBody</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span class="hs-special">)</span><span>    </span><span class="hs-comment">-- ^ The action to build the transaction.</span></span><span>
+</span><span id="line-190"></span><span id="build"><span class="annot"><span class="annottext">build :: Maybe Action
+-&gt; LocalNodeConnectInfo CardanoMode
+-&gt; PlutusScript PlutusScriptV1
+-&gt; AddressAny
+-&gt; AddressAny
+-&gt; (TxIn, Value)
+-&gt; (TxIn, Value)
+-&gt; [(TxIn, a)]
+-&gt; TxIn
+-&gt; (Maybe Value, Maybe Value)
+-&gt; Maybe TxMetadata
+-&gt; MantisM IO (TxBody AlonzoEra)
+</span><a href="Mantis.Oracle.Submit.html#build"><span class="hs-identifier hs-var hs-var">build</span></a></span></span><span> </span><span id="local-6989586621679283503"><span class="annot"><span class="annottext">Maybe Action
+</span><a href="#local-6989586621679283503"><span class="hs-identifier hs-var">action</span></a></span></span><span> </span><span id="local-6989586621679283502"><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283502"><span class="hs-identifier hs-var">connection</span></a></span></span><span> </span><span id="local-6989586621679283501"><span class="annot"><span class="annottext">PlutusScript PlutusScriptV1
+</span><a href="#local-6989586621679283501"><span class="hs-identifier hs-var">script</span></a></span></span><span> </span><span id="local-6989586621679283500"><span class="annot"><span class="annottext">AddressAny
+</span><a href="#local-6989586621679283500"><span class="hs-identifier hs-var">scriptAddress</span></a></span></span><span> </span><span id="local-6989586621679283499"><span class="annot"><span class="annottext">AddressAny
+</span><a href="#local-6989586621679283499"><span class="hs-identifier hs-var">controlAddress</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679283498"><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283498"><span class="hs-identifier hs-var">datumTxIn</span></a></span></span><span class="hs-special">,</span><span>  </span><span id="local-6989586621679283497"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283497"><span class="hs-identifier hs-var">datumValue</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679283496"><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283496"><span class="hs-identifier hs-var">controlTxIn</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679283495"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283495"><span class="hs-identifier hs-var">controlValue</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679283494"><span class="annot"><span class="annottext">[(TxIn, a)]
+</span><a href="#local-6989586621679283494"><span class="hs-identifier hs-var">plainUTxOs</span></a></span></span><span> </span><span id="local-6989586621679283493"><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283493"><span class="hs-identifier hs-var">collateralTxIn</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679283492"><span class="annot"><span class="annottext">Maybe Value
+</span><a href="#local-6989586621679283492"><span class="hs-identifier hs-var">oldData</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679283491"><span class="annot"><span class="annottext">Maybe Value
+</span><a href="#local-6989586621679283491"><span class="hs-identifier hs-var">newData</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679283490"><span class="annot"><span class="annottext">Maybe TxMetadata
+</span><a href="#local-6989586621679283490"><span class="hs-identifier hs-var">metadata</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-191"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-192"></span><span>    </span><span id="local-6989586621679283489"><span class="annot"><span class="annottext">Maybe ScriptData
+</span><a href="#local-6989586621679283489"><span class="hs-identifier hs-var">oldData'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-193"></span><span>      </span><span class="annot"><span class="annottext">Either ScriptDataJsonError (Maybe ScriptData)
+-&gt; MantisM IO (Maybe ScriptData)
+forall (m :: * -&gt; *) e a.
+(Monad m, Show e) =&gt;
+Either e a -&gt; MantisM m a
+</span><span class="hs-identifier hs-var">foistMantisEither</span></span><span>
+</span><span id="line-194"></span><span>        </span><span class="annot"><span class="annottext">(Either ScriptDataJsonError (Maybe ScriptData)
+ -&gt; MantisM IO (Maybe ScriptData))
+-&gt; Either ScriptDataJsonError (Maybe ScriptData)
+-&gt; MantisM IO (Maybe ScriptData)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Either ScriptDataJsonError (Maybe ScriptData)
+-&gt; (Value -&gt; Either ScriptDataJsonError (Maybe ScriptData))
+-&gt; Maybe Value
+-&gt; Either ScriptDataJsonError (Maybe ScriptData)
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span>
+</span><span id="line-195"></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe ScriptData -&gt; Either ScriptDataJsonError (Maybe ScriptData)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Maybe ScriptData
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-196"></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(ScriptData -&gt; Maybe ScriptData)
+-&gt; Either ScriptDataJsonError ScriptData
+-&gt; Either ScriptDataJsonError (Maybe ScriptData)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">ScriptData -&gt; Maybe ScriptData
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(Either ScriptDataJsonError ScriptData
+ -&gt; Either ScriptDataJsonError (Maybe ScriptData))
+-&gt; (Value -&gt; Either ScriptDataJsonError ScriptData)
+-&gt; Value
+-&gt; Either ScriptDataJsonError (Maybe ScriptData)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ScriptDataJsonSchema
+-&gt; Value -&gt; Either ScriptDataJsonError ScriptData
+</span><span class="hs-identifier hs-var">scriptDataFromJson</span></span><span> </span><span class="annot"><span class="annottext">ScriptDataJsonSchema
+</span><span class="hs-identifier hs-var">ScriptDataJsonNoSchema</span></span><span class="hs-special">)</span><span>
+</span><span id="line-197"></span><span>          </span><span class="annot"><span class="annottext">Maybe Value
+</span><a href="#local-6989586621679283492"><span class="hs-identifier hs-var">oldData</span></a></span><span>
+</span><span id="line-198"></span><span>    </span><span id="local-6989586621679283486"><span class="annot"><span class="annottext">Maybe ScriptData
+</span><a href="#local-6989586621679283486"><span class="hs-identifier hs-var">newData'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-199"></span><span>      </span><span class="annot"><span class="annottext">Either ScriptDataJsonError (Maybe ScriptData)
+-&gt; MantisM IO (Maybe ScriptData)
+forall (m :: * -&gt; *) e a.
+(Monad m, Show e) =&gt;
+Either e a -&gt; MantisM m a
+</span><span class="hs-identifier hs-var">foistMantisEither</span></span><span>
+</span><span id="line-200"></span><span>        </span><span class="annot"><span class="annottext">(Either ScriptDataJsonError (Maybe ScriptData)
+ -&gt; MantisM IO (Maybe ScriptData))
+-&gt; Either ScriptDataJsonError (Maybe ScriptData)
+-&gt; MantisM IO (Maybe ScriptData)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Either ScriptDataJsonError (Maybe ScriptData)
+-&gt; (Value -&gt; Either ScriptDataJsonError (Maybe ScriptData))
+-&gt; Maybe Value
+-&gt; Either ScriptDataJsonError (Maybe ScriptData)
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span>
+</span><span id="line-201"></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe ScriptData -&gt; Either ScriptDataJsonError (Maybe ScriptData)
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Maybe ScriptData
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span>
+</span><span id="line-202"></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(ScriptData -&gt; Maybe ScriptData)
+-&gt; Either ScriptDataJsonError ScriptData
+-&gt; Either ScriptDataJsonError (Maybe ScriptData)
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">ScriptData -&gt; Maybe ScriptData
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(Either ScriptDataJsonError ScriptData
+ -&gt; Either ScriptDataJsonError (Maybe ScriptData))
+-&gt; (Value -&gt; Either ScriptDataJsonError ScriptData)
+-&gt; Value
+-&gt; Either ScriptDataJsonError (Maybe ScriptData)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ScriptDataJsonSchema
+-&gt; Value -&gt; Either ScriptDataJsonError ScriptData
+</span><span class="hs-identifier hs-var">scriptDataFromJson</span></span><span> </span><span class="annot"><span class="annottext">ScriptDataJsonSchema
+</span><span class="hs-identifier hs-var">ScriptDataJsonNoSchema</span></span><span class="hs-special">)</span><span>
+</span><span id="line-203"></span><span>          </span><span class="annot"><span class="annottext">Maybe Value
+</span><a href="#local-6989586621679283491"><span class="hs-identifier hs-var">newData</span></a></span><span>
+</span><span id="line-204"></span><span>    </span><span id="local-6989586621679283485"><span class="annot"><span class="annottext">AddressInEra AlonzoEra
+</span><a href="#local-6989586621679283485"><span class="hs-identifier hs-var">scriptAddress'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-205"></span><span>      </span><span class="annot"><span class="annottext">String
+-&gt; Maybe (AddressInEra AlonzoEra)
+-&gt; MantisM IO (AddressInEra AlonzoEra)
+forall (m :: * -&gt; *) a. Monad m =&gt; String -&gt; Maybe a -&gt; MantisM m a
+</span><span class="hs-identifier hs-var">foistMantisMaybe</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Failed to convert script address.&quot;</span></span><span>
+</span><span id="line-206"></span><span>        </span><span class="annot"><span class="annottext">(Maybe (AddressInEra AlonzoEra)
+ -&gt; MantisM IO (AddressInEra AlonzoEra))
+-&gt; Maybe (AddressInEra AlonzoEra)
+-&gt; MantisM IO (AddressInEra AlonzoEra)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">CardanoEra AlonzoEra
+-&gt; AddressAny -&gt; Maybe (AddressInEra AlonzoEra)
+forall era.
+CardanoEra era -&gt; AddressAny -&gt; Maybe (AddressInEra era)
+</span><span class="hs-identifier hs-var">anyAddressInEra</span></span><span> </span><span class="annot"><span class="annottext">CardanoEra AlonzoEra
+</span><span class="hs-identifier hs-var">AlonzoEra</span></span><span> </span><span class="annot"><span class="annottext">AddressAny
+</span><a href="#local-6989586621679283500"><span class="hs-identifier hs-var">scriptAddress</span></a></span><span>
+</span><span id="line-207"></span><span>    </span><span id="local-6989586621679283482"><span class="annot"><span class="annottext">AddressInEra AlonzoEra
+</span><a href="#local-6989586621679283482"><span class="hs-identifier hs-var">controlAddress'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-208"></span><span>      </span><span class="annot"><span class="annottext">String
+-&gt; Maybe (AddressInEra AlonzoEra)
+-&gt; MantisM IO (AddressInEra AlonzoEra)
+forall (m :: * -&gt; *) a. Monad m =&gt; String -&gt; Maybe a -&gt; MantisM m a
+</span><span class="hs-identifier hs-var">foistMantisMaybe</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Failed to convert control address.&quot;</span></span><span>
+</span><span id="line-209"></span><span>        </span><span class="annot"><span class="annottext">(Maybe (AddressInEra AlonzoEra)
+ -&gt; MantisM IO (AddressInEra AlonzoEra))
+-&gt; Maybe (AddressInEra AlonzoEra)
+-&gt; MantisM IO (AddressInEra AlonzoEra)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">CardanoEra AlonzoEra
+-&gt; AddressAny -&gt; Maybe (AddressInEra AlonzoEra)
+forall era.
+CardanoEra era -&gt; AddressAny -&gt; Maybe (AddressInEra era)
+</span><span class="hs-identifier hs-var">anyAddressInEra</span></span><span> </span><span class="annot"><span class="annottext">CardanoEra AlonzoEra
+</span><span class="hs-identifier hs-var">AlonzoEra</span></span><span> </span><span class="annot"><span class="annottext">AddressAny
+</span><a href="#local-6989586621679283499"><span class="hs-identifier hs-var">controlAddress</span></a></span><span>
+</span><span id="line-210"></span><span>    </span><span id="local-6989586621679283481"><span class="annot"><span class="annottext">SystemStart
+</span><a href="#local-6989586621679283481"><span class="hs-identifier hs-var">start</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-211"></span><span>      </span><span class="annot"><span class="annottext">IO (Either AcquireFailure SystemStart) -&gt; MantisM IO SystemStart
+forall (m :: * -&gt; *) e a.
+(MonadIO m, Show e) =&gt;
+IO (Either e a) -&gt; MantisM m a
+</span><span class="hs-identifier hs-var">foistMantisEitherIO</span></span><span>
+</span><span id="line-212"></span><span>        </span><span class="annot"><span class="annottext">(IO (Either AcquireFailure SystemStart) -&gt; MantisM IO SystemStart)
+-&gt; IO (Either AcquireFailure SystemStart) -&gt; MantisM IO SystemStart
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; Maybe ChainPoint
+-&gt; QueryInMode CardanoMode SystemStart
+-&gt; IO (Either AcquireFailure SystemStart)
+forall mode result.
+LocalNodeConnectInfo mode
+-&gt; Maybe ChainPoint
+-&gt; QueryInMode mode result
+-&gt; IO (Either AcquireFailure result)
+</span><span class="hs-identifier hs-var">queryNodeLocalState</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283502"><span class="hs-identifier hs-var">connection</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe ChainPoint
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="annot"><span class="annottext">QueryInMode CardanoMode SystemStart
+forall mode. QueryInMode mode SystemStart
+</span><span class="hs-identifier hs-var">QuerySystemStart</span></span><span>
+</span><span id="line-213"></span><span>    </span><span id="local-6989586621679283478"><span class="annot"><span class="annottext">EraHistory CardanoMode
+</span><a href="#local-6989586621679283478"><span class="hs-identifier hs-var">history</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-214"></span><span>      </span><span class="annot"><span class="annottext">IO (Either AcquireFailure (EraHistory CardanoMode))
+-&gt; MantisM IO (EraHistory CardanoMode)
+forall (m :: * -&gt; *) e a.
+(MonadIO m, Show e) =&gt;
+IO (Either e a) -&gt; MantisM m a
+</span><span class="hs-identifier hs-var">foistMantisEitherIO</span></span><span>
+</span><span id="line-215"></span><span>        </span><span class="annot"><span class="annottext">(IO (Either AcquireFailure (EraHistory CardanoMode))
+ -&gt; MantisM IO (EraHistory CardanoMode))
+-&gt; (QueryInMode CardanoMode (EraHistory CardanoMode)
+    -&gt; IO (Either AcquireFailure (EraHistory CardanoMode)))
+-&gt; QueryInMode CardanoMode (EraHistory CardanoMode)
+-&gt; MantisM IO (EraHistory CardanoMode)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; Maybe ChainPoint
+-&gt; QueryInMode CardanoMode (EraHistory CardanoMode)
+-&gt; IO (Either AcquireFailure (EraHistory CardanoMode))
+forall mode result.
+LocalNodeConnectInfo mode
+-&gt; Maybe ChainPoint
+-&gt; QueryInMode mode result
+-&gt; IO (Either AcquireFailure result)
+</span><span class="hs-identifier hs-var">queryNodeLocalState</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283502"><span class="hs-identifier hs-var">connection</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe ChainPoint
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-216"></span><span>        </span><span class="annot"><span class="annottext">(QueryInMode CardanoMode (EraHistory CardanoMode)
+ -&gt; MantisM IO (EraHistory CardanoMode))
+-&gt; QueryInMode CardanoMode (EraHistory CardanoMode)
+-&gt; MantisM IO (EraHistory CardanoMode)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ConsensusModeIsMultiEra CardanoMode
+-&gt; QueryInMode CardanoMode (EraHistory CardanoMode)
+forall mode.
+ConsensusModeIsMultiEra mode -&gt; QueryInMode mode (EraHistory mode)
+</span><span class="hs-identifier hs-var">QueryEraHistory</span></span><span> </span><span class="annot"><span class="annottext">ConsensusModeIsMultiEra CardanoMode
+</span><span class="hs-identifier hs-var">CardanoModeIsMultiEra</span></span><span>
+</span><span id="line-217"></span><span>    </span><span id="local-6989586621679283475"><span class="annot"><span class="annottext">ProtocolParameters
+</span><a href="#local-6989586621679283475"><span class="hs-identifier hs-var">protocol</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-218"></span><span>      </span><span class="annot"><span class="annottext">IO (Either AcquireFailure (Either EraMismatch ProtocolParameters))
+-&gt; MantisM IO ProtocolParameters
+forall e e' a.
+(Show e, Show e') =&gt;
+IO (Either e (Either e' a)) -&gt; MantisM IO a
+</span><a href="Mantis.Oracle.Submit.html#foistMantisEitherIO%27"><span class="hs-identifier hs-var">foistMantisEitherIO'</span></a></span><span>
+</span><span id="line-219"></span><span>        </span><span class="annot"><span class="annottext">(IO (Either AcquireFailure (Either EraMismatch ProtocolParameters))
+ -&gt; MantisM IO ProtocolParameters)
+-&gt; (QueryInEra AlonzoEra ProtocolParameters
+    -&gt; IO
+         (Either AcquireFailure (Either EraMismatch ProtocolParameters)))
+-&gt; QueryInEra AlonzoEra ProtocolParameters
+-&gt; MantisM IO ProtocolParameters
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; Maybe ChainPoint
+-&gt; QueryInMode CardanoMode (Either EraMismatch ProtocolParameters)
+-&gt; IO
+     (Either AcquireFailure (Either EraMismatch ProtocolParameters))
+forall mode result.
+LocalNodeConnectInfo mode
+-&gt; Maybe ChainPoint
+-&gt; QueryInMode mode result
+-&gt; IO (Either AcquireFailure result)
+</span><span class="hs-identifier hs-var">queryNodeLocalState</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283502"><span class="hs-identifier hs-var">connection</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe ChainPoint
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-220"></span><span>        </span><span class="annot"><span class="annottext">(QueryInMode CardanoMode (Either EraMismatch ProtocolParameters)
+ -&gt; IO
+      (Either AcquireFailure (Either EraMismatch ProtocolParameters)))
+-&gt; (QueryInEra AlonzoEra ProtocolParameters
+    -&gt; QueryInMode CardanoMode (Either EraMismatch ProtocolParameters))
+-&gt; QueryInEra AlonzoEra ProtocolParameters
+-&gt; IO
+     (Either AcquireFailure (Either EraMismatch ProtocolParameters))
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">EraInMode AlonzoEra CardanoMode
+-&gt; QueryInEra AlonzoEra ProtocolParameters
+-&gt; QueryInMode CardanoMode (Either EraMismatch ProtocolParameters)
+forall era mode result1.
+EraInMode era mode
+-&gt; QueryInEra era result1
+-&gt; QueryInMode mode (Either EraMismatch result1)
+</span><span class="hs-identifier hs-var">QueryInEra</span></span><span> </span><span class="annot"><span class="annottext">EraInMode AlonzoEra CardanoMode
+</span><span class="hs-identifier hs-var">AlonzoEraInCardanoMode</span></span><span>
+</span><span id="line-221"></span><span>        </span><span class="annot"><span class="annottext">(QueryInEra AlonzoEra ProtocolParameters
+ -&gt; MantisM IO ProtocolParameters)
+-&gt; QueryInEra AlonzoEra ProtocolParameters
+-&gt; MantisM IO ProtocolParameters
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ShelleyBasedEra AlonzoEra
+-&gt; QueryInShelleyBasedEra AlonzoEra ProtocolParameters
+-&gt; QueryInEra AlonzoEra ProtocolParameters
+forall era result.
+ShelleyBasedEra era
+-&gt; QueryInShelleyBasedEra era result -&gt; QueryInEra era result
+</span><span class="hs-identifier hs-var">QueryInShelleyBasedEra</span></span><span> </span><span class="annot"><span class="annottext">ShelleyBasedEra AlonzoEra
+</span><span class="hs-identifier hs-var">ShelleyBasedEraAlonzo</span></span><span> </span><span class="annot"><span class="annottext">QueryInShelleyBasedEra AlonzoEra ProtocolParameters
+forall era. QueryInShelleyBasedEra era ProtocolParameters
+</span><span class="hs-identifier hs-var">QueryProtocolParameters</span></span><span>
+</span><span id="line-222"></span><span>    </span><span id="local-6989586621679283468"><span class="annot"><span class="annottext">UTxO AlonzoEra
+</span><a href="#local-6989586621679283468"><span class="hs-identifier hs-var">utxo</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-223"></span><span>      </span><span class="annot"><span class="annottext">IO (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra)))
+-&gt; MantisM IO (UTxO AlonzoEra)
+forall e e' a.
+(Show e, Show e') =&gt;
+IO (Either e (Either e' a)) -&gt; MantisM IO a
+</span><a href="Mantis.Oracle.Submit.html#foistMantisEitherIO%27"><span class="hs-identifier hs-var">foistMantisEitherIO'</span></a></span><span>
+</span><span id="line-224"></span><span>        </span><span class="annot"><span class="annottext">(IO (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra)))
+ -&gt; MantisM IO (UTxO AlonzoEra))
+-&gt; ([TxIn]
+    -&gt; IO
+         (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra))))
+-&gt; [TxIn]
+-&gt; MantisM IO (UTxO AlonzoEra)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; Maybe ChainPoint
+-&gt; QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra))
+-&gt; IO (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra)))
+forall mode result.
+LocalNodeConnectInfo mode
+-&gt; Maybe ChainPoint
+-&gt; QueryInMode mode result
+-&gt; IO (Either AcquireFailure result)
+</span><span class="hs-identifier hs-var">queryNodeLocalState</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283502"><span class="hs-identifier hs-var">connection</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe ChainPoint
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-225"></span><span>        </span><span class="annot"><span class="annottext">(QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra))
+ -&gt; IO
+      (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra))))
+-&gt; ([TxIn]
+    -&gt; QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra)))
+-&gt; [TxIn]
+-&gt; IO (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra)))
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">EraInMode AlonzoEra CardanoMode
+-&gt; QueryInEra AlonzoEra (UTxO AlonzoEra)
+-&gt; QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra))
+forall era mode result1.
+EraInMode era mode
+-&gt; QueryInEra era result1
+-&gt; QueryInMode mode (Either EraMismatch result1)
+</span><span class="hs-identifier hs-var">QueryInEra</span></span><span> </span><span class="annot"><span class="annottext">EraInMode AlonzoEra CardanoMode
+</span><span class="hs-identifier hs-var">AlonzoEraInCardanoMode</span></span><span>
+</span><span id="line-226"></span><span>        </span><span class="annot"><span class="annottext">(QueryInEra AlonzoEra (UTxO AlonzoEra)
+ -&gt; QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra)))
+-&gt; ([TxIn] -&gt; QueryInEra AlonzoEra (UTxO AlonzoEra))
+-&gt; [TxIn]
+-&gt; QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra))
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ShelleyBasedEra AlonzoEra
+-&gt; QueryInShelleyBasedEra AlonzoEra (UTxO AlonzoEra)
+-&gt; QueryInEra AlonzoEra (UTxO AlonzoEra)
+forall era result.
+ShelleyBasedEra era
+-&gt; QueryInShelleyBasedEra era result -&gt; QueryInEra era result
+</span><span class="hs-identifier hs-var">QueryInShelleyBasedEra</span></span><span> </span><span class="annot"><span class="annottext">ShelleyBasedEra AlonzoEra
+</span><span class="hs-identifier hs-var">ShelleyBasedEraAlonzo</span></span><span>  </span><span>
+</span><span id="line-227"></span><span>        </span><span class="annot"><span class="annottext">(QueryInShelleyBasedEra AlonzoEra (UTxO AlonzoEra)
+ -&gt; QueryInEra AlonzoEra (UTxO AlonzoEra))
+-&gt; ([TxIn] -&gt; QueryInShelleyBasedEra AlonzoEra (UTxO AlonzoEra))
+-&gt; [TxIn]
+-&gt; QueryInEra AlonzoEra (UTxO AlonzoEra)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">QueryUTxOFilter
+-&gt; QueryInShelleyBasedEra AlonzoEra (UTxO AlonzoEra)
+forall era.
+QueryUTxOFilter -&gt; QueryInShelleyBasedEra era (UTxO era)
+</span><span class="hs-identifier hs-var">QueryUTxO</span></span><span>
+</span><span id="line-228"></span><span>        </span><span class="annot"><span class="annottext">(QueryUTxOFilter
+ -&gt; QueryInShelleyBasedEra AlonzoEra (UTxO AlonzoEra))
+-&gt; ([TxIn] -&gt; QueryUTxOFilter)
+-&gt; [TxIn]
+-&gt; QueryInShelleyBasedEra AlonzoEra (UTxO AlonzoEra)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Set TxIn -&gt; QueryUTxOFilter
+</span><span class="hs-identifier hs-var">QueryUTxOByTxIn</span></span><span>
+</span><span id="line-229"></span><span>        </span><span class="annot"><span class="annottext">(Set TxIn -&gt; QueryUTxOFilter)
+-&gt; ([TxIn] -&gt; Set TxIn) -&gt; [TxIn] -&gt; QueryUTxOFilter
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[TxIn] -&gt; Set TxIn
+forall a. Ord a =&gt; [a] -&gt; Set a
+</span><span class="hs-identifier hs-var">S.fromList</span></span><span>
+</span><span id="line-230"></span><span>        </span><span class="annot"><span class="annottext">([TxIn] -&gt; MantisM IO (UTxO AlonzoEra))
+-&gt; [TxIn] -&gt; MantisM IO (UTxO AlonzoEra)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283498"><span class="hs-identifier hs-var">datumTxIn</span></a></span><span>
+</span><span id="line-231"></span><span>        </span><span class="annot"><span class="annottext">TxIn -&gt; [TxIn] -&gt; [TxIn]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283496"><span class="hs-identifier hs-var">controlTxIn</span></a></span><span>
+</span><span id="line-232"></span><span>        </span><span class="annot"><span class="annottext">TxIn -&gt; [TxIn] -&gt; [TxIn]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283464"><span class="hs-identifier hs-var">txIn</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679283464"><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283464"><span class="hs-identifier hs-var">txIn</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[(TxIn, a)]
+</span><a href="#local-6989586621679283494"><span class="hs-identifier hs-var">plainUTxOs</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-233"></span><span>    </span><span class="hs-keyword">let</span><span>
+</span><span id="line-234"></span><span>      </span><span id="local-6989586621679283463"><span class="annot"><span class="annottext">txIns :: [(TxIn, BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra))]
+</span><a href="#local-6989586621679283463"><span class="hs-identifier hs-var hs-var">txIns</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-235"></span><span>          </span><span class="hs-special">(</span><span>
+</span><span id="line-236"></span><span>            </span><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283498"><span class="hs-identifier hs-var">datumTxIn</span></a></span><span>
+</span><span id="line-237"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Witness WitCtxTxIn AlonzoEra
+-&gt; BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra)
+forall a. a -&gt; BuildTxWith BuildTx a
+</span><span class="hs-identifier hs-var">BuildTxWith</span></span><span>
+</span><span id="line-238"></span><span>              </span><span class="annot"><span class="annottext">(Witness WitCtxTxIn AlonzoEra
+ -&gt; BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra))
+-&gt; Witness WitCtxTxIn AlonzoEra
+-&gt; BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Witness WitCtxTxIn AlonzoEra
+-&gt; (ScriptData -&gt; Witness WitCtxTxIn AlonzoEra)
+-&gt; Maybe ScriptData
+-&gt; Witness WitCtxTxIn AlonzoEra
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span>
+</span><span id="line-239"></span><span>                  </span><span class="hs-special">(</span><span class="annot"><span class="annottext">KeyWitnessInCtx WitCtxTxIn -&gt; Witness WitCtxTxIn AlonzoEra
+forall witctx era. KeyWitnessInCtx witctx -&gt; Witness witctx era
+</span><span class="hs-identifier hs-var">KeyWitness</span></span><span> </span><span class="annot"><span class="annottext">KeyWitnessInCtx WitCtxTxIn
+</span><span class="hs-identifier hs-var">KeyWitnessForSpending</span></span><span class="hs-special">)</span><span>
+</span><span id="line-240"></span><span>                  </span><span class="hs-special">(</span><span>
+</span><span id="line-241"></span><span>                    </span><span class="hs-glyph">\</span><span id="local-6989586621679283459"><span class="annot"><span class="annottext">ScriptData
+</span><a href="#local-6989586621679283459"><span class="hs-identifier hs-var">oldData''</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-242"></span><span>                      </span><span class="annot"><span class="annottext">ScriptWitnessInCtx WitCtxTxIn
+-&gt; ScriptWitness WitCtxTxIn AlonzoEra
+-&gt; Witness WitCtxTxIn AlonzoEra
+forall witctx era.
+ScriptWitnessInCtx witctx
+-&gt; ScriptWitness witctx era -&gt; Witness witctx era
+</span><span class="hs-identifier hs-var">ScriptWitness</span></span><span> </span><span class="annot"><span class="annottext">ScriptWitnessInCtx WitCtxTxIn
+</span><span class="hs-identifier hs-var">ScriptWitnessForSpending</span></span><span>
+</span><span id="line-243"></span><span>                        </span><span class="annot"><span class="annottext">(ScriptWitness WitCtxTxIn AlonzoEra
+ -&gt; Witness WitCtxTxIn AlonzoEra)
+-&gt; ScriptWitness WitCtxTxIn AlonzoEra
+-&gt; Witness WitCtxTxIn AlonzoEra
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ScriptLanguageInEra PlutusScriptV1 AlonzoEra
+-&gt; PlutusScriptVersion PlutusScriptV1
+-&gt; PlutusScript PlutusScriptV1
+-&gt; ScriptDatum WitCtxTxIn
+-&gt; ScriptData
+-&gt; ExecutionUnits
+-&gt; ScriptWitness WitCtxTxIn AlonzoEra
+forall lang era witctx.
+ScriptLanguageInEra lang era
+-&gt; PlutusScriptVersion lang
+-&gt; PlutusScript lang
+-&gt; ScriptDatum witctx
+-&gt; ScriptData
+-&gt; ExecutionUnits
+-&gt; ScriptWitness witctx era
+</span><span class="hs-identifier hs-var">PlutusScriptWitness</span></span><span>
+</span><span id="line-244"></span><span>                          </span><span class="annot"><span class="annottext">ScriptLanguageInEra PlutusScriptV1 AlonzoEra
+</span><span class="hs-identifier hs-var">PlutusScriptV1InAlonzo</span></span><span>
+</span><span id="line-245"></span><span>                          </span><span class="annot"><span class="annottext">PlutusScriptVersion PlutusScriptV1
+</span><span class="hs-identifier hs-var">PlutusScriptV1</span></span><span>
+</span><span id="line-246"></span><span>                          </span><span class="annot"><span class="annottext">PlutusScript PlutusScriptV1
+</span><a href="#local-6989586621679283501"><span class="hs-identifier hs-var">script</span></a></span><span>
+</span><span id="line-247"></span><span>                          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ScriptData -&gt; ScriptDatum WitCtxTxIn
+</span><span class="hs-identifier hs-var">ScriptDatumForTxIn</span></span><span> </span><span class="annot"><span class="annottext">ScriptData
+</span><a href="#local-6989586621679283459"><span class="hs-identifier hs-var">oldData''</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-248"></span><span>                          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer -&gt; ScriptData
+</span><span class="hs-identifier hs-var">ScriptDataNumber</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; ScriptData)
+-&gt; (Action -&gt; Integer) -&gt; Action -&gt; ScriptData
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Action -&gt; Integer
+forall a. Enum a =&gt; a -&gt; Integer
+</span><span class="hs-identifier hs-var">P.fromEnum</span></span><span> </span><span class="annot"><span class="annottext">(Action -&gt; ScriptData) -&gt; Action -&gt; ScriptData
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Maybe Action -&gt; Action
+forall a. HasCallStack =&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromJust</span></span><span> </span><span class="annot"><span class="annottext">Maybe Action
+</span><a href="#local-6989586621679283503"><span class="hs-identifier hs-var">action</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-249"></span><span>                          </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; ExecutionUnits
+</span><span class="hs-identifier hs-var">ExecutionUnits</span></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-number">0</span></span><span class="hs-special">)</span><span>
+</span><span id="line-250"></span><span>                  </span><span class="hs-special">)</span><span>
+</span><span id="line-251"></span><span>                  </span><span class="annot"><span class="annottext">Maybe ScriptData
+</span><a href="#local-6989586621679283489"><span class="hs-identifier hs-var">oldData'</span></a></span><span>
+</span><span id="line-252"></span><span>          </span><span class="hs-special">)</span><span>
+</span><span id="line-253"></span><span>        </span><span class="annot"><span class="annottext">(TxIn, BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra))
+-&gt; [(TxIn, BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra))]
+-&gt; [(TxIn, BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra))]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-254"></span><span>            </span><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283496"><span class="hs-identifier hs-var">controlTxIn</span></a></span><span>
+</span><span id="line-255"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Witness WitCtxTxIn AlonzoEra
+-&gt; BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra)
+forall a. a -&gt; BuildTxWith BuildTx a
+</span><span class="hs-identifier hs-var">BuildTxWith</span></span><span> </span><span class="annot"><span class="annottext">(Witness WitCtxTxIn AlonzoEra
+ -&gt; BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra))
+-&gt; Witness WitCtxTxIn AlonzoEra
+-&gt; BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">KeyWitnessInCtx WitCtxTxIn -&gt; Witness WitCtxTxIn AlonzoEra
+forall witctx era. KeyWitnessInCtx witctx -&gt; Witness witctx era
+</span><span class="hs-identifier hs-var">KeyWitness</span></span><span> </span><span class="annot"><span class="annottext">KeyWitnessInCtx WitCtxTxIn
+</span><span class="hs-identifier hs-var">KeyWitnessForSpending</span></span><span>
+</span><span id="line-256"></span><span>          </span><span class="hs-special">)</span><span>
+</span><span id="line-257"></span><span>        </span><span class="annot"><span class="annottext">(TxIn, BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra))
+-&gt; [(TxIn, BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra))]
+-&gt; [(TxIn, BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra))]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-258"></span><span>            </span><span class="hs-special">(</span><span>
+</span><span id="line-259"></span><span>              </span><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283449"><span class="hs-identifier hs-var">txIn</span></a></span><span>
+</span><span id="line-260"></span><span>            </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Witness WitCtxTxIn AlonzoEra
+-&gt; BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra)
+forall a. a -&gt; BuildTxWith BuildTx a
+</span><span class="hs-identifier hs-var">BuildTxWith</span></span><span> </span><span class="annot"><span class="annottext">(Witness WitCtxTxIn AlonzoEra
+ -&gt; BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra))
+-&gt; Witness WitCtxTxIn AlonzoEra
+-&gt; BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">KeyWitnessInCtx WitCtxTxIn -&gt; Witness WitCtxTxIn AlonzoEra
+forall witctx era. KeyWitnessInCtx witctx -&gt; Witness witctx era
+</span><span class="hs-identifier hs-var">KeyWitness</span></span><span> </span><span class="annot"><span class="annottext">KeyWitnessInCtx WitCtxTxIn
+</span><span class="hs-identifier hs-var">KeyWitnessForSpending</span></span><span>
+</span><span id="line-261"></span><span>            </span><span class="hs-special">)</span><span>
+</span><span id="line-262"></span><span>          </span><span class="hs-glyph">|</span><span>
+</span><span id="line-263"></span><span>            </span><span class="hs-special">(</span><span id="local-6989586621679283449"><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283449"><span class="hs-identifier hs-var">txIn</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[(TxIn, a)]
+</span><a href="#local-6989586621679283494"><span class="hs-identifier hs-var">plainUTxOs</span></a></span><span>
+</span><span id="line-264"></span><span>          </span><span class="hs-special">]</span><span>
+</span><span id="line-265"></span><span>      </span><span id="local-6989586621679283448"><span class="annot"><span class="annottext">txOuts :: [TxOut AlonzoEra]
+</span><a href="#local-6989586621679283448"><span class="hs-identifier hs-var hs-var">txOuts</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-266"></span><span>        </span><span class="hs-special">[</span><span>
+</span><span id="line-267"></span><span>          </span><span class="annot"><span class="annottext">AddressInEra AlonzoEra
+-&gt; TxOutValue AlonzoEra
+-&gt; TxOutDatumHash AlonzoEra
+-&gt; TxOut AlonzoEra
+forall era.
+AddressInEra era
+-&gt; TxOutValue era -&gt; TxOutDatumHash era -&gt; TxOut era
+</span><span class="hs-identifier hs-var">TxOut</span></span><span>
+</span><span id="line-268"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AddressInEra AlonzoEra
+-&gt; (ScriptData -&gt; AddressInEra AlonzoEra)
+-&gt; Maybe ScriptData
+-&gt; AddressInEra AlonzoEra
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="annot"><span class="annottext">AddressInEra AlonzoEra
+</span><a href="#local-6989586621679283482"><span class="hs-identifier hs-var">controlAddress'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AddressInEra AlonzoEra -&gt; ScriptData -&gt; AddressInEra AlonzoEra
+forall a b. a -&gt; b -&gt; a
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">AddressInEra AlonzoEra
+</span><a href="#local-6989586621679283485"><span class="hs-identifier hs-var">scriptAddress'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Maybe ScriptData
+</span><a href="#local-6989586621679283486"><span class="hs-identifier hs-var">newData'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-269"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">MultiAssetSupportedInEra AlonzoEra -&gt; Value -&gt; TxOutValue AlonzoEra
+forall era. MultiAssetSupportedInEra era -&gt; Value -&gt; TxOutValue era
+</span><span class="hs-identifier hs-var">TxOutValue</span></span><span> </span><span class="annot"><span class="annottext">MultiAssetSupportedInEra AlonzoEra
+</span><span class="hs-identifier hs-var">MultiAssetInAlonzoEra</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283497"><span class="hs-identifier hs-var">datumValue</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-270"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxOutDatumHash AlonzoEra
+-&gt; (ScriptData -&gt; TxOutDatumHash AlonzoEra)
+-&gt; Maybe ScriptData
+-&gt; TxOutDatumHash AlonzoEra
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="annot"><span class="annottext">TxOutDatumHash AlonzoEra
+forall era. TxOutDatumHash era
+</span><span class="hs-identifier hs-var">TxOutDatumHashNone</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ScriptDataSupportedInEra AlonzoEra
+-&gt; Hash ScriptData -&gt; TxOutDatumHash AlonzoEra
+forall era.
+ScriptDataSupportedInEra era
+-&gt; Hash ScriptData -&gt; TxOutDatumHash era
+</span><span class="hs-identifier hs-var">TxOutDatumHash</span></span><span> </span><span class="annot"><span class="annottext">ScriptDataSupportedInEra AlonzoEra
+</span><span class="hs-identifier hs-var">ScriptDataInAlonzoEra</span></span><span> </span><span class="annot"><span class="annottext">(Hash ScriptData -&gt; TxOutDatumHash AlonzoEra)
+-&gt; (ScriptData -&gt; Hash ScriptData)
+-&gt; ScriptData
+-&gt; TxOutDatumHash AlonzoEra
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ScriptData -&gt; Hash ScriptData
+</span><span class="hs-identifier hs-var">hashScriptData</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Maybe ScriptData
+</span><a href="#local-6989586621679283486"><span class="hs-identifier hs-var">newData'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-271"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">AddressInEra AlonzoEra
+-&gt; TxOutValue AlonzoEra
+-&gt; TxOutDatumHash AlonzoEra
+-&gt; TxOut AlonzoEra
+forall era.
+AddressInEra era
+-&gt; TxOutValue era -&gt; TxOutDatumHash era -&gt; TxOut era
+</span><span class="hs-identifier hs-var">TxOut</span></span><span>
+</span><span id="line-272"></span><span>            </span><span class="annot"><span class="annottext">AddressInEra AlonzoEra
+</span><a href="#local-6989586621679283482"><span class="hs-identifier hs-var">controlAddress'</span></a></span><span>
+</span><span id="line-273"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">MultiAssetSupportedInEra AlonzoEra -&gt; Value -&gt; TxOutValue AlonzoEra
+forall era. MultiAssetSupportedInEra era -&gt; Value -&gt; TxOutValue era
+</span><span class="hs-identifier hs-var">TxOutValue</span></span><span> </span><span class="annot"><span class="annottext">MultiAssetSupportedInEra AlonzoEra
+</span><span class="hs-identifier hs-var">MultiAssetInAlonzoEra</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283495"><span class="hs-identifier hs-var">controlValue</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-274"></span><span>            </span><span class="annot"><span class="annottext">TxOutDatumHash AlonzoEra
+forall era. TxOutDatumHash era
+</span><span class="hs-identifier hs-var">TxOutDatumHashNone</span></span><span>
+</span><span id="line-275"></span><span>        </span><span class="hs-special">]</span><span>
+</span><span id="line-276"></span><span>      </span><span id="local-6989586621679283442"><span class="annot"><span class="annottext">txInsCollateral :: TxInsCollateral AlonzoEra
+</span><a href="#local-6989586621679283442"><span class="hs-identifier hs-var hs-var">txInsCollateral</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">CollateralSupportedInEra AlonzoEra
+-&gt; [TxIn] -&gt; TxInsCollateral AlonzoEra
+forall era.
+CollateralSupportedInEra era -&gt; [TxIn] -&gt; TxInsCollateral era
+</span><span class="hs-identifier hs-var">TxInsCollateral</span></span><span> </span><span class="annot"><span class="annottext">CollateralSupportedInEra AlonzoEra
+</span><span class="hs-identifier hs-var">CollateralInAlonzoEra</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">TxIn
+</span><a href="#local-6989586621679283493"><span class="hs-identifier hs-var">collateralTxIn</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-277"></span><span>      </span><span id="local-6989586621679283439"><span class="annot"><span class="annottext">txFee :: TxFee AlonzoEra
+</span><a href="#local-6989586621679283439"><span class="hs-identifier hs-var hs-var">txFee</span></a></span></span><span>             </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxFeesExplicitInEra AlonzoEra -&gt; Lovelace -&gt; TxFee AlonzoEra
+forall era. TxFeesExplicitInEra era -&gt; Lovelace -&gt; TxFee era
+</span><span class="hs-identifier hs-var">TxFeeExplicit</span></span><span> </span><span class="annot"><span class="annottext">TxFeesExplicitInEra AlonzoEra
+</span><span class="hs-identifier hs-var">TxFeesExplicitInAlonzoEra</span></span><span> </span><span class="annot"><span class="annottext">Lovelace
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-278"></span><span>      </span><span id="local-6989586621679283436"><span class="annot"><span class="annottext">txValidityRange :: (TxValidityLowerBound era, TxValidityUpperBound AlonzoEra)
+</span><a href="#local-6989586621679283436"><span class="hs-identifier hs-var hs-var">txValidityRange</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxValidityLowerBound era
+forall era. TxValidityLowerBound era
+</span><span class="hs-identifier hs-var">TxValidityNoLowerBound</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ValidityNoUpperBoundSupportedInEra AlonzoEra
+-&gt; TxValidityUpperBound AlonzoEra
+forall era.
+ValidityNoUpperBoundSupportedInEra era -&gt; TxValidityUpperBound era
+</span><span class="hs-identifier hs-var">TxValidityNoUpperBound</span></span><span> </span><span class="annot"><span class="annottext">ValidityNoUpperBoundSupportedInEra AlonzoEra
+</span><span class="hs-identifier hs-var">ValidityNoUpperBoundInAlonzoEra</span></span><span class="hs-special">)</span><span>
+</span><span id="line-279"></span><span>      </span><span id="local-6989586621679283432"><span class="annot"><span class="annottext">txMetadata :: TxMetadataInEra AlonzoEra
+</span><a href="#local-6989586621679283432"><span class="hs-identifier hs-var hs-var">txMetadata</span></a></span></span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxMetadataInEra AlonzoEra
+-&gt; (TxMetadata -&gt; TxMetadataInEra AlonzoEra)
+-&gt; Maybe TxMetadata
+-&gt; TxMetadataInEra AlonzoEra
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="annot"><span class="annottext">TxMetadataInEra AlonzoEra
+forall era. TxMetadataInEra era
+</span><span class="hs-identifier hs-var">TxMetadataNone</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxMetadataSupportedInEra AlonzoEra
+-&gt; TxMetadata -&gt; TxMetadataInEra AlonzoEra
+forall era.
+TxMetadataSupportedInEra era -&gt; TxMetadata -&gt; TxMetadataInEra era
+</span><span class="hs-identifier hs-var">TxMetadataInEra</span></span><span> </span><span class="annot"><span class="annottext">TxMetadataSupportedInEra AlonzoEra
+</span><span class="hs-identifier hs-var">TxMetadataInAlonzoEra</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Maybe TxMetadata
+</span><a href="#local-6989586621679283490"><span class="hs-identifier hs-var">metadata</span></a></span><span>
+</span><span id="line-280"></span><span>      </span><span id="local-6989586621679283428"><span class="annot"><span class="annottext">txAuxScripts :: TxAuxScripts era
+</span><a href="#local-6989586621679283428"><span class="hs-identifier hs-var hs-var">txAuxScripts</span></a></span></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxAuxScripts era
+forall era. TxAuxScripts era
+</span><span class="hs-identifier hs-var">TxAuxScriptsNone</span></span><span>
+</span><span id="line-281"></span><span>      </span><span id="local-6989586621679283426"><span class="annot"><span class="annottext">txExtraScriptData :: BuildTxWith BuildTx (TxExtraScriptData era)
+</span><a href="#local-6989586621679283426"><span class="hs-identifier hs-var hs-var">txExtraScriptData</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxExtraScriptData era
+-&gt; BuildTxWith BuildTx (TxExtraScriptData era)
+forall a. a -&gt; BuildTxWith BuildTx a
+</span><span class="hs-identifier hs-var">BuildTxWith</span></span><span> </span><span class="annot"><span class="annottext">TxExtraScriptData era
+forall era. TxExtraScriptData era
+</span><span class="hs-identifier hs-var">TxExtraScriptDataNone</span></span><span>
+</span><span id="line-282"></span><span>      </span><span id="local-6989586621679283424"><span class="annot"><span class="annottext">txExtraKeyWits :: TxExtraKeyWitnesses era
+</span><a href="#local-6989586621679283424"><span class="hs-identifier hs-var hs-var">txExtraKeyWits</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxExtraKeyWitnesses era
+forall era. TxExtraKeyWitnesses era
+</span><span class="hs-identifier hs-var">TxExtraKeyWitnessesNone</span></span><span>
+</span><span id="line-283"></span><span>      </span><span id="local-6989586621679283422"><span class="annot"><span class="annottext">txProtocolParams :: BuildTxWith BuildTx (Maybe ProtocolParameters)
+</span><a href="#local-6989586621679283422"><span class="hs-identifier hs-var hs-var">txProtocolParams</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe ProtocolParameters
+-&gt; BuildTxWith BuildTx (Maybe ProtocolParameters)
+forall a. a -&gt; BuildTxWith BuildTx a
+</span><span class="hs-identifier hs-var">BuildTxWith</span></span><span> </span><span class="annot"><span class="annottext">(Maybe ProtocolParameters
+ -&gt; BuildTxWith BuildTx (Maybe ProtocolParameters))
+-&gt; Maybe ProtocolParameters
+-&gt; BuildTxWith BuildTx (Maybe ProtocolParameters)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ProtocolParameters -&gt; Maybe ProtocolParameters
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">ProtocolParameters
+</span><a href="#local-6989586621679283475"><span class="hs-identifier hs-var">protocol</span></a></span><span>
+</span><span id="line-284"></span><span>      </span><span id="local-6989586621679283421"><span class="annot"><span class="annottext">txWithdrawals :: TxWithdrawals build era
+</span><a href="#local-6989586621679283421"><span class="hs-identifier hs-var hs-var">txWithdrawals</span></a></span></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxWithdrawals build era
+forall build era. TxWithdrawals build era
+</span><span class="hs-identifier hs-var">TxWithdrawalsNone</span></span><span>
+</span><span id="line-285"></span><span>      </span><span id="local-6989586621679283419"><span class="annot"><span class="annottext">txCertificates :: TxCertificates build era
+</span><a href="#local-6989586621679283419"><span class="hs-identifier hs-var hs-var">txCertificates</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxCertificates build era
+forall build era. TxCertificates build era
+</span><span class="hs-identifier hs-var">TxCertificatesNone</span></span><span>
+</span><span id="line-286"></span><span>      </span><span id="local-6989586621679283417"><span class="annot"><span class="annottext">txUpdateProposal :: TxUpdateProposal era
+</span><a href="#local-6989586621679283417"><span class="hs-identifier hs-var hs-var">txUpdateProposal</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxUpdateProposal era
+forall era. TxUpdateProposal era
+</span><span class="hs-identifier hs-var">TxUpdateProposalNone</span></span><span>
+</span><span id="line-287"></span><span>      </span><span id="local-6989586621679283415"><span class="annot"><span class="annottext">txMintValue :: TxMintValue build era
+</span><a href="#local-6989586621679283415"><span class="hs-identifier hs-var hs-var">txMintValue</span></a></span></span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxMintValue build era
+forall build era. TxMintValue build era
+</span><span class="hs-identifier hs-var">TxMintNone</span></span><span>
+</span><span id="line-288"></span><span>      </span><span id="local-6989586621679283413"><span class="annot"><span class="annottext">txScriptValidity :: BuildTxWith BuildTx (TxScriptValidity era)
+</span><a href="#local-6989586621679283413"><span class="hs-identifier hs-var hs-var">txScriptValidity</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxScriptValidity era -&gt; BuildTxWith BuildTx (TxScriptValidity era)
+forall a. a -&gt; BuildTxWith BuildTx a
+</span><span class="hs-identifier hs-var">BuildTxWith</span></span><span> </span><span class="annot"><span class="annottext">TxScriptValidity era
+forall era. TxScriptValidity era
+</span><span class="hs-identifier hs-var">TxScriptValidityNone</span></span><span> </span><span>
+</span><span id="line-289"></span><span>    </span><span class="annot"><span class="annottext">Either TxBodyErrorAutoBalance (TxBody AlonzoEra)
+-&gt; MantisM IO (TxBody AlonzoEra)
+forall (m :: * -&gt; *) e a.
+(Monad m, Show e) =&gt;
+Either e a -&gt; MantisM m a
+</span><span class="hs-identifier hs-var">foistMantisEither</span></span><span>
+</span><span id="line-290"></span><span>      </span><span class="annot"><span class="annottext">(Either TxBodyErrorAutoBalance (TxBody AlonzoEra)
+ -&gt; MantisM IO (TxBody AlonzoEra))
+-&gt; Either TxBodyErrorAutoBalance (TxBody AlonzoEra)
+-&gt; MantisM IO (TxBody AlonzoEra)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">EraInMode AlonzoEra CardanoMode
+-&gt; SystemStart
+-&gt; EraHistory CardanoMode
+-&gt; ProtocolParameters
+-&gt; Set PoolId
+-&gt; UTxO AlonzoEra
+-&gt; TxBodyContent BuildTx AlonzoEra
+-&gt; AddressInEra AlonzoEra
+-&gt; Maybe Word
+-&gt; Either TxBodyErrorAutoBalance (TxBody AlonzoEra)
+forall era mode.
+IsShelleyBasedEra era =&gt;
+EraInMode era mode
+-&gt; SystemStart
+-&gt; EraHistory mode
+-&gt; ProtocolParameters
+-&gt; Set PoolId
+-&gt; UTxO era
+-&gt; TxBodyContent BuildTx era
+-&gt; AddressInEra era
+-&gt; Maybe Word
+-&gt; Either TxBodyErrorAutoBalance (TxBody era)
+</span><span class="hs-identifier hs-var">makeTransactionBodyAutoBalance</span></span><span>
+</span><span id="line-291"></span><span>          </span><span class="annot"><span class="annottext">EraInMode AlonzoEra CardanoMode
+</span><span class="hs-identifier hs-var">AlonzoEraInCardanoMode</span></span><span>
+</span><span id="line-292"></span><span>          </span><span class="annot"><span class="annottext">SystemStart
+</span><a href="#local-6989586621679283481"><span class="hs-identifier hs-var">start</span></a></span><span>
+</span><span id="line-293"></span><span>          </span><span class="annot"><span class="annottext">EraHistory CardanoMode
+</span><a href="#local-6989586621679283478"><span class="hs-identifier hs-var">history</span></a></span><span>
+</span><span id="line-294"></span><span>          </span><span class="annot"><span class="annottext">ProtocolParameters
+</span><a href="#local-6989586621679283475"><span class="hs-identifier hs-var">protocol</span></a></span><span>
+</span><span id="line-295"></span><span>          </span><span class="annot"><span class="annottext">Set PoolId
+forall a. Set a
+</span><span class="hs-identifier hs-var">S.empty</span></span><span>
+</span><span id="line-296"></span><span>          </span><span class="annot"><span class="annottext">UTxO AlonzoEra
+</span><a href="#local-6989586621679283468"><span class="hs-identifier hs-var">utxo</span></a></span><span>
+</span><span id="line-297"></span><span>          </span><span class="annot"><span class="annottext">TxBodyContent :: forall build era.
+TxIns build era
+-&gt; TxInsCollateral era
+-&gt; [TxOut era]
+-&gt; TxFee era
+-&gt; (TxValidityLowerBound era, TxValidityUpperBound era)
+-&gt; TxMetadataInEra era
+-&gt; TxAuxScripts era
+-&gt; BuildTxWith build (TxExtraScriptData era)
+-&gt; TxExtraKeyWitnesses era
+-&gt; BuildTxWith build (Maybe ProtocolParameters)
+-&gt; TxWithdrawals build era
+-&gt; TxCertificates build era
+-&gt; TxUpdateProposal era
+-&gt; TxMintValue build era
+-&gt; BuildTxWith build (TxScriptValidity era)
+-&gt; TxBodyContent build era
+</span><span class="hs-identifier hs-type">TxBodyContent</span></span><span class="hs-special">{</span><span class="annot"><span class="annottext">[(TxIn, BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra))]
+[TxOut AlonzoEra]
+(TxValidityLowerBound AlonzoEra, TxValidityUpperBound AlonzoEra)
+BuildTxWith BuildTx (Maybe ProtocolParameters)
+BuildTxWith BuildTx (TxExtraScriptData AlonzoEra)
+BuildTxWith BuildTx (TxScriptValidity AlonzoEra)
+TxAuxScripts AlonzoEra
+TxCertificates BuildTx AlonzoEra
+TxExtraKeyWitnesses AlonzoEra
+TxFee AlonzoEra
+TxInsCollateral AlonzoEra
+TxMetadataInEra AlonzoEra
+TxMintValue BuildTx AlonzoEra
+TxUpdateProposal AlonzoEra
+TxWithdrawals BuildTx AlonzoEra
+forall era.
+(TxValidityLowerBound era, TxValidityUpperBound AlonzoEra)
+forall era. BuildTxWith BuildTx (TxExtraScriptData era)
+forall era. BuildTxWith BuildTx (TxScriptValidity era)
+forall era. TxAuxScripts era
+forall era. TxExtraKeyWitnesses era
+forall era. TxUpdateProposal era
+forall build era. TxCertificates build era
+forall build era. TxMintValue build era
+forall build era. TxWithdrawals build era
+txWithdrawals :: TxWithdrawals BuildTx AlonzoEra
+txValidityRange :: (TxValidityLowerBound AlonzoEra, TxValidityUpperBound AlonzoEra)
+txUpdateProposal :: TxUpdateProposal AlonzoEra
+txScriptValidity :: BuildTxWith BuildTx (TxScriptValidity AlonzoEra)
+txProtocolParams :: BuildTxWith BuildTx (Maybe ProtocolParameters)
+txOuts :: [TxOut AlonzoEra]
+txMintValue :: TxMintValue BuildTx AlonzoEra
+txMetadata :: TxMetadataInEra AlonzoEra
+txInsCollateral :: TxInsCollateral AlonzoEra
+txIns :: [(TxIn, BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra))]
+txFee :: TxFee AlonzoEra
+txExtraScriptData :: BuildTxWith BuildTx (TxExtraScriptData AlonzoEra)
+txExtraKeyWits :: TxExtraKeyWitnesses AlonzoEra
+txCertificates :: TxCertificates BuildTx AlonzoEra
+txAuxScripts :: TxAuxScripts AlonzoEra
+txScriptValidity :: forall era. BuildTxWith BuildTx (TxScriptValidity era)
+txMintValue :: forall build era. TxMintValue build era
+txUpdateProposal :: forall era. TxUpdateProposal era
+txCertificates :: forall build era. TxCertificates build era
+txWithdrawals :: forall build era. TxWithdrawals build era
+txProtocolParams :: BuildTxWith BuildTx (Maybe ProtocolParameters)
+txExtraKeyWits :: forall era. TxExtraKeyWitnesses era
+txExtraScriptData :: forall era. BuildTxWith BuildTx (TxExtraScriptData era)
+txAuxScripts :: forall era. TxAuxScripts era
+txMetadata :: TxMetadataInEra AlonzoEra
+txValidityRange :: forall era.
+(TxValidityLowerBound era, TxValidityUpperBound AlonzoEra)
+txFee :: TxFee AlonzoEra
+txInsCollateral :: TxInsCollateral AlonzoEra
+txOuts :: [TxOut AlonzoEra]
+txIns :: [(TxIn, BuildTxWith BuildTx (Witness WitCtxTxIn AlonzoEra))]
+</span><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></span><span class="hs-special">}</span><span>
+</span><span id="line-298"></span><span>          </span><span class="annot"><span class="annottext">AddressInEra AlonzoEra
+</span><a href="#local-6989586621679283482"><span class="hs-identifier hs-var">controlAddress'</span></a></span><span>
+</span><span id="line-299"></span><span>          </span><span class="annot"><span class="annottext">Maybe Word
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-300"></span><span>
+</span><span id="line-301"></span><span>
+</span><span id="line-302"></span><span class="hs-comment">-- | Sign and submit a transaction.</span><span>
+</span><span id="line-303"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#submit"><span class="hs-identifier hs-type">submit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span> </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
+</span><span id="line-304"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxBody</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span>                 </span><span class="hs-comment">-- ^ The transaction body.</span><span>
+</span><span id="line-305"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SigningKey</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PaymentKey</span></span><span>            </span><span class="hs-comment">-- ^ The signing key.</span><span>
+</span><span id="line-306"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                  </span><span class="hs-comment">-- ^ The action to submit the transaction.</span><span>
+</span><span id="line-307"></span><span id="submit"><span class="annot"><span class="annottext">submit :: LocalNodeConnectInfo CardanoMode
+-&gt; TxBody AlonzoEra -&gt; SigningKey PaymentKey -&gt; MantisM IO TxId
+</span><a href="Mantis.Oracle.Submit.html#submit"><span class="hs-identifier hs-var hs-var">submit</span></a></span></span><span> </span><span id="local-6989586621679283393"><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283393"><span class="hs-identifier hs-var">connection</span></a></span></span><span> </span><span id="local-6989586621679283392"><span class="annot"><span class="annottext">TxBody AlonzoEra
+</span><a href="#local-6989586621679283392"><span class="hs-identifier hs-var">body</span></a></span></span><span> </span><span id="local-6989586621679283391"><span class="annot"><span class="annottext">SigningKey PaymentKey
+</span><a href="#local-6989586621679283391"><span class="hs-identifier hs-var">controlSigning</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-308"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-309"></span><span>    </span><span class="hs-keyword">let</span><span>
+</span><span id="line-310"></span><span>      </span><span id="local-6989586621679283390"><span class="annot"><span class="annottext">tx :: Tx AlonzoEra
+</span><a href="#local-6989586621679283390"><span class="hs-identifier hs-var hs-var">tx</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-311"></span><span>        </span><span class="annot"><span class="annottext">TxBody AlonzoEra -&gt; [ShelleyWitnessSigningKey] -&gt; Tx AlonzoEra
+forall era.
+IsShelleyBasedEra era =&gt;
+TxBody era -&gt; [ShelleyWitnessSigningKey] -&gt; Tx era
+</span><span class="hs-identifier hs-var">signShelleyTransaction</span></span><span>
+</span><span id="line-312"></span><span>          </span><span class="annot"><span class="annottext">TxBody AlonzoEra
+</span><a href="#local-6989586621679283392"><span class="hs-identifier hs-var">body</span></a></span><span>
+</span><span id="line-313"></span><span>          </span><span class="hs-special">[</span><span>
+</span><span id="line-314"></span><span>            </span><span class="annot"><span class="annottext">SigningKey PaymentKey -&gt; ShelleyWitnessSigningKey
+</span><span class="hs-identifier hs-var">WitnessPaymentKey</span></span><span> </span><span class="annot"><span class="annottext">SigningKey PaymentKey
+</span><a href="#local-6989586621679283391"><span class="hs-identifier hs-var">controlSigning</span></a></span><span>
+</span><span id="line-315"></span><span>          </span><span class="hs-special">]</span><span>
+</span><span id="line-316"></span><span>    </span><span id="local-6989586621679283387"><span class="annot"><span class="annottext">SubmitResult (TxValidationErrorInMode CardanoMode)
+</span><a href="#local-6989586621679283387"><span class="hs-identifier hs-var">result</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-317"></span><span>      </span><span class="annot"><span class="annottext">IO (SubmitResult (TxValidationErrorInMode CardanoMode))
+-&gt; MantisM IO (SubmitResult (TxValidationErrorInMode CardanoMode))
+forall (m :: * -&gt; *) a. MonadIO m =&gt; IO a -&gt; m a
+</span><span class="hs-identifier hs-var">liftIO</span></span><span>
+</span><span id="line-318"></span><span>        </span><span class="annot"><span class="annottext">(IO (SubmitResult (TxValidationErrorInMode CardanoMode))
+ -&gt; MantisM IO (SubmitResult (TxValidationErrorInMode CardanoMode)))
+-&gt; (TxInMode CardanoMode
+    -&gt; IO (SubmitResult (TxValidationErrorInMode CardanoMode)))
+-&gt; TxInMode CardanoMode
+-&gt; MantisM IO (SubmitResult (TxValidationErrorInMode CardanoMode))
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; TxInMode CardanoMode
+-&gt; IO (SubmitResult (TxValidationErrorInMode CardanoMode))
+forall mode.
+LocalNodeConnectInfo mode
+-&gt; TxInMode mode
+-&gt; IO (SubmitResult (TxValidationErrorInMode mode))
+</span><span class="hs-identifier hs-var">submitTxToNodeLocal</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283393"><span class="hs-identifier hs-var">connection</span></a></span><span>
+</span><span id="line-319"></span><span>        </span><span class="annot"><span class="annottext">(TxInMode CardanoMode
+ -&gt; MantisM IO (SubmitResult (TxValidationErrorInMode CardanoMode)))
+-&gt; TxInMode CardanoMode
+-&gt; MantisM IO (SubmitResult (TxValidationErrorInMode CardanoMode))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Tx AlonzoEra
+-&gt; EraInMode AlonzoEra CardanoMode -&gt; TxInMode CardanoMode
+forall era mode. Tx era -&gt; EraInMode era mode -&gt; TxInMode mode
+</span><span class="hs-identifier hs-var">TxInMode</span></span><span> </span><span class="annot"><span class="annottext">Tx AlonzoEra
+</span><a href="#local-6989586621679283390"><span class="hs-identifier hs-var">tx</span></a></span><span> </span><span class="annot"><span class="annottext">EraInMode AlonzoEra CardanoMode
+</span><span class="hs-identifier hs-var">AlonzoEraInCardanoMode</span></span><span>
+</span><span id="line-320"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">SubmitResult (TxValidationErrorInMode CardanoMode)
+</span><a href="#local-6989586621679283387"><span class="hs-identifier hs-var">result</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-321"></span><span>      </span><span class="annot"><span class="annottext">SubmitResult (TxValidationErrorInMode CardanoMode)
+</span><span class="hs-identifier hs-var">SubmitSuccess</span></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TxId -&gt; MantisM IO TxId
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(TxId -&gt; MantisM IO TxId) -&gt; TxId -&gt; MantisM IO TxId
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">TxBody AlonzoEra -&gt; TxId
+forall era. TxBody era -&gt; TxId
+</span><span class="hs-identifier hs-var">getTxId</span></span><span> </span><span class="annot"><span class="annottext">TxBody AlonzoEra
+</span><a href="#local-6989586621679283392"><span class="hs-identifier hs-var">body</span></a></span><span>
+</span><span id="line-322"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">SubmitFail</span></span><span> </span><span id="local-6989586621679283381"><span class="annot"><span class="annottext">TxValidationErrorInMode CardanoMode
+</span><a href="#local-6989586621679283381"><span class="hs-identifier hs-var">reason</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; MantisM IO TxId
+forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
+</span><span class="hs-identifier hs-var">throwError</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; MantisM IO TxId) -&gt; String -&gt; MantisM IO TxId
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">TxValidationErrorInMode CardanoMode -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">TxValidationErrorInMode CardanoMode
+</span><a href="#local-6989586621679283381"><span class="hs-identifier hs-var">reason</span></a></span><span>
+</span><span id="line-323"></span><span>
+</span><span id="line-324"></span><span>
+</span><span id="line-325"></span><span class="hs-comment">-- | Find the UTxOs meeting a criterion.</span><span>
+</span><span id="line-326"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-type">findUTxO</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span>     </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
+</span><span id="line-327"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span>                           </span><span class="hs-comment">-- ^ The address to query.</span><span>
+</span><span id="line-328"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Value</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span><span>                      </span><span class="hs-comment">-- ^ The condition on values in the UTxO.</span><span>
+</span><span id="line-329"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxIn</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-comment">-- ^ The action to find the UTxOs.</span><span>
+</span><span id="line-330"></span><span id="findUTxO"><span class="annot"><span class="annottext">findUTxO :: LocalNodeConnectInfo CardanoMode
+-&gt; AddressAny
+-&gt; (Value -&gt; Bool)
+-&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+</span><a href="Mantis.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-var hs-var">findUTxO</span></a></span></span><span> </span><span id="local-6989586621679283380"><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283380"><span class="hs-identifier hs-var">localConnInfo</span></a></span></span><span> </span><span id="local-6989586621679283379"><span class="annot"><span class="annottext">AddressAny
+</span><a href="#local-6989586621679283379"><span class="hs-identifier hs-var">address</span></a></span></span><span> </span><span id="local-6989586621679283378"><span class="annot"><span class="annottext">Value -&gt; Bool
+</span><a href="#local-6989586621679283378"><span class="hs-identifier hs-var">condition</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-331"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-332"></span><span>    </span><span class="hs-keyword">let</span><span>
+</span><span id="line-333"></span><span>      </span><span id="local-6989586621679283377"><span class="annot"><span class="annottext">query :: QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra))
+</span><a href="#local-6989586621679283377"><span class="hs-identifier hs-var hs-var">query</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-334"></span><span>        </span><span class="annot"><span class="annottext">EraInMode AlonzoEra CardanoMode
+-&gt; QueryInEra AlonzoEra (UTxO AlonzoEra)
+-&gt; QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra))
+forall era mode result1.
+EraInMode era mode
+-&gt; QueryInEra era result1
+-&gt; QueryInMode mode (Either EraMismatch result1)
+</span><span class="hs-identifier hs-var">QueryInEra</span></span><span> </span><span class="annot"><span class="annottext">EraInMode AlonzoEra CardanoMode
+</span><span class="hs-identifier hs-var">AlonzoEraInCardanoMode</span></span><span>
+</span><span id="line-335"></span><span>          </span><span class="annot"><span class="annottext">(QueryInEra AlonzoEra (UTxO AlonzoEra)
+ -&gt; QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra)))
+-&gt; (Set AddressAny -&gt; QueryInEra AlonzoEra (UTxO AlonzoEra))
+-&gt; Set AddressAny
+-&gt; QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra))
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ShelleyBasedEra AlonzoEra
+-&gt; QueryInShelleyBasedEra AlonzoEra (UTxO AlonzoEra)
+-&gt; QueryInEra AlonzoEra (UTxO AlonzoEra)
+forall era result.
+ShelleyBasedEra era
+-&gt; QueryInShelleyBasedEra era result -&gt; QueryInEra era result
+</span><span class="hs-identifier hs-var">QueryInShelleyBasedEra</span></span><span> </span><span class="annot"><span class="annottext">ShelleyBasedEra AlonzoEra
+</span><span class="hs-identifier hs-var">ShelleyBasedEraAlonzo</span></span><span>
+</span><span id="line-336"></span><span>          </span><span class="annot"><span class="annottext">(QueryInShelleyBasedEra AlonzoEra (UTxO AlonzoEra)
+ -&gt; QueryInEra AlonzoEra (UTxO AlonzoEra))
+-&gt; (Set AddressAny
+    -&gt; QueryInShelleyBasedEra AlonzoEra (UTxO AlonzoEra))
+-&gt; Set AddressAny
+-&gt; QueryInEra AlonzoEra (UTxO AlonzoEra)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">QueryUTxOFilter
+-&gt; QueryInShelleyBasedEra AlonzoEra (UTxO AlonzoEra)
+forall era.
+QueryUTxOFilter -&gt; QueryInShelleyBasedEra era (UTxO era)
+</span><span class="hs-identifier hs-var">QueryUTxO</span></span><span>
+</span><span id="line-337"></span><span>          </span><span class="annot"><span class="annottext">(QueryUTxOFilter
+ -&gt; QueryInShelleyBasedEra AlonzoEra (UTxO AlonzoEra))
+-&gt; (Set AddressAny -&gt; QueryUTxOFilter)
+-&gt; Set AddressAny
+-&gt; QueryInShelleyBasedEra AlonzoEra (UTxO AlonzoEra)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Set AddressAny -&gt; QueryUTxOFilter
+</span><span class="hs-identifier hs-var">QueryUTxOByAddress</span></span><span>
+</span><span id="line-338"></span><span>          </span><span class="annot"><span class="annottext">(Set AddressAny
+ -&gt; QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra)))
+-&gt; Set AddressAny
+-&gt; QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">AddressAny -&gt; Set AddressAny
+forall a. a -&gt; Set a
+</span><span class="hs-identifier hs-var">S.singleton</span></span><span> </span><span class="annot"><span class="annottext">AddressAny
+</span><a href="#local-6989586621679283379"><span class="hs-identifier hs-var">address</span></a></span><span>
+</span><span id="line-339"></span><span>      </span><span id="local-6989586621679283374"><span class="annot"><span class="annottext">compare' :: (a, TxOut era) -&gt; (a, TxOut era) -&gt; Ordering
+</span><a href="#local-6989586621679283374"><span class="hs-identifier hs-var hs-var">compare'</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span> </span><span class="annot"><span class="annottext">AddressInEra era
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxOutValue</span></span><span> </span><span class="annot"><span class="annottext">MultiAssetSupportedInEra era
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679283373"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283373"><span class="hs-identifier hs-var">value</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TxOutDatumHash era
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span> </span><span class="annot"><span class="annottext">AddressInEra era
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxOutValue</span></span><span> </span><span class="annot"><span class="annottext">MultiAssetSupportedInEra era
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679283372"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283372"><span class="hs-identifier hs-var">value'</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TxOutDatumHash era
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-340"></span><span>        </span><span class="annot"><span class="annottext">Value -&gt; Lovelace
+</span><span class="hs-identifier hs-var">selectLovelace</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283372"><span class="hs-identifier hs-var">value'</span></a></span><span> </span><span class="annot"><span class="annottext">Lovelace -&gt; Lovelace -&gt; Ordering
+forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
+</span><span class="hs-operator hs-var">`compare`</span></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Lovelace
+</span><span class="hs-identifier hs-var">selectLovelace</span></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283373"><span class="hs-identifier hs-var">value</span></a></span><span>
+</span><span id="line-341"></span><span>      </span><span class="annot"><a href="#local-6989586621679283374"><span class="hs-identifier hs-var">compare'</span></a></span><span> </span><span class="annot"><span class="annottext">(a, TxOut era)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">(a, TxOut era)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Ordering
+</span><span class="hs-identifier hs-var">EQ</span></span><span>
+</span><span id="line-342"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">UTxO</span></span><span> </span><span id="local-6989586621679283369"><span class="annot"><span class="annottext">Map TxIn (TxOut AlonzoEra)
+</span><a href="#local-6989586621679283369"><span class="hs-identifier hs-var">utxos</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-343"></span><span>      </span><span class="annot"><span class="annottext">IO (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra)))
+-&gt; MantisM IO (UTxO AlonzoEra)
+forall e e' a.
+(Show e, Show e') =&gt;
+IO (Either e (Either e' a)) -&gt; MantisM IO a
+</span><a href="Mantis.Oracle.Submit.html#foistMantisEitherIO%27"><span class="hs-identifier hs-var">foistMantisEitherIO'</span></a></span><span>
+</span><span id="line-344"></span><span>        </span><span class="annot"><span class="annottext">(IO (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra)))
+ -&gt; MantisM IO (UTxO AlonzoEra))
+-&gt; IO (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra)))
+-&gt; MantisM IO (UTxO AlonzoEra)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; Maybe ChainPoint
+-&gt; QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra))
+-&gt; IO (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra)))
+forall mode result.
+LocalNodeConnectInfo mode
+-&gt; Maybe ChainPoint
+-&gt; QueryInMode mode result
+-&gt; IO (Either AcquireFailure result)
+</span><span class="hs-identifier hs-var">queryNodeLocalState</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+</span><a href="#local-6989586621679283380"><span class="hs-identifier hs-var">localConnInfo</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe ChainPoint
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="annot"><span class="annottext">QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra))
+</span><a href="#local-6989586621679283377"><span class="hs-identifier hs-var">query</span></a></span><span>
+</span><span id="line-345"></span><span>    </span><span class="annot"><span class="annottext">[(TxIn, TxOut AlonzoEra)] -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span>
+</span><span id="line-346"></span><span>      </span><span class="annot"><span class="annottext">([(TxIn, TxOut AlonzoEra)] -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)])
+-&gt; [(TxIn, TxOut AlonzoEra)]
+-&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">((TxIn, TxOut AlonzoEra) -&gt; (TxIn, TxOut AlonzoEra) -&gt; Ordering)
+-&gt; [(TxIn, TxOut AlonzoEra)] -&gt; [(TxIn, TxOut AlonzoEra)]
+forall a. (a -&gt; a -&gt; Ordering) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">sortBy</span></span><span> </span><span class="annot"><span class="annottext">(TxIn, TxOut AlonzoEra) -&gt; (TxIn, TxOut AlonzoEra) -&gt; Ordering
+forall a era a era. (a, TxOut era) -&gt; (a, TxOut era) -&gt; Ordering
+</span><a href="#local-6989586621679283374"><span class="hs-identifier hs-var">compare'</span></a></span><span>
+</span><span id="line-347"></span><span>      </span><span class="hs-special">[</span><span>
+</span><span id="line-348"></span><span>        </span><span class="annot"><span class="annottext">(TxIn, TxOut AlonzoEra)
+</span><a href="#local-6989586621679283368"><span class="hs-identifier hs-var">utxo</span></a></span><span>
+</span><span id="line-349"></span><span>      </span><span class="hs-glyph">|</span><span>
+</span><span id="line-350"></span><span>        </span><span id="local-6989586621679283368"><span class="annot"><span class="annottext">utxo :: (TxIn, TxOut AlonzoEra)
+</span><a href="#local-6989586621679283368"><span class="hs-identifier hs-var">utxo</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxIn
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span> </span><span class="annot"><span class="annottext">AddressInEra AlonzoEra
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxOutValue</span></span><span> </span><span class="annot"><span class="annottext">MultiAssetSupportedInEra AlonzoEra
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679283367"><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283367"><span class="hs-identifier hs-var">value</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TxOutDatumHash AlonzoEra
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map TxIn (TxOut AlonzoEra) -&gt; [(TxIn, TxOut AlonzoEra)]
+forall k a. Map k a -&gt; [(k, a)]
+</span><span class="hs-identifier hs-var">M.toList</span></span><span> </span><span class="annot"><span class="annottext">Map TxIn (TxOut AlonzoEra)
+</span><a href="#local-6989586621679283369"><span class="hs-identifier hs-var">utxos</span></a></span><span>
+</span><span id="line-351"></span><span>      </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Value -&gt; Bool
+</span><a href="#local-6989586621679283378"><span class="hs-identifier hs-var">condition</span></a></span><span> </span><span class="annot"><span class="annottext">Value
+</span><a href="#local-6989586621679283367"><span class="hs-identifier hs-var">value</span></a></span><span>
+</span><span id="line-352"></span><span>      </span><span class="hs-special">]</span><span>
+</span><span id="line-353"></span><span>
+</span><span id="line-354"></span><span>
+</span><span id="line-355"></span><span class="hs-comment">-- | Convert a Plutus `AssetClass` to a Cardano `AssetId`.</span><span>
+</span><span id="line-356"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#classToId"><span class="hs-identifier hs-type">classToId</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AssetClass</span></span><span>         </span><span class="hs-comment">-- ^ The asset class.</span><span>
+</span><span id="line-357"></span><span>          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AssetId</span></span><span> </span><span class="hs-comment">-- ^ The asset identifier.</span><span>
+</span><span id="line-358"></span><span id="classToId"><span class="annot"><span class="annottext">classToId :: AssetClass -&gt; MantisM IO AssetId
+</span><a href="Mantis.Oracle.Submit.html#classToId"><span class="hs-identifier hs-var hs-var">classToId</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AssetClass</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CurrencySymbol</span></span><span> </span><span id="local-6989586621679283363"><span class="annot"><span class="annottext">BuiltinByteString
+</span><a href="#local-6989586621679283363"><span class="hs-identifier hs-var">policy</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TokenName</span></span><span> </span><span id="local-6989586621679283361"><span class="annot"><span class="annottext">BuiltinByteString
+</span><a href="#local-6989586621679283361"><span class="hs-identifier hs-var">name</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-359"></span><span>   </span><span class="hs-keyword">do</span><span>
+</span><span id="line-360"></span><span>     </span><span id="local-6989586621679283360"><span class="annot"><span class="annottext">PolicyId
+</span><a href="#local-6989586621679283360"><span class="hs-identifier hs-var">policy'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
+</span><span id="line-361"></span><span>       </span><span class="annot"><span class="annottext">String -&gt; Maybe PolicyId -&gt; MantisM IO PolicyId
+forall (m :: * -&gt; *) a. Monad m =&gt; String -&gt; Maybe a -&gt; MantisM m a
+</span><span class="hs-identifier hs-var">foistMantisMaybe</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Failed to convert policy.&quot;</span></span><span>
+</span><span id="line-362"></span><span>         </span><span class="annot"><span class="annottext">(Maybe PolicyId -&gt; MantisM IO PolicyId)
+-&gt; (ByteString -&gt; Maybe PolicyId)
+-&gt; ByteString
+-&gt; MantisM IO PolicyId
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">AsType PolicyId -&gt; ByteString -&gt; Maybe PolicyId
+forall a.
+SerialiseAsRawBytes a =&gt;
+AsType a -&gt; ByteString -&gt; Maybe a
+</span><span class="hs-identifier hs-var">deserialiseFromRawBytes</span></span><span> </span><span class="annot"><span class="annottext">AsType PolicyId
+</span><span class="hs-identifier hs-var">AsPolicyId</span></span><span>
+</span><span id="line-363"></span><span>         </span><span class="annot"><span class="annottext">(ByteString -&gt; MantisM IO PolicyId)
+-&gt; ByteString -&gt; MantisM IO PolicyId
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">BuiltinByteString -&gt; ByteString
+forall arep a. FromBuiltin arep a =&gt; arep -&gt; a
+</span><span class="hs-identifier hs-var">fromBuiltin</span></span><span> </span><span class="annot"><span class="annottext">BuiltinByteString
+</span><a href="#local-6989586621679283363"><span class="hs-identifier hs-var">policy</span></a></span><span>
+</span><span id="line-364"></span><span>     </span><span class="annot"><span class="annottext">AssetId -&gt; MantisM IO AssetId
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span>
+</span><span id="line-365"></span><span>       </span><span class="annot"><span class="annottext">(AssetId -&gt; MantisM IO AssetId)
+-&gt; (ByteString -&gt; AssetId) -&gt; ByteString -&gt; MantisM IO AssetId
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">PolicyId -&gt; AssetName -&gt; AssetId
+</span><span class="hs-identifier hs-var">AssetId</span></span><span> </span><span class="annot"><span class="annottext">PolicyId
+</span><a href="#local-6989586621679283360"><span class="hs-identifier hs-var">policy'</span></a></span><span>
+</span><span id="line-366"></span><span>       </span><span class="annot"><span class="annottext">(AssetName -&gt; AssetId)
+-&gt; (ByteString -&gt; AssetName) -&gt; ByteString -&gt; AssetId
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; AssetName
+</span><span class="hs-identifier hs-var">AssetName</span></span><span>
+</span><span id="line-367"></span><span>       </span><span class="annot"><span class="annottext">(ByteString -&gt; MantisM IO AssetId)
+-&gt; ByteString -&gt; MantisM IO AssetId
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">BuiltinByteString -&gt; ByteString
+forall arep a. FromBuiltin arep a =&gt; arep -&gt; a
+</span><span class="hs-identifier hs-var">fromBuiltin</span></span><span> </span><span class="annot"><span class="annottext">BuiltinByteString
+</span><a href="#local-6989586621679283361"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><span id="line-368"></span><span>
+</span><span id="line-369"></span><span>
+</span><span id="line-370"></span><span class="hs-comment">-- | Hoist doublely nested `Either`s.</span><span>
+</span><span id="line-371"></span><span id="local-6989586621679283727"><span id="local-6989586621679283728"><span id="local-6989586621679283729"><span class="annot"><a href="Mantis.Oracle.Submit.html#foistMantisEitherIO%27"><span class="hs-identifier hs-type">foistMantisEitherIO'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679283729"><span class="hs-identifier hs-type">e</span></a></span><span>
+</span><span id="line-372"></span><span>                     </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679283728"><span class="hs-identifier hs-type">e'</span></a></span><span>
+</span><span id="line-373"></span><span>                     </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><a href="#local-6989586621679283729"><span class="hs-identifier hs-type">e</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><a href="#local-6989586621679283728"><span class="hs-identifier hs-type">e'</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679283727"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ The action with the nested `Either`s.</span><span>
+</span><span id="line-374"></span><span>                     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="#local-6989586621679283727"><span class="hs-identifier hs-type">a</span></a></span><span>                </span><span class="hs-comment">-- ^ The hoisted action.</span></span></span></span><span>
+</span><span id="line-375"></span><span id="foistMantisEitherIO%27"><span class="annot"><span class="annottext">foistMantisEitherIO' :: IO (Either e (Either e' a)) -&gt; MantisM IO a
+</span><a href="Mantis.Oracle.Submit.html#foistMantisEitherIO%27"><span class="hs-identifier hs-var hs-var">foistMantisEitherIO'</span></a></span></span><span> </span><span id="local-6989586621679283355"><span class="annot"><span class="annottext">IO (Either e (Either e' a))
+</span><a href="#local-6989586621679283355"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-376"></span><span>  </span><span class="hs-keyword">do</span><span>
+</span><span id="line-377"></span><span>    </span><span id="local-6989586621679283354"><span class="annot"><span class="annottext">Either e' a
+</span><a href="#local-6989586621679283354"><span class="hs-identifier hs-var">a'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO (Either e (Either e' a)) -&gt; MantisM IO (Either e' a)
+forall (m :: * -&gt; *) e a.
+(MonadIO m, Show e) =&gt;
+IO (Either e a) -&gt; MantisM m a
+</span><span class="hs-identifier hs-var">foistMantisEitherIO</span></span><span> </span><span class="annot"><span class="annottext">IO (Either e (Either e' a))
+</span><a href="#local-6989586621679283355"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-378"></span><span>    </span><span class="annot"><span class="annottext">Either e' a -&gt; MantisM IO a
+forall (m :: * -&gt; *) e a.
+(Monad m, Show e) =&gt;
+Either e a -&gt; MantisM m a
+</span><span class="hs-identifier hs-var">foistMantisEither</span></span><span> </span><span class="annot"><span class="annottext">Either e' a
+</span><a href="#local-6989586621679283354"><span class="hs-identifier hs-var">a'</span></a></span><span>
+</span><span id="line-379"></span></pre></body></html>
