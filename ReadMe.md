@@ -472,7 +472,7 @@ Simulation and PAB Examples
 
 The oracle can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic via the `readOracleConstraints` function in [`Mantis.Oracle.Client`](src/Mantis/Oracle/Client.hs), which returns the correct lookups, transaction constraints, and datum for a script endpoint to employ the oracle. The `readOracle` function is the simplest example of an endpoint: it just reads the oracle value and performs no other actions.
 
-See [ReadMe-PAB.md](ReadMe-PAB.md) for examples use the Plutus simulator and the Plutus Application Backend.
+See the slighly older version of this tool at https://github.com/functionally/mantis-oracle/blob/51d21574dd2a11280ece72068d56ef33f5672404/ReadMe.md for examples use the Plutus simulator and the Plutus Application Backend. Full simulator and PAB support will be included when the PAB is released.
 
 
 API documentation
