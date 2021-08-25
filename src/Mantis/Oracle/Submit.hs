@@ -1,3 +1,17 @@
+-----------------------------------------------------------------------------
+--
+-- Module      :  $Headers
+-- Copyright   :  (c) 2021 Brian W Bush
+-- License     :  MIT
+--
+-- Maintainer  :  Brian W Bush <code@functionally.io>
+-- Stability   :  Experimental
+-- Portability :  Portable
+--
+-- | Submitting transactions to the oracle.
+--
+-----------------------------------------------------------------------------
+
 
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
@@ -5,14 +19,16 @@
 
 
 module Mantis.Oracle.Submit (
-  writeOracle
+  createOracle
+, deleteOracle
+, writeOracle
 ) where
 
 
-import Cardano.Api                                        -- (AddressAny, AlonzoEra, AssetId(..), AssetName(..), AsType(..), BuildTxWith(..), CardanoMode, CollateralSupportedInEra, EraInMode(..), LocalNodeConnectInfo, MultiAssetSupportedInEra(..), NetworkId, PaymentCredential(..), PaymentKey, PolicyId(..), PlutusScript, PlutusScriptV1, QueryInEra(..), QueryInShelleyBasedEra(..), QueryUTxOFilter(..), ScriptDataSupportedInEra(..), ShelleyBasedEra(..), ShelleyWitnessSigningKey(..), SigningKey, StakeAddressReference(..), TxAuxScripts(..), TxBody, TxBodyContent(..), TxCertificates(..), TxExtraKeyWitnesses(..), TxExtraScriptData(..), TxFee(..), TxId, TxIn, TxInMode(..), TxInsCollateral, TxMetadata, TxMetadataInEra(..), TxMintValue(..), TxOut(..), TxOutValue(..), TxScriptValidity(..), TxUpdateProposal(..), TxValidityLowerBound(..), TxValidityUpperBound(..), TxWithdrawals(..), UTxO(..), Value, ValidityNoUpperBoundSupportedInEra(..), anyAddressInEra, deserialiseFromRawBytesHex, getTxId, getVerificationKey, hashScriptData, makeShelleyAddress, makeTransactionBodyAutoBalance, metadataFromJson, negateValue, queryNodeLocalState, scriptDataFromJson, selectAsset, selectLovelace, signShelleyTransaction, submitTxToNodeLocal, toAddressAny, valueFromList, valueToList, verificationKeyHash)
+import Cardano.Api
 import Control.Monad.Except                              (throwError, liftIO)
 import Data.List                                         (sortBy)
-import Data.Maybe                                        (catMaybes)
+import Data.Maybe                                        (catMaybes, fromJust)
 import Data.Word                                         (Word64)
 import Ledger.Value                                      (AssetClass(..), CurrencySymbol(..), TokenName(..))
 import Mantis.Oracle                                     (oracleAddress, plutusOracle)
@@ -29,24 +45,84 @@ import qualified Data.Text           as T
 import qualified PlutusTx.Prelude    as P
 
 
-writeOracle :: LocalNodeConnectInfo CardanoMode
-            -> NetworkId
-            -> Oracle
-            -> AddressAny
-            -> SigningKey PaymentKey
-            -> Quantity
-            -> A.Value
-            -> A.Value
-            -> Maybe Word64
-            -> Maybe A.Value
-            -> MantisM IO TxId
-writeOracle connection network oracle controlAddress controlSigning minLovelace oldData newData metadataKey message =
+-- | Submit the transaction to create an oracle.
+createOracle :: A.Value                          -- ^ The initial datum.
+             -> Maybe Word64                     -- ^ The metadata key for the initial datum, if any.
+             -> Maybe A.Value                    -- ^ The metadata message, if any.
+             -> LocalNodeConnectInfo CardanoMode -- ^ The connection info for the local node.
+             -> NetworkId                        -- ^ The network identifier.
+             -> Oracle                           -- ^ The oracle.
+             -> AddressAny                       -- ^ The payment address.
+             -> SigningKey PaymentKey            -- ^ The signing key for the payment address.
+             -> Quantity                         -- ^ The Lovelace to be sent to the script.
+             -> MantisM IO TxId                  -- ^ Action to submit the creation transaction.
+createOracle newData =
+  operateOracle
+    Nothing
+    Nothing
+    (Just newData)
+
+
+-- | Submit the transaction to delete an oracle.
+deleteOracle :: A.Value                           -- ^ The datum currently held in the script.
+             -> Maybe A.Value                     -- ^ The metadata message, if any.
+             -> LocalNodeConnectInfo CardanoMode  -- ^ The connection info for the local node.
+             -> NetworkId                         -- ^ The network identifier.
+             -> Oracle                            -- ^ The oracle.
+             -> AddressAny                        -- ^ The payment address.
+             -> SigningKey PaymentKey             -- ^ The signing key for the payment address.
+             -> Quantity                          -- ^ The Lovelace to be sent to the script.
+             -> MantisM IO TxId                   -- ^ Action to submit the deletion transaction.
+deleteOracle oldData =
+  operateOracle
+    (Just Delete)
+    (Just oldData)
+    Nothing
+    Nothing
+
+
+-- | Submit the transaction to write new data to an oracle.
+writeOracle :: A.Value                          -- ^ The datum currently held in the script. 
+            -> A.Value                          -- ^ The new datum.                              
+            -> Maybe Word64                     -- ^ The metadata key for the new datum, if any.
+            -> Maybe A.Value                    -- ^ The metadata message, if any.              
+            -> LocalNodeConnectInfo CardanoMode -- ^ The connection info for the local node.
+            -> NetworkId                        -- ^ The network identifier.
+            -> Oracle                           -- ^ The oracle.
+            -> AddressAny                       -- ^ The payment address.
+            -> SigningKey PaymentKey            -- ^ The signing key for the payment address.
+            -> Quantity                         -- ^ The Lovelace to be sent to the script.
+            -> MantisM IO TxId                  -- ^ Action to submit the writing transaction.
+writeOracle oldData newData =
+  operateOracle
+    (Just Write)
+    (Just oldData)
+    (Just newData)
+
+
+-- | Submit a transaction to operate the oracle.
+operateOracle :: Maybe Action                     -- ^ The redeemer, if any.
+              -> Maybe A.Value                    -- ^ The datum currently held in the script, if any.   
+              -> Maybe A.Value                    -- ^ The new datum, if any.                         
+              -> Maybe Word64                     -- ^ The metadata key for the new datum, if any
+              -> Maybe A.Value                    -- ^ The metadata message, if any.             
+              -> LocalNodeConnectInfo CardanoMode -- ^ The connection info for the local node.
+              -> NetworkId                        -- ^ The network identifier.          
+              -> Oracle                           -- ^ The oracle.
+              -> AddressAny                       -- ^ The payment address.
+              -> SigningKey PaymentKey            -- ^ The signing key for the payment address.
+              -> Quantity                         -- ^ The Lovelace to be sent to the script.
+              -> MantisM IO TxId                  -- ^ Action to submit the deletion transaction.
+operateOracle action oldData newData metadataKey message connection network oracle controlAddress controlSigning minLovelace =
   do
     let
       script = plutusOracle oracle
       scriptAddress = oracleAddress network oracle
       messageMetadata = ("674", ) <$> message
-      oracleMetadata = (, newData) . T.pack . show <$> metadataKey
+      oracleMetadata = do
+                         metadataKey' <- metadataKey
+                         newData' <- newData
+                         return (T.pack $ show metadataKey', newData')
     controlAsset <- classToId $ controlToken oracle
     datumAsset   <- classToId $ datumToken   oracle
     metadata <-
@@ -58,7 +134,7 @@ writeOracle connection network oracle controlAddress controlSigning minLovelace 
                        . A.Object
                        $ H.fromList metadata'
     [(datumTxIn, TxOut _ (TxOutValue _ datumValue) _)] <-
-      findUTxO connection scriptAddress
+      findUTxO connection (maybe controlAddress (const scriptAddress) oldData)
         $ \value -> selectAsset value datumAsset > 0
     [(controlTxIn, TxOut _ (TxOutValue _ controlValue) _)] <-
       findUTxO connection controlAddress
@@ -84,6 +160,7 @@ writeOracle connection network oracle controlAddress controlSigning minLovelace 
       controlValue' = total <> negateValue (datumValue' <> changeValue)
     body <-
       build
+        action
         connection
         script
         scriptAddress
@@ -97,25 +174,33 @@ writeOracle connection network oracle controlAddress controlSigning minLovelace 
     submit connection body controlSigning
 
 
-build :: LocalNodeConnectInfo CardanoMode
-      -> PlutusScript PlutusScriptV1
-      -> AddressAny
-      -> AddressAny
-      -> (TxIn, Value)
-      -> (TxIn, Value)
-      -> [(TxIn, a)]
-      -> TxIn
-      -> (A.Value, A.Value)
-      -> Maybe TxMetadata
-      -> MantisM IO (TxBody AlonzoEra)
-build connection script scriptAddress controlAddress (datumTxIn,  datumValue) (controlTxIn, controlValue) plainUTxOs collateralTxIn (oldData, newData) metadata =
+-- | Build an oracle transaction.
+build :: Maybe Action                     -- ^ The redeemer, if any.
+      -> LocalNodeConnectInfo CardanoMode -- ^ The connection info for the local node.
+      -> PlutusScript PlutusScriptV1      -- ^ The Plutus script.
+      -> AddressAny                       -- ^ The address of the Plutus script.
+      -> AddressAny                       -- ^ The payment address.
+      -> (TxIn, Value)                    -- ^ The UTxO with containing the datum token.
+      -> (TxIn, Value)                    -- ^ The UTxO containing the control token.
+      -> [(TxIn, a)]                      -- ^ The UTxOs to be consumed by the transaction.
+      -> TxIn                             -- ^ The UTxO for collateral.
+      -> (Maybe A.Value, Maybe A.Value)   -- ^ The existing datum and the datum to replace it, if any.
+      -> Maybe TxMetadata                 -- ^ The message metadata, if any.
+      -> MantisM IO (TxBody AlonzoEra)    -- ^ The action to build the transaction.
+build action connection script scriptAddress controlAddress (datumTxIn,  datumValue) (controlTxIn, controlValue) plainUTxOs collateralTxIn (oldData, newData) metadata =
   do
     oldData' <-
       foistMantisEither
-        $ scriptDataFromJson ScriptDataJsonNoSchema oldData
+        $ maybe
+          (return Nothing)
+          (fmap Just . scriptDataFromJson ScriptDataJsonNoSchema)
+          oldData
     newData' <-
       foistMantisEither
-        $ scriptDataFromJson ScriptDataJsonNoSchema newData
+        $ maybe
+          (return Nothing)
+          (fmap Just . scriptDataFromJson ScriptDataJsonNoSchema)
+          newData
     scriptAddress' <-
       foistMantisMaybe "Failed to convert script address."
         $ anyAddressInEra AlonzoEra scriptAddress
@@ -150,14 +235,20 @@ build connection script scriptAddress controlAddress (datumTxIn,  datumValue) (c
           (
             datumTxIn
           , BuildTxWith
-              . ScriptWitness ScriptWitnessForSpending
-              $ PlutusScriptWitness
-                PlutusScriptV1InAlonzo
-                PlutusScriptV1
-                script
-                (ScriptDatumForTxIn oldData')
-                (ScriptDataNumber $ P.fromEnum Write)
-                (ExecutionUnits 0 0)
+              $ maybe
+                  (KeyWitness KeyWitnessForSpending)
+                  (
+                    \oldData'' ->
+                      ScriptWitness ScriptWitnessForSpending
+                        $ PlutusScriptWitness
+                          PlutusScriptV1InAlonzo
+                          PlutusScriptV1
+                          script
+                          (ScriptDatumForTxIn oldData'')
+                          (ScriptDataNumber . P.fromEnum $ fromJust action)
+                          (ExecutionUnits 0 0)
+                  )
+                  oldData'
           )
         : (
             controlTxIn
@@ -174,9 +265,9 @@ build connection script scriptAddress controlAddress (datumTxIn,  datumValue) (c
       txOuts =
         [
           TxOut
-            scriptAddress'
+            (maybe controlAddress' (const scriptAddress') newData')
             (TxOutValue MultiAssetInAlonzoEra datumValue)
-            (TxOutDatumHash ScriptDataInAlonzoEra $ hashScriptData newData')
+            (maybe TxOutDatumHashNone (TxOutDatumHash ScriptDataInAlonzoEra . hashScriptData) newData')
         , TxOut
             controlAddress'
             (TxOutValue MultiAssetInAlonzoEra controlValue)
@@ -208,10 +299,11 @@ build connection script scriptAddress controlAddress (datumTxIn,  datumValue) (c
           Nothing
 
 
-submit :: LocalNodeConnectInfo CardanoMode
-       -> TxBody AlonzoEra
-       -> SigningKey PaymentKey
-       -> MantisM IO TxId
+-- | Sign and submit a transaction.
+submit :: LocalNodeConnectInfo CardanoMode -- ^ The connection info for the local node.
+       -> TxBody AlonzoEra                 -- ^ The transaction body.
+       -> SigningKey PaymentKey            -- ^ The signing key.
+       -> MantisM IO TxId                  -- ^ The action to submit the transaction.
 submit connection body controlSigning =
   do
     let
@@ -230,10 +322,11 @@ submit connection body controlSigning =
       SubmitFail reason -> throwError $ show reason
 
 
-findUTxO :: LocalNodeConnectInfo CardanoMode
-         -> AddressAny
-         -> (Value -> Bool)
-         -> MantisM IO [(TxIn, TxOut AlonzoEra)]
+-- | Find the UTxOs meeting a criterion.
+findUTxO :: LocalNodeConnectInfo CardanoMode     -- ^ The connection info for the local node.
+         -> AddressAny                           -- ^ The address to query.
+         -> (Value -> Bool)                      -- ^ The condition on values in the UTxO.
+         -> MantisM IO [(TxIn, TxOut AlonzoEra)] -- ^ The action to find the UTxOs.
 findUTxO localConnInfo address condition =
   do
     let
@@ -244,7 +337,7 @@ findUTxO localConnInfo address condition =
           . QueryUTxOByAddress
           $ S.singleton address
       compare' (_, TxOut _ (TxOutValue _ value) _) (_, TxOut _ (TxOutValue _ value') _) =
-        selectLovelace value `compare` selectLovelace value'
+        selectLovelace value' `compare` selectLovelace value
       compare' _ _ = EQ
     UTxO utxos <-
       foistMantisEitherIO'
@@ -259,8 +352,9 @@ findUTxO localConnInfo address condition =
       ]
 
 
-classToId :: AssetClass
-          -> MantisM IO AssetId
+-- | Convert a Plutus `AssetClass` to a Cardano `AssetId`.
+classToId :: AssetClass         -- ^ The asset class.
+          -> MantisM IO AssetId -- ^ The asset identifier.
 classToId (AssetClass (CurrencySymbol policy, TokenName name)) =
    do
      policy' <-
@@ -273,10 +367,11 @@ classToId (AssetClass (CurrencySymbol policy, TokenName name)) =
        $ fromBuiltin name
 
 
+-- | Hoist doublely nested `Either`s.
 foistMantisEitherIO' :: Show e
                      => Show e'
-                     => IO (Either e (Either e' a))
-                     -> MantisM IO a
+                     => IO (Either e (Either e' a)) -- ^ The action with the nested `Either`s.
+                     -> MantisM IO a                -- ^ The hoisted action.
 foistMantisEitherIO' a =
   do
     a' <- foistMantisEitherIO a

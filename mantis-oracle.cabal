@@ -78,6 +78,7 @@ executable mantis-oracle
                    , cardano-api
                    , mantis
                    , mantis-oracle
+                   , mtl
                    , optparse-applicative
                    , plutus-ledger
                    , plutus-tx
