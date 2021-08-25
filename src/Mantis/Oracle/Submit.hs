@@ -46,6 +46,7 @@ import qualified PlutusTx.Prelude    as P
 
 
 -- | Submit the transaction to create an oracle.
+-- FIXME: Document UTxO assumptions.
 createOracle :: A.Value                          -- ^ The initial datum.
              -> Maybe Word64                     -- ^ The metadata key for the initial datum, if any.
              -> Maybe A.Value                    -- ^ The metadata message, if any.
@@ -64,6 +65,7 @@ createOracle newData =
 
 
 -- | Submit the transaction to delete an oracle.
+-- FIXME: Document UTxO assumptions.
 deleteOracle :: A.Value                           -- ^ The datum currently held in the script.
              -> Maybe A.Value                     -- ^ The metadata message, if any.
              -> LocalNodeConnectInfo CardanoMode  -- ^ The connection info for the local node.
@@ -82,6 +84,7 @@ deleteOracle oldData =
 
 
 -- | Submit the transaction to write new data to an oracle.
+-- FIXME: Document UTxO assumptions.
 writeOracle :: A.Value                          -- ^ The datum currently held in the script. 
             -> A.Value                          -- ^ The new datum.                              
             -> Maybe Word64                     -- ^ The metadata key for the new datum, if any.
@@ -133,12 +136,15 @@ operateOracle action oldData newData metadataKey message connection network orac
                        . metadataFromJson TxMetadataJsonNoSchema
                        . A.Object
                        $ H.fromList metadata'
+    -- FIXME: Report error if assumptions do not hold.
     [(datumTxIn, TxOut _ (TxOutValue _ datumValue) _)] <-
       findUTxO connection (maybe controlAddress (const scriptAddress) oldData)
         $ \value -> selectAsset value datumAsset > 0
+    -- FIXME: Report error if assumptions do not hold.
     [(controlTxIn, TxOut _ (TxOutValue _ controlValue) _)] <-
       findUTxO connection controlAddress
         $ \value -> selectAsset value controlAsset > 0
+    -- FIXME: Report error if assumptions do not hold.
     plainUTxOs@((collateralTxIn, _) : _) <-
       findUTxO connection controlAddress
         $ \value -> length (valueToList value) == 1
