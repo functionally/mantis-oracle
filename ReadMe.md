@@ -199,7 +199,7 @@ In this example, record that we have:
 
 First, learn about the `create` command:
 
-    $ cabal run exe:mantis-oracle -- create --help
+    $ mantis-oracle -- create --help
     
     Usage: mantis-oracle create CONFIG_FILE
                                   SIGNING_ADDRESS
@@ -306,7 +306,7 @@ In this example, record that we have:
 
 First, learn about the `write` command:
 
-    $ cabal run exe:mantis-oracle -- write --help
+    $ mantis-oracle -- write --help
     
     Usage: mantis-oracle write CONFIG_FILE
                                  SIGNING_ADDRESS
@@ -370,7 +370,7 @@ The datum hash in the eUTxO will match the hash for the new file:
 
 First, learn about the `delete` command:
 
-    $ cabal run exe:mantis-oracle -- delete --help
+    $ mantis-oracle -- delete --help
     
     Usage: mantis-oracle delete CONFIG_FILE
                                   SIGNING_ADDRESS
