@@ -5,3 +5,7 @@ tmp/
 week06/
 dist-newstyle/
 *.cid
+*.address
+*.skey
+*.vkey
+*-service/
