@@ -68,7 +68,7 @@ This example assumes the following:
 *   Version 1.29.0-rc2 of `cardano-node` and the bundled version of `cardano-cli`.
 *   `alonzo-purple.payment-0.address` contains the address of a wallet funded with test ADA.
 *   `alonzo-purple.payment-0.skey` contains the corresponding signing key for the above address.
-*   `alonzo-purple.payment-0.skey` contains the corresponding verification key for the above address.
+*   `alonzo-purple.payment-0.vkey` contains the corresponding verification key for the above address.
 *   `alonzo-purple.payment-1.address` contains the address of a (possibly empty) address for use in the example.
 *   `alonzo-purple.payment-1.skey` contains the corresponding signing key for the above address.
 *   The control token for the oracle is named `tBRIO`.
