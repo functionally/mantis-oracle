@@ -1,7 +1,7 @@
 A General-Purpose Token-Based Oracle for Cardano
 ================================================
 
-This Cardano oracle reports structured data (namely, the `PlutuxTx.Data` type) to a transaction if the fee, as a quantity of a fungible token, is paid. It can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic.
+This Cardano oracle reports structured data (namely, the `PlutuxTx.BuiltinData` type) to a transaction if the fee, as a quantity of a fungible token, is paid. It can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic.
 
 
 Parameters
@@ -221,7 +221,7 @@ First, learn about the `create` command:
       --lovelace INTEGER       The minimum Lovelace for outputs.
       -h,--help                Show this help text
 
-We create the oracle with the example datum in [example-datum-0.json](example-datum-0.json). Note that the datum may be any JSON that can be serialized to CBOR.
+We create the oracle with the example datum in [example-data-0.json](example-data-0.json). Note that the datum may be any JSON that can be serialized to CBOR.
 
     mantis-oracle create alonzo-purple.mantis-oracle     \
                   $(cat alonzo-purple.payment-1.address) \
@@ -330,7 +330,7 @@ First, learn about the `write` command:
       --lovelace INTEGER       The minimum Lovelace for outputs.
       -h,--help                Show this help text
 
-We replace the oracle's datum from [example-datum-0.json](example-datum-0.json) with new data in [example-datum-1.json](example-datum-1.json).
+We replace the oracle's datum from [example-data-0.json](example-data-0.json) with new data in [example-data-1.json](example-data-1.json).
 
     mantis-oracle write alonzo-purple.mantis-oracle      \
                   $(cat alonzo-purple.payment-1.address) \
@@ -390,7 +390,7 @@ First, learn about the `delete` command:
       --lovelace INTEGER       The minimum Lovelace for outputs.
       -h,--help                Show this help text
 
-We delete the oracle with the example datum in [example-datum-1.json](example-datum-1.json).
+We delete the oracle with the example datum in [example-data-1.json](example-data-1.json).
 
     mantis-oracle delete alonzo-purple.mantis-oracle     \
                   $(cat alonzo-purple.payment-1.address) \
