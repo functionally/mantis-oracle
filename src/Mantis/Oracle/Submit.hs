@@ -136,25 +136,31 @@ operateOracle action oldData newData metadataKey message connection network orac
                        $ H.fromList metadata'
     datumUTxOs <-
       findUTxO connection (maybe controlAddress (const scriptAddress) oldData)
-        $ \value -> selectAsset value datumAsset > 0
+        $ \value -> selectAsset value datumAsset == 1
     (datumTxIn, datumValue) <-
       case datumUTxOs of
-        [(datumTxIn, TxOut _ (TxOutValue _ datumValue) _)] -> return (datumTxIn, datumValue)
-        _                                                  -> throwError "Datum eUTxO not found."
+        (datumTxIn, TxOut _ (TxOutValue _ datumValue) _) : _ -> return (datumTxIn, datumValue)
+        _                                                    -> throwError
+                                                                  $ "UTxO with single datum token not found: "
+                                                                  ++ show datumUTxOs
     controlUTxOs <-
       findUTxO connection controlAddress
-        $ \value -> selectAsset value controlAsset > 0
+        $ \value -> selectAsset value controlAsset == 1
     (controlTxIn, controlValue) <-
       case controlUTxOs of
-        [(controlTxIn, TxOut _ (TxOutValue _ controlValue) _)] -> return (controlTxIn, controlValue)
-        _                                                      -> throwError "Control eUTxO not found."
+        (controlTxIn, TxOut _ (TxOutValue _ controlValue) _) : _ -> return (controlTxIn, controlValue)
+        _                                                        -> throwError
+                                                                      $ "UTxO with single control token not found: "
+                                                                      ++ show controlUTxOs
     plainUTxOs <-
       findUTxO connection controlAddress
         $ \value -> length (valueToList value) == 1
     collateralTxIn <-
       case plainUTxOs of
-        ((collateralTxIn, _) : _) -> return collateralTxIn
-        _                         -> throwError "Collateral UTxO not found."
+        (collateralTxIn, _) : _ -> return collateralTxIn
+        _                       -> throwError
+                                     $ "UTxO with no tokens not found: "
+                                     ++ show plainUTxOs
     let
       total =
            datumValue
