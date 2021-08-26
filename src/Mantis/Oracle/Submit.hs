@@ -19,6 +19,7 @@
 
 
 module Mantis.Oracle.Submit (
+-- * Operations
   createOracle
 , deleteOracle
 , writeOracle
@@ -45,7 +46,7 @@ import qualified Data.Text           as T
 import qualified PlutusTx.Prelude    as P
 
 
--- | Submit the transaction to create an oracle.
+-- | Submit the transaction to create an oracle. The payment address must have *separate* eUTxOs containing the datum token and the control token; it also must have at least one other UTxO containing no tokens.
 createOracle :: A.Value                          -- ^ The initial datum.
              -> Maybe Word64                     -- ^ The metadata key for the initial datum, if any.
              -> Maybe A.Value                    -- ^ The metadata message, if any.
@@ -63,7 +64,7 @@ createOracle newData =
     (Just newData)
 
 
--- | Submit the transaction to delete an oracle.
+-- | Submit the transaction to delete an oracle. The payment address must have an eUTxO containing the control token; it also must have at least one other UTxO containing no tokens.
 deleteOracle :: A.Value                           -- ^ The datum currently held in the script.
              -> Maybe A.Value                     -- ^ The metadata message, if any.
              -> LocalNodeConnectInfo CardanoMode  -- ^ The connection info for the local node.
@@ -81,7 +82,7 @@ deleteOracle oldData =
     Nothing
 
 
--- | Submit the transaction to write new data to an oracle.
+-- | Submit the transaction to write new data to an oracle. The payment address must have an eUTxO containing the control token; it also must have at least one other UTxO containing no tokens.
 writeOracle :: A.Value                          -- ^ The datum currently held in the script. 
             -> A.Value                          -- ^ The new datum.                              
             -> Maybe Word64                     -- ^ The metadata key for the new datum, if any.
@@ -133,15 +134,33 @@ operateOracle action oldData newData metadataKey message connection network orac
                        . metadataFromJson TxMetadataJsonNoSchema
                        . A.Object
                        $ H.fromList metadata'
-    [(datumTxIn, TxOut _ (TxOutValue _ datumValue) _)] <-
+    datumUTxOs <-
       findUTxO connection (maybe controlAddress (const scriptAddress) oldData)
-        $ \value -> selectAsset value datumAsset > 0
-    [(controlTxIn, TxOut _ (TxOutValue _ controlValue) _)] <-
+        $ \value -> selectAsset value datumAsset == 1
+    (datumTxIn, datumValue) <-
+      case datumUTxOs of
+        (datumTxIn, TxOut _ (TxOutValue _ datumValue) _) : _ -> return (datumTxIn, datumValue)
+        _                                                    -> throwError
+                                                                  $ "UTxO with single datum token not found: "
+                                                                  ++ show datumUTxOs
+    controlUTxOs <-
       findUTxO connection controlAddress
-        $ \value -> selectAsset value controlAsset > 0
-    plainUTxOs@((collateralTxIn, _) : _) <-
+        $ \value -> selectAsset value controlAsset == 1
+    (controlTxIn, controlValue) <-
+      case controlUTxOs of
+        (controlTxIn, TxOut _ (TxOutValue _ controlValue) _) : _ -> return (controlTxIn, controlValue)
+        _                                                        -> throwError
+                                                                      $ "UTxO with single control token not found: "
+                                                                      ++ show controlUTxOs
+    plainUTxOs <-
       findUTxO connection controlAddress
         $ \value -> length (valueToList value) == 1
+    collateralTxIn <-
+      case plainUTxOs of
+        (collateralTxIn, _) : _ -> return collateralTxIn
+        _                       -> throwError
+                                     $ "UTxO with no tokens not found: "
+                                     ++ show plainUTxOs
     let
       total =
            datumValue
