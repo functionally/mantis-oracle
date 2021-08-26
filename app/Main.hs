@@ -308,7 +308,7 @@ main =
                   lovelaceAmount
           -- Read the signing address.
           signingAddress' <-
-            foistMantisMaybe "Failed to read signing address"
+            foistMantisMaybe "Failed to parse signing address"
               . deserialiseAddress AsAddressAny
               . T.pack
               $ signingAddress command
@@ -321,7 +321,7 @@ main =
           message <-
             maybe
               (return Nothing)
-              (foistMantisMaybeIO "Failed reading message." . A.decodeFileStrict)
+              (foistMantisMaybeIO "Failed reading message JSON." . A.decodeFileStrict)
               $ messageFile command
           -- Operate the oracle.
           op
@@ -350,7 +350,7 @@ main =
       Create{..}   -> run
                         $ do
                           newData <-
-                            foistMantisMaybeIO "Failed reading new data."
+                            foistMantisMaybeIO "Failed reading new data JSON."
                               . A.decodeFileStrict
                               $ newDataFile
                           operate
@@ -360,7 +360,7 @@ main =
       Delete{..}   -> run
                         $ do
                           oldData <-
-                            foistMantisMaybeIO "Failed reading old data."
+                            foistMantisMaybeIO "Failed reading old data JSON."
                               . A.decodeFileStrict
                               $ oldDataFile
                           operate
@@ -369,11 +369,11 @@ main =
       Write{..}    -> run
                         $ do
                           oldData <-
-                            foistMantisMaybeIO "Failed reading old data."
+                            foistMantisMaybeIO "Failed reading old data JSON."
                               . A.decodeFileStrict
                               $ oldDataFile
                           newData <-
-                            foistMantisMaybeIO "Failed reading new data."
+                            foistMantisMaybeIO "Failed reading new data JSON."
                               . A.decodeFileStrict
                               $ newDataFile
                           operate
