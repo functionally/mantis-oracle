@@ -152,29 +152,6 @@ makeValidator Oracle{..} _ redeemer context@ScriptContext{..} =
       Delete  -> deleting && controlled
       Read    -> singleDatum  && unchangedDatum && feePaid
       Write   -> singleDatum  && controlled  && datumPresent
-      Debug i -> if i == -1
-                   then datumTokenInput
-                   else if i == -2
-                     then datumTokenOutput
-                     else if i == -3
-                       then singleDatum
-                       else if i == -4
-                         then isJust inputDatumHash
-                         else if i == -5
-                           then datumPresent
-                           else if i == -6
-                             then unchangedDatum
-                             else if i == -7
-                               then signedByControl
-                               else if i == -8
-                                 then noScriptControl
-                                 else if i == -9
-                                   then controlled
-                                   else if i == -10
-                                     then deleting
-                                     else if i == -11
-                                       then feePaid
-                                       else False
 
 
 -- | Type for the script.

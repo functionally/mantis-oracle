@@ -88,7 +88,6 @@ data Action =
     Delete        -- ^ Delete (close) the oracle.
   | Read          -- ^ Read the oracle's datum.
   | Write         -- ^ Set or update the oracle's datum.
-  | Debug Integer -- ^ Reserved for debugging the validator.
     deriving Haskell.Show
 
 -- FIXME: Temporarily map actions to integers, in order to accommodate Alonzo Purple.
@@ -100,10 +99,9 @@ instance Enum Action where
   fromEnum Delete    = 0
   fromEnum Read      = 1
   fromEnum Write     = 2
-  fromEnum (Debug i) = i
   toEnum i
     | i == 0    = Delete
     | i == 1    = Read
     | i == 2    = Write
-    | otherwise = Debug i
+    | otherwise = error ()
 #endif
