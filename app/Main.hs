@@ -87,9 +87,10 @@ data Command =
     , signingAddress :: String
     , signingKeyFile :: FilePath
     , newDataFile    :: FilePath
+    , maxCollateral  :: Maybe Integer
     , metadataKey    :: Maybe Word64
     , messageFile    :: Maybe FilePath
-    , minLovelace    :: Maybe Integer
+    , scriptLovelace :: Maybe Integer
     }
   | Delete
     {
@@ -97,8 +98,9 @@ data Command =
     , signingAddress :: String
     , signingKeyFile :: FilePath
     , oldDataFile    :: FilePath
+    , maxCollateral  :: Maybe Integer
     , messageFile    :: Maybe FilePath
-    , minLovelace    :: Maybe Integer
+    , scriptLovelace :: Maybe Integer
     }
   | Write
     {
@@ -107,9 +109,10 @@ data Command =
     , signingKeyFile :: FilePath
     , oldDataFile    :: FilePath
     , newDataFile    :: FilePath
+    , maxCollateral  :: Maybe Integer
     , metadataKey    :: Maybe Word64
     , messageFile    :: Maybe FilePath
-    , minLovelace    :: Maybe Integer
+    , scriptLovelace :: Maybe Integer
     }
 #if USE_PAB
   | Test
@@ -175,43 +178,46 @@ main =
                       O.info
                         (
                           Create
-                            <$> O.strArgument               (                      O.metavar "CONFIG_FILE"     <> O.help "The configuration file."                    )
-                            <*> O.strArgument               (                      O.metavar "SIGNING_ADDRESS" <> O.help "The address for the signing key."           )
-                            <*> O.strArgument               (                      O.metavar "SIGNING_FILE"    <> O.help "The signing key file."                      )
-                            <*> O.strArgument               (                      O.metavar "NEW_JSON_FILE"   <> O.help "The JSON file for the new oracle data."     )
-                            <*> O.optional (O.option O.auto $ O.long "metadata" <> O.metavar "INTEGER"         <> O.help "The metadata key for the oracle data."      )
-                            <*> O.optional (O.strOption     $ O.long "message"  <> O.metavar "JSON_FILE"       <> O.help "The JSON file for the message metadata."    )
-                            <*> O.optional (O.option O.auto $ O.long "lovelace" <> O.metavar "INTEGER"         <> O.help "The minimum Lovelace for outputs."          )
+                            <$> O.strArgument               (                        O.metavar "CONFIG_FILE"     <> O.help "The configuration file."                    )
+                            <*> O.strArgument               (                        O.metavar "SIGNING_ADDRESS" <> O.help "The address for the signing key."           )
+                            <*> O.strArgument               (                        O.metavar "SIGNING_FILE"    <> O.help "The signing key file."                      )
+                            <*> O.strArgument               (                        O.metavar "NEW_JSON_FILE"   <> O.help "The JSON file for the new oracle data."     )
+                            <*> O.optional (O.option O.auto $ O.long "collateral" <> O.metavar "LOVELACE"        <> O.help "The maximum collateral for the transaction.")
+                            <*> O.optional (O.option O.auto $ O.long "metadata"   <> O.metavar "INTEGER"         <> O.help "The metadata key for the oracle data."      )
+                            <*> O.optional (O.strOption     $ O.long "message"    <> O.metavar "JSON_FILE"       <> O.help "The JSON file for the message metadata."    )
+                            <*> O.optional (O.option O.auto $ O.long "lovelace"   <> O.metavar "LOVELACE"        <> O.help "The value to be sent to the script."        )
                         )
-                        $ O.progDesc "Write a value to the oracle."
+                        $ O.progDesc "Create the oracle."
                     )
                  <> O.command "delete"
                     (
                       O.info
                         (
                           Delete
-                            <$> O.strArgument               (                      O.metavar "CONFIG_FILE"     <> O.help "The configuration file."                    )
-                            <*> O.strArgument               (                      O.metavar "SIGNING_ADDRESS" <> O.help "The address for the signing key."           )
-                            <*> O.strArgument               (                      O.metavar "SIGNING_FILE"    <> O.help "The signing key file."                      )
-                            <*> O.strArgument               (                      O.metavar "OLD_JSON_FILE"   <> O.help "The JSON file for the existing oracle data.")
-                            <*> O.optional (O.strOption     $ O.long "message"  <> O.metavar "JSON_FILE"       <> O.help "The JSON file for the message metadata."    )
-                            <*> O.optional (O.option O.auto $ O.long "lovelace" <> O.metavar "INTEGER"         <> O.help "The minimum Lovelace for outputs."          )
+                            <$> O.strArgument               (                        O.metavar "CONFIG_FILE"     <> O.help "The configuration file."                    )
+                            <*> O.strArgument               (                        O.metavar "SIGNING_ADDRESS" <> O.help "The address for the signing key."           )
+                            <*> O.strArgument               (                        O.metavar "SIGNING_FILE"    <> O.help "The signing key file."                      )
+                            <*> O.strArgument               (                        O.metavar "OLD_JSON_FILE"   <> O.help "The JSON file for the existing oracle data.")
+                            <*> O.optional (O.option O.auto $ O.long "collateral" <> O.metavar "LOVELACE"        <> O.help "The maximum collateral for the transaction.")
+                            <*> O.optional (O.strOption     $ O.long "message"    <> O.metavar "JSON_FILE"       <> O.help "The JSON file for the message metadata."    )
+                            <*> O.optional (O.option O.auto $ O.long "lovelace"   <> O.metavar "LOVELACE"        <> O.help "The value to be sent to the script."        )
                         )
-                        $ O.progDesc "Write a value to the oracle."
+                        $ O.progDesc "Delete the oracle."
                     )
                  <> O.command "write"
                     (
                       O.info
                         (
                           Write
-                            <$> O.strArgument               (                      O.metavar "CONFIG_FILE"     <> O.help "The configuration file."                    )
-                            <*> O.strArgument               (                      O.metavar "SIGNING_ADDRESS" <> O.help "The address for the signing key."           )
-                            <*> O.strArgument               (                      O.metavar "SIGNING_FILE"    <> O.help "The signing key file."                      )
-                            <*> O.strArgument               (                      O.metavar "OLD_JSON_FILE"   <> O.help "The JSON file for the existing oracle data.")
-                            <*> O.strArgument               (                      O.metavar "NEW_JSON_FILE"   <> O.help "The JSON file for the new oracle data."     )
-                            <*> O.optional (O.option O.auto $ O.long "metadata" <> O.metavar "INTEGER"         <> O.help "The metadata key for the oracle data."      )
-                            <*> O.optional (O.strOption     $ O.long "message"  <> O.metavar "JSON_FILE"       <> O.help "The JSON file for the message metadata."    )
-                            <*> O.optional (O.option O.auto $ O.long "lovelace" <> O.metavar "INTEGER"         <> O.help "The minimum Lovelace for outputs."          )
+                            <$> O.strArgument               (                        O.metavar "CONFIG_FILE"     <> O.help "The configuration file."                    )
+                            <*> O.strArgument               (                        O.metavar "SIGNING_ADDRESS" <> O.help "The address for the signing key."           )
+                            <*> O.strArgument               (                        O.metavar "SIGNING_FILE"    <> O.help "The signing key file."                      )
+                            <*> O.strArgument               (                        O.metavar "OLD_JSON_FILE"   <> O.help "The JSON file for the existing oracle data.")
+                            <*> O.strArgument               (                        O.metavar "NEW_JSON_FILE"   <> O.help "The JSON file for the new oracle data."     )
+                            <*> O.optional (O.option O.auto $ O.long "collateral" <> O.metavar "LOVELACE"        <> O.help "The maximum collateral for the transaction.")
+                            <*> O.optional (O.option O.auto $ O.long "metadata"   <> O.metavar "INTEGER"         <> O.help "The metadata key for the oracle data."      )
+                            <*> O.optional (O.strOption     $ O.long "message"    <> O.metavar "JSON_FILE"       <> O.help "The JSON file for the message metadata."    )
+                            <*> O.optional (O.option O.auto $ O.long "lovelace"   <> O.metavar "LOVELACE"        <> O.help "The value to be sent to the script."        )
                         )
                         $ O.progDesc "Write a value to the oracle."
                     )
@@ -331,7 +337,8 @@ main =
             oracle
             signingAddress'
             signingKey
-            (maybe 5_000_000 Quantity $ minLovelace command)
+            (maybe 2_000_000 (quantityToLovelace . Quantity) $ maxCollateral  command)
+            (maybe 5_000_000                       Quantity  $ scriptLovelace command)
     case command of
       Export{..}   -> do
                         Configuration{..} <- read <$> readFile configFile
@@ -417,6 +424,6 @@ readAssetClass text =
     Right currency = fmap P.toBuiltin . Base16.decode . BS.pack $ takeWhile (/= '.') text
     name           = fromString . tail $ dropWhile (/= '.') text
   in
-    assetClass 
+    assetClass
       (CurrencySymbol currency)
       (TokenName      name    )
