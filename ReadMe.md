@@ -231,11 +231,13 @@ We create the oracle with the example datum in [example-data-0.json](example-dat
 Wait until the transaction is recorded on the blockchain and look at the eUTxOs:
 
     $ cardano-cli query utxo $MAGIC --address $ADDRESS_S
+    
                                TxHash                                 TxIx        Amount
     --------------------------------------------------------------------------------------
     91a72627f4cfeb4aa289f5ef8be6c788777891052b1f9d5034b88d4238d43d67     1        5000000 lovelace + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tSOFR + TxOutDatumHash ScriptDataInAlonzoEra "27f7dc5d54a5a5cfa25f75f200f62f5a3decce6ca05f4497ce3123d8b3f682ad"
     
     $ cardano-cli query utxo $MAGIC --address $ADDRESS_1
+    
                                TxHash                                 TxIx        Amount
     --------------------------------------------------------------------------------------
     65748b659a06c5284ca931614a079d0b222ae3f2637991c336ec4402072d7e33     2        100000000 lovelace + 1000 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + TxOutDatumHashNone
@@ -288,6 +290,7 @@ Wait until the transaction is recorded on the blockchain and look at the eUTxOs:
     43ac8560e968c4141f223533962a4bf3980847f81a1142256c37b6b379f05acf     1        5000000 lovelace + 5 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY + 1 13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tSOFR + TxOutDatumHash ScriptDataInAlonzoEra "27f7dc5d54a5a5cfa25f75f200f62f5a3decce6ca05f4497ce3123d8b3f682ad"
     
     $ cardano-cli query utxo $MAGIC --address $ADDRESS_1
+    
                                TxHash                                 TxIx        Amount
     --------------------------------------------------------------------------------------
     43ac8560e968c4141f223533962a4bf3980847f81a1142256c37b6b379f05acf     0        94319051 lovelace + TxOutDatumHashNone
@@ -431,7 +434,7 @@ We can burn the test tokens and collect the remaining test ADA from this example
       --tx-in $TXID_5#2 \
       --change-address $ADDRESS_0 \
       --mint "-1000 $CURRENCY.tPIGY+-1 $CURRENCY.tSOFR+-1 $CURRENCY.tBRIO" \
-      --mint-script-file policy-0.script \
+      --mint-script-file alonzo-purple.policy-0.script \
       --out-file tx.raw
     
     cardano-cli transaction sign $MAGIC \
