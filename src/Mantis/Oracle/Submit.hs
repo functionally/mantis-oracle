@@ -304,7 +304,7 @@ build action connection script scriptAddress controlAddress (datumTxIn,  datumVa
       txCertificates    = TxCertificatesNone
       txUpdateProposal  = TxUpdateProposalNone
       txMintValue       = TxMintNone
-      txScriptValidity  = BuildTxWith TxScriptValidityNone 
+      txScriptValidity  = TxScriptValidityNone 
     foistMantisEither
       $ makeTransactionBodyAutoBalance
           AlonzoEraInCardanoMode
