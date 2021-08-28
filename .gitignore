@@ -2,10 +2,13 @@ tmp/
 *.tmp
 *.log
 *.sw?
-week06/
 dist-newstyle/
 *.cid
 *.address
 *.skey
 *.vkey
+*.plutus
+*.script
+*.protocol
+tx.*
 *-service/
