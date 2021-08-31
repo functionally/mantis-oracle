@@ -58,9 +58,9 @@ test-show-details: direct
 
 source-repository-package
   type: git
-  location: https://bitbucket.org/functionally/mantis.git
-  tag: 821e389711c368629409038bd8cb487b5eadc39e
-  --sha256: 12xm7yk3lrr698zs09h2pz7k9mwb2r07ib1iljzcdxb85mx7jdir
+  location: https://bitbucket.org/functionally/mantra.git
+  tag: 5f9c955a6350d2264c12fc799b63af90fc694e07
+  --sha256: 1a62ivy6xhhmrafk0y8pyvpdbwab0hf796md0y5fmcx9l91qcphn
 
 source-repository-package
   type: git

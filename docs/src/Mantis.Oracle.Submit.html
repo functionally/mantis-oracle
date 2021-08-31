@@ -18,11 +18,11 @@
 </span><span id="line-18"></span><span class="hs-pragma">{-# LANGUAGE TupleSections     #-}</span><span>
 </span><span id="line-19"></span><span>
 </span><span id="line-20"></span><span>
-</span><span id="line-21"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Mantis.Oracle.Submit</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Mantra.Oracle.Submit</span><span> </span><span class="hs-special">(</span><span>
 </span><span id="line-22"></span><span class="annot"><span class="hs-comment">-- * Operations</span></span><span>
-</span><span id="line-23"></span><span>  </span><span class="annot"><a href="Mantis.Oracle.Submit.html#createOracle"><span class="hs-identifier">createOracle</span></a></span><span>
-</span><span id="line-24"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Submit.html#deleteOracle"><span class="hs-identifier">deleteOracle</span></a></span><span>
-</span><span id="line-25"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Submit.html#writeOracle"><span class="hs-identifier">writeOracle</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="annot"><a href="Mantra.Oracle.Submit.html#createOracle"><span class="hs-identifier">createOracle</span></a></span><span>
+</span><span id="line-24"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantra.Oracle.Submit.html#deleteOracle"><span class="hs-identifier">deleteOracle</span></a></span><span>
+</span><span id="line-25"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantra.Oracle.Submit.html#writeOracle"><span class="hs-identifier">writeOracle</span></a></span><span>
 </span><span id="line-26"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-27"></span><span>
 </span><span id="line-28"></span><span>
@@ -32,9 +32,9 @@
 </span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span>                                        </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">catMaybes</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">fromJust</span></span><span class="hs-special">)</span><span>
 </span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Word</span></span><span>                                         </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Word64</span></span><span class="hs-special">)</span><span>
 </span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ledger.Value</span></span><span>                                      </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">AssetClass</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">CurrencySymbol</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">TokenName</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Mantis.Oracle.html"><span class="hs-identifier">Mantis.Oracle</span></a></span><span>                                     </span><span class="hs-special">(</span><span class="annot"><a href="Mantis.Oracle.html#oracleAddress"><span class="hs-identifier">oracleAddress</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#plutusOracle"><span class="hs-identifier">plutusOracle</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html"><span class="hs-identifier">Mantis.Oracle.Types</span></a></span><span>                               </span><span class="hs-special">(</span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier">Action</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier">Oracle</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
-</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Mantis.Types</span></span><span>                                      </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">MantisM</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">foistMantisEither</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">foistMantisEitherIO</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">foistMantisMaybe</span></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Mantra.Oracle.html"><span class="hs-identifier">Mantra.Oracle</span></a></span><span>                                     </span><span class="hs-special">(</span><span class="annot"><a href="Mantra.Oracle.html#oracleAddress"><span class="hs-identifier">oracleAddress</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantra.Oracle.html#plutusOracle"><span class="hs-identifier">plutusOracle</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html"><span class="hs-identifier">Mantra.Oracle.Types</span></a></span><span>                               </span><span class="hs-special">(</span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier">Action</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier">Oracle</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Mantra.Types</span></span><span>                                      </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">MantraM</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">foistMantraEither</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">foistMantraEitherIO</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">foistMantraMaybe</span></span><span class="hs-special">)</span><span>
 </span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ouroboros.Network.Protocol.LocalTxSubmission.Type</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">SubmitResult</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">PlutusTx.Builtins</span></span><span>                                 </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">fromBuiltin</span></span><span class="hs-special">)</span><span>
 </span><span id="line-40"></span><span>
@@ -47,16 +47,16 @@
 </span><span id="line-47"></span><span>
 </span><span id="line-48"></span><span>
 </span><span id="line-49"></span><span class="hs-comment">-- | Submit the transaction to create an oracle. The payment address must have *separate* eUTxOs containing the datum token and the control token; it also must have at least one other UTxO containing no tokens.</span><span>
-</span><span id="line-50"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#createOracle"><span class="hs-identifier hs-type">createOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                          </span><span class="hs-comment">-- ^ The initial datum.</span><span>
+</span><span id="line-50"></span><span class="annot"><a href="Mantra.Oracle.Submit.html#createOracle"><span class="hs-identifier hs-type">createOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                          </span><span class="hs-comment">-- ^ The initial datum.</span><span>
 </span><span id="line-51"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Word64</span></span><span>                     </span><span class="hs-comment">-- ^ The metadata key for the initial datum, if any.</span><span>
 </span><span id="line-52"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                    </span><span class="hs-comment">-- ^ The metadata message, if any.</span><span>
 </span><span id="line-53"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span> </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
 </span><span id="line-54"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NetworkId</span></span><span>                        </span><span class="hs-comment">-- ^ The network identifier.</span><span>
-</span><span id="line-55"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                           </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-55"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                           </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-56"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span>                       </span><span class="hs-comment">-- ^ The payment address.</span><span>
 </span><span id="line-57"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SigningKey</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PaymentKey</span></span><span>            </span><span class="hs-comment">-- ^ The signing key for the payment address.</span><span>
 </span><span id="line-58"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Quantity</span></span><span>                         </span><span class="hs-comment">-- ^ The Lovelace to be sent to the script.</span><span>
-</span><span id="line-59"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                  </span><span class="hs-comment">-- ^ Action to submit the creation transaction.</span><span>
+</span><span id="line-59"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantraM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                  </span><span class="hs-comment">-- ^ Action to submit the creation transaction.</span><span>
 </span><span id="line-60"></span><span id="createOracle"><span class="annot"><span class="annottext">createOracle :: Value
 -&gt; Maybe Word64
 -&gt; Maybe Value
@@ -66,8 +66,8 @@
 -&gt; AddressAny
 -&gt; SigningKey PaymentKey
 -&gt; Quantity
--&gt; MantisM IO TxId
-</span><a href="Mantis.Oracle.Submit.html#createOracle"><span class="hs-identifier hs-var hs-var">createOracle</span></a></span></span><span> </span><span id="local-6989586621679283137"><span class="annot"><span class="annottext">Value
+-&gt; MantraM IO TxId
+</span><a href="Mantra.Oracle.Submit.html#createOracle"><span class="hs-identifier hs-var hs-var">createOracle</span></a></span></span><span> </span><span id="local-6989586621679283137"><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679283137"><span class="hs-identifier hs-var">newData</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-61"></span><span>  </span><span class="annot"><span class="annottext">Maybe Action
 -&gt; Maybe Value
@@ -80,8 +80,8 @@
 -&gt; AddressAny
 -&gt; SigningKey PaymentKey
 -&gt; Quantity
--&gt; MantisM IO TxId
-</span><a href="Mantis.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-var">operateOracle</span></a></span><span>
+-&gt; MantraM IO TxId
+</span><a href="Mantra.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-var">operateOracle</span></a></span><span>
 </span><span id="line-62"></span><span>    </span><span class="annot"><span class="annottext">Maybe Action
 forall a. Maybe a
 </span><span class="hs-identifier hs-var">Nothing</span></span><span>
@@ -95,15 +95,15 @@ forall a. a -&gt; Maybe a
 </span><span id="line-65"></span><span>
 </span><span id="line-66"></span><span>
 </span><span id="line-67"></span><span class="hs-comment">-- | Submit the transaction to delete an oracle. The payment address must have an eUTxO containing the control token; it also must have at least one other UTxO containing no tokens.</span><span>
-</span><span id="line-68"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#deleteOracle"><span class="hs-identifier hs-type">deleteOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                           </span><span class="hs-comment">-- ^ The datum currently held in the script.</span><span>
+</span><span id="line-68"></span><span class="annot"><a href="Mantra.Oracle.Submit.html#deleteOracle"><span class="hs-identifier hs-type">deleteOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                           </span><span class="hs-comment">-- ^ The datum currently held in the script.</span><span>
 </span><span id="line-69"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                     </span><span class="hs-comment">-- ^ The metadata message, if any.</span><span>
 </span><span id="line-70"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span>  </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
 </span><span id="line-71"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NetworkId</span></span><span>                         </span><span class="hs-comment">-- ^ The network identifier.</span><span>
-</span><span id="line-72"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                            </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-72"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                            </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-73"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span>                        </span><span class="hs-comment">-- ^ The payment address.</span><span>
 </span><span id="line-74"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SigningKey</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PaymentKey</span></span><span>             </span><span class="hs-comment">-- ^ The signing key for the payment address.</span><span>
 </span><span id="line-75"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Quantity</span></span><span>                          </span><span class="hs-comment">-- ^ The Lovelace to be sent to the script.</span><span>
-</span><span id="line-76"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                   </span><span class="hs-comment">-- ^ Action to submit the deletion transaction.</span><span>
+</span><span id="line-76"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantraM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                   </span><span class="hs-comment">-- ^ Action to submit the deletion transaction.</span><span>
 </span><span id="line-77"></span><span id="deleteOracle"><span class="annot"><span class="annottext">deleteOracle :: Value
 -&gt; Maybe Value
 -&gt; LocalNodeConnectInfo CardanoMode
@@ -112,8 +112,8 @@ forall a. a -&gt; Maybe a
 -&gt; AddressAny
 -&gt; SigningKey PaymentKey
 -&gt; Quantity
--&gt; MantisM IO TxId
-</span><a href="Mantis.Oracle.Submit.html#deleteOracle"><span class="hs-identifier hs-var hs-var">deleteOracle</span></a></span></span><span> </span><span id="local-6989586621679283135"><span class="annot"><span class="annottext">Value
+-&gt; MantraM IO TxId
+</span><a href="Mantra.Oracle.Submit.html#deleteOracle"><span class="hs-identifier hs-var hs-var">deleteOracle</span></a></span></span><span> </span><span id="local-6989586621679283135"><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679283135"><span class="hs-identifier hs-var">oldData</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-78"></span><span>  </span><span class="annot"><span class="annottext">Maybe Action
 -&gt; Maybe Value
@@ -126,12 +126,12 @@ forall a. a -&gt; Maybe a
 -&gt; AddressAny
 -&gt; SigningKey PaymentKey
 -&gt; Quantity
--&gt; MantisM IO TxId
-</span><a href="Mantis.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-var">operateOracle</span></a></span><span>
+-&gt; MantraM IO TxId
+</span><a href="Mantra.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-var">operateOracle</span></a></span><span>
 </span><span id="line-79"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Action -&gt; Maybe Action
 forall a. a -&gt; Maybe a
 </span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Action
-</span><a href="Mantis.Oracle.Types.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span><span class="hs-special">)</span><span>
+</span><a href="Mantra.Oracle.Types.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-80"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Value -&gt; Maybe Value
 forall a. a -&gt; Maybe a
 </span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Value
@@ -145,17 +145,17 @@ forall a. Maybe a
 </span><span id="line-83"></span><span>
 </span><span id="line-84"></span><span>
 </span><span id="line-85"></span><span class="hs-comment">-- | Submit the transaction to write new data to an oracle. The payment address must have an eUTxO containing the control token; it also must have at least one other UTxO containing no tokens.</span><span>
-</span><span id="line-86"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#writeOracle"><span class="hs-identifier hs-type">writeOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                          </span><span class="hs-comment">-- ^ The datum currently held in the script. </span><span>
+</span><span id="line-86"></span><span class="annot"><a href="Mantra.Oracle.Submit.html#writeOracle"><span class="hs-identifier hs-type">writeOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                          </span><span class="hs-comment">-- ^ The datum currently held in the script. </span><span>
 </span><span id="line-87"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                          </span><span class="hs-comment">-- ^ The new datum.                              </span><span>
 </span><span id="line-88"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Word64</span></span><span>                     </span><span class="hs-comment">-- ^ The metadata key for the new datum, if any.</span><span>
 </span><span id="line-89"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                    </span><span class="hs-comment">-- ^ The metadata message, if any.              </span><span>
 </span><span id="line-90"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span> </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
 </span><span id="line-91"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NetworkId</span></span><span>                        </span><span class="hs-comment">-- ^ The network identifier.</span><span>
-</span><span id="line-92"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                           </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-92"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                           </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-93"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span>                       </span><span class="hs-comment">-- ^ The payment address.</span><span>
 </span><span id="line-94"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SigningKey</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PaymentKey</span></span><span>            </span><span class="hs-comment">-- ^ The signing key for the payment address.</span><span>
 </span><span id="line-95"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Quantity</span></span><span>                         </span><span class="hs-comment">-- ^ The Lovelace to be sent to the script.</span><span>
-</span><span id="line-96"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                  </span><span class="hs-comment">-- ^ Action to submit the writing transaction.</span><span>
+</span><span id="line-96"></span><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantraM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                  </span><span class="hs-comment">-- ^ Action to submit the writing transaction.</span><span>
 </span><span id="line-97"></span><span id="writeOracle"><span class="annot"><span class="annottext">writeOracle :: Value
 -&gt; Value
 -&gt; Maybe Word64
@@ -166,8 +166,8 @@ forall a. Maybe a
 -&gt; AddressAny
 -&gt; SigningKey PaymentKey
 -&gt; Quantity
--&gt; MantisM IO TxId
-</span><a href="Mantis.Oracle.Submit.html#writeOracle"><span class="hs-identifier hs-var hs-var">writeOracle</span></a></span></span><span> </span><span id="local-6989586621679283133"><span class="annot"><span class="annottext">Value
+-&gt; MantraM IO TxId
+</span><a href="Mantra.Oracle.Submit.html#writeOracle"><span class="hs-identifier hs-var hs-var">writeOracle</span></a></span></span><span> </span><span id="local-6989586621679283133"><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679283133"><span class="hs-identifier hs-var">oldData</span></a></span></span><span> </span><span id="local-6989586621679283132"><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679283132"><span class="hs-identifier hs-var">newData</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-98"></span><span>  </span><span class="annot"><span class="annottext">Maybe Action
@@ -181,12 +181,12 @@ forall a. Maybe a
 -&gt; AddressAny
 -&gt; SigningKey PaymentKey
 -&gt; Quantity
--&gt; MantisM IO TxId
-</span><a href="Mantis.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-var">operateOracle</span></a></span><span>
+-&gt; MantraM IO TxId
+</span><a href="Mantra.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-var">operateOracle</span></a></span><span>
 </span><span id="line-99"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Action -&gt; Maybe Action
 forall a. a -&gt; Maybe a
 </span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Action
-</span><a href="Mantis.Oracle.Types.html#Write"><span class="hs-identifier hs-var">Write</span></a></span><span class="hs-special">)</span><span>
+</span><a href="Mantra.Oracle.Types.html#Write"><span class="hs-identifier hs-var">Write</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-100"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Value -&gt; Maybe Value
 forall a. a -&gt; Maybe a
 </span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Value
@@ -198,18 +198,18 @@ forall a. a -&gt; Maybe a
 </span><span id="line-102"></span><span>
 </span><span id="line-103"></span><span>
 </span><span id="line-104"></span><span class="hs-comment">-- | Submit a transaction to operate the oracle.</span><span>
-</span><span id="line-105"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-type">operateOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>                     </span><span class="hs-comment">-- ^ The redeemer, if any.</span><span>
+</span><span id="line-105"></span><span class="annot"><a href="Mantra.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-type">operateOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>                     </span><span class="hs-comment">-- ^ The redeemer, if any.</span><span>
 </span><span id="line-106"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                    </span><span class="hs-comment">-- ^ The datum currently held in the script, if any.   </span><span>
 </span><span id="line-107"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                    </span><span class="hs-comment">-- ^ The new datum, if any.                         </span><span>
 </span><span id="line-108"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Word64</span></span><span>                     </span><span class="hs-comment">-- ^ The metadata key for the new datum, if any</span><span>
 </span><span id="line-109"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span>                    </span><span class="hs-comment">-- ^ The metadata message, if any.             </span><span>
 </span><span id="line-110"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span> </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
 </span><span id="line-111"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NetworkId</span></span><span>                        </span><span class="hs-comment">-- ^ The network identifier.          </span><span>
-</span><span id="line-112"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                           </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-112"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                           </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-113"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span>                       </span><span class="hs-comment">-- ^ The payment address.</span><span>
 </span><span id="line-114"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SigningKey</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PaymentKey</span></span><span>            </span><span class="hs-comment">-- ^ The signing key for the payment address.</span><span>
 </span><span id="line-115"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Quantity</span></span><span>                         </span><span class="hs-comment">-- ^ The Lovelace to be sent to the script.</span><span>
-</span><span id="line-116"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                  </span><span class="hs-comment">-- ^ Action to submit the deletion transaction.</span><span>
+</span><span id="line-116"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantraM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                  </span><span class="hs-comment">-- ^ Action to submit the deletion transaction.</span><span>
 </span><span id="line-117"></span><span id="operateOracle"><span class="annot"><span class="annottext">operateOracle :: Maybe Action
 -&gt; Maybe Value
 -&gt; Maybe Value
@@ -221,8 +221,8 @@ forall a. a -&gt; Maybe a
 -&gt; AddressAny
 -&gt; SigningKey PaymentKey
 -&gt; Quantity
--&gt; MantisM IO TxId
-</span><a href="Mantis.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-var hs-var">operateOracle</span></a></span></span><span> </span><span id="local-6989586621679283130"><span class="annot"><span class="annottext">Maybe Action
+-&gt; MantraM IO TxId
+</span><a href="Mantra.Oracle.Submit.html#operateOracle"><span class="hs-identifier hs-var hs-var">operateOracle</span></a></span></span><span> </span><span id="local-6989586621679283130"><span class="annot"><span class="annottext">Maybe Action
 </span><a href="#local-6989586621679283130"><span class="hs-identifier hs-var">action</span></a></span></span><span> </span><span id="local-6989586621679283129"><span class="annot"><span class="annottext">Maybe Value
 </span><a href="#local-6989586621679283129"><span class="hs-identifier hs-var">oldData</span></a></span></span><span> </span><span id="local-6989586621679283128"><span class="annot"><span class="annottext">Maybe Value
 </span><a href="#local-6989586621679283128"><span class="hs-identifier hs-var">newData</span></a></span></span><span> </span><span id="local-6989586621679283127"><span class="annot"><span class="annottext">Maybe Word64
@@ -238,11 +238,11 @@ forall a. a -&gt; Maybe a
 </span><span id="line-119"></span><span>    </span><span class="hs-keyword">let</span><span>
 </span><span id="line-120"></span><span>      </span><span id="local-6989586621679283119"><span class="annot"><span class="annottext">script :: PlutusScript PlutusScriptV1
 </span><a href="#local-6989586621679283119"><span class="hs-identifier hs-var hs-var">script</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; PlutusScript PlutusScriptV1
-</span><a href="Mantis.Oracle.html#plutusOracle"><span class="hs-identifier hs-var">plutusOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="Mantra.Oracle.html#plutusOracle"><span class="hs-identifier hs-var">plutusOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
 </span><a href="#local-6989586621679283123"><span class="hs-identifier hs-var">oracle</span></a></span><span>
 </span><span id="line-121"></span><span>      </span><span id="local-6989586621679283118"><span class="annot"><span class="annottext">scriptAddress :: AddressAny
 </span><a href="#local-6989586621679283118"><span class="hs-identifier hs-var hs-var">scriptAddress</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NetworkId -&gt; Oracle -&gt; AddressAny
-</span><a href="Mantis.Oracle.html#oracleAddress"><span class="hs-identifier hs-var">oracleAddress</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkId
+</span><a href="Mantra.Oracle.html#oracleAddress"><span class="hs-identifier hs-var">oracleAddress</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkId
 </span><a href="#local-6989586621679283124"><span class="hs-identifier hs-var">network</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
 </span><a href="#local-6989586621679283123"><span class="hs-identifier hs-var">oracle</span></a></span><span>
 </span><span id="line-122"></span><span>      </span><span id="local-6989586621679283117"><span class="annot"><span class="annottext">messageMetadata :: Maybe (Text, Value)
@@ -270,20 +270,20 @@ forall a. Show a =&gt; a -&gt; String
 </span><a href="#local-6989586621679283114"><span class="hs-identifier hs-var">metadataKey'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679283113"><span class="hs-identifier hs-var">newData'</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-127"></span><span>    </span><span id="local-6989586621679283110"><span class="annot"><span class="annottext">AssetId
-</span><a href="#local-6989586621679283110"><span class="hs-identifier hs-var">controlAsset</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">AssetClass -&gt; MantisM IO AssetId
-</span><a href="Mantis.Oracle.Submit.html#classToId"><span class="hs-identifier hs-var">classToId</span></a></span><span> </span><span class="annot"><span class="annottext">(AssetClass -&gt; MantisM IO AssetId)
--&gt; AssetClass -&gt; MantisM IO AssetId
+</span><a href="#local-6989586621679283110"><span class="hs-identifier hs-var">controlAsset</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">AssetClass -&gt; MantraM IO AssetId
+</span><a href="Mantra.Oracle.Submit.html#classToId"><span class="hs-identifier hs-var">classToId</span></a></span><span> </span><span class="annot"><span class="annottext">(AssetClass -&gt; MantraM IO AssetId)
+-&gt; AssetClass -&gt; MantraM IO AssetId
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; AssetClass
-</span><a href="Mantis.Oracle.Types.html#controlToken"><span class="hs-identifier hs-var hs-var">controlToken</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="Mantra.Oracle.Types.html#controlToken"><span class="hs-identifier hs-var hs-var">controlToken</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
 </span><a href="#local-6989586621679283123"><span class="hs-identifier hs-var">oracle</span></a></span><span>
 </span><span id="line-128"></span><span>    </span><span id="local-6989586621679283107"><span class="annot"><span class="annottext">AssetId
-</span><a href="#local-6989586621679283107"><span class="hs-identifier hs-var">datumAsset</span></a></span></span><span>   </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">AssetClass -&gt; MantisM IO AssetId
-</span><a href="Mantis.Oracle.Submit.html#classToId"><span class="hs-identifier hs-var">classToId</span></a></span><span> </span><span class="annot"><span class="annottext">(AssetClass -&gt; MantisM IO AssetId)
--&gt; AssetClass -&gt; MantisM IO AssetId
+</span><a href="#local-6989586621679283107"><span class="hs-identifier hs-var">datumAsset</span></a></span></span><span>   </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">AssetClass -&gt; MantraM IO AssetId
+</span><a href="Mantra.Oracle.Submit.html#classToId"><span class="hs-identifier hs-var">classToId</span></a></span><span> </span><span class="annot"><span class="annottext">(AssetClass -&gt; MantraM IO AssetId)
+-&gt; AssetClass -&gt; MantraM IO AssetId
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; AssetClass
-</span><a href="Mantis.Oracle.Types.html#datumToken"><span class="hs-identifier hs-var hs-var">datumToken</span></a></span><span>   </span><span class="annot"><span class="annottext">Oracle
+</span><a href="Mantra.Oracle.Types.html#datumToken"><span class="hs-identifier hs-var hs-var">datumToken</span></a></span><span>   </span><span class="annot"><span class="annottext">Oracle
 </span><a href="#local-6989586621679283123"><span class="hs-identifier hs-var">oracle</span></a></span><span>
 </span><span id="line-129"></span><span>    </span><span id="local-6989586621679283105"><span class="annot"><span class="annottext">Maybe TxMetadata
 </span><a href="#local-6989586621679283105"><span class="hs-identifier hs-var">metadata</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
@@ -292,23 +292,23 @@ forall a. [Maybe a] -&gt; [a]
 </span><span class="hs-identifier hs-var">catMaybes</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Maybe (Text, Value)
 </span><a href="#local-6989586621679283117"><span class="hs-identifier hs-var">messageMetadata</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Maybe (Text, Value)
 </span><a href="#local-6989586621679283115"><span class="hs-identifier hs-var">oracleMetadata</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-131"></span><span>        </span><span class="hs-special">[</span><span class="hs-special">]</span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe TxMetadata -&gt; MantisM IO (Maybe TxMetadata)
+</span><span id="line-131"></span><span>        </span><span class="hs-special">[</span><span class="hs-special">]</span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe TxMetadata -&gt; MantraM IO (Maybe TxMetadata)
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Maybe TxMetadata
 forall a. Maybe a
 </span><span class="hs-identifier hs-var">Nothing</span></span><span>
 </span><span id="line-132"></span><span>        </span><span id="local-6989586621679283104"><span class="annot"><span class="annottext">[(Text, Value)]
 </span><a href="#local-6989586621679283104"><span class="hs-identifier hs-var">metadata'</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Either TxMetadataJsonError (Maybe TxMetadata)
--&gt; MantisM IO (Maybe TxMetadata)
+-&gt; MantraM IO (Maybe TxMetadata)
 forall (m :: * -&gt; *) e a.
 (Monad m, Show e) =&gt;
-Either e a -&gt; MantisM m a
-</span><span class="hs-identifier hs-var">foistMantisEither</span></span><span>
+Either e a -&gt; MantraM m a
+</span><span class="hs-identifier hs-var">foistMantraEither</span></span><span>
 </span><span id="line-133"></span><span>                       </span><span class="annot"><span class="annottext">(Either TxMetadataJsonError (Maybe TxMetadata)
- -&gt; MantisM IO (Maybe TxMetadata))
+ -&gt; MantraM IO (Maybe TxMetadata))
 -&gt; (Object -&gt; Either TxMetadataJsonError (Maybe TxMetadata))
 -&gt; Object
--&gt; MantisM IO (Maybe TxMetadata)
+-&gt; MantraM IO (Maybe TxMetadata)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(TxMetadata -&gt; Maybe TxMetadata)
 -&gt; Either TxMetadataJsonError TxMetadata
@@ -334,8 +334,8 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Object -&gt; Value
 </span><span class="hs-identifier hs-var">A.Object</span></span><span>
-</span><span id="line-136"></span><span>                       </span><span class="annot"><span class="annottext">(Object -&gt; MantisM IO (Maybe TxMetadata))
--&gt; Object -&gt; MantisM IO (Maybe TxMetadata)
+</span><span id="line-136"></span><span>                       </span><span class="annot"><span class="annottext">(Object -&gt; MantraM IO (Maybe TxMetadata))
+-&gt; Object -&gt; MantraM IO (Maybe TxMetadata)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[(Text, Value)] -&gt; Object
 forall k v. (Eq k, Hashable k) =&gt; [(k, v)] -&gt; HashMap k v
@@ -346,8 +346,8 @@ forall k v. (Eq k, Hashable k) =&gt; [(k, v)] -&gt; HashMap k v
 </span><span id="line-138"></span><span>      </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 -&gt; AddressAny
 -&gt; (Value -&gt; Bool)
--&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
-</span><a href="Mantis.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-var">findUTxO</span></a></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; MantraM IO [(TxIn, TxOut AlonzoEra)]
+</span><a href="Mantra.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-var">findUTxO</span></a></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 </span><a href="#local-6989586621679283125"><span class="hs-identifier hs-var">connection</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">AddressAny -&gt; (Value -&gt; AddressAny) -&gt; Maybe Value -&gt; AddressAny
 forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
 </span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="annot"><span class="annottext">AddressAny
@@ -356,8 +356,8 @@ forall a b. a -&gt; b -&gt; a
 </span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">AddressAny
 </span><a href="#local-6989586621679283118"><span class="hs-identifier hs-var">scriptAddress</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Maybe Value
 </span><a href="#local-6989586621679283129"><span class="hs-identifier hs-var">oldData</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-139"></span><span>        </span><span class="annot"><span class="annottext">((Value -&gt; Bool) -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)])
--&gt; (Value -&gt; Bool) -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+</span><span id="line-139"></span><span>        </span><span class="annot"><span class="annottext">((Value -&gt; Bool) -&gt; MantraM IO [(TxIn, TxOut AlonzoEra)])
+-&gt; (Value -&gt; Bool) -&gt; MantraM IO [(TxIn, TxOut AlonzoEra)]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679283094"><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679283094"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetId -&gt; Quantity
@@ -378,17 +378,17 @@ forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679283087"><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679283087"><span class="hs-identifier hs-var">datumValue</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TxOutDatumHash AlonzoEra
 </span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span class="annot"><span class="annottext">[(TxIn, TxOut AlonzoEra)]
-</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(TxIn, Value) -&gt; MantisM IO (TxIn, Value)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(TxIn, Value) -&gt; MantraM IO (TxIn, Value)
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxIn
 </span><a href="#local-6989586621679283090"><span class="hs-identifier hs-var">datumTxIn</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679283087"><span class="hs-identifier hs-var">datumValue</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-143"></span><span>        </span><span class="annot"><span class="annottext">[(TxIn, TxOut AlonzoEra)]
-</span><span class="hs-identifier">_</span></span><span>                                                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; MantisM IO (TxIn, Value)
+</span><span class="hs-identifier">_</span></span><span>                                                    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; MantraM IO (TxIn, Value)
 forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
 </span><span class="hs-identifier hs-var">throwError</span></span><span>
-</span><span id="line-144"></span><span>                                                                  </span><span class="annot"><span class="annottext">(String -&gt; MantisM IO (TxIn, Value))
--&gt; String -&gt; MantisM IO (TxIn, Value)
+</span><span id="line-144"></span><span>                                                                  </span><span class="annot"><span class="annottext">(String -&gt; MantraM IO (TxIn, Value))
+-&gt; String -&gt; MantraM IO (TxIn, Value)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;UTxO with single datum token not found: &quot;</span></span><span>
@@ -403,12 +403,12 @@ forall a. Show a =&gt; a -&gt; String
 </span><span id="line-147"></span><span>      </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 -&gt; AddressAny
 -&gt; (Value -&gt; Bool)
--&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
-</span><a href="Mantis.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-var">findUTxO</span></a></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; MantraM IO [(TxIn, TxOut AlonzoEra)]
+</span><a href="Mantra.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-var">findUTxO</span></a></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 </span><a href="#local-6989586621679283125"><span class="hs-identifier hs-var">connection</span></a></span><span> </span><span class="annot"><span class="annottext">AddressAny
 </span><a href="#local-6989586621679283122"><span class="hs-identifier hs-var">controlAddress</span></a></span><span>
-</span><span id="line-148"></span><span>        </span><span class="annot"><span class="annottext">((Value -&gt; Bool) -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)])
--&gt; (Value -&gt; Bool) -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+</span><span id="line-148"></span><span>        </span><span class="annot"><span class="annottext">((Value -&gt; Bool) -&gt; MantraM IO [(TxIn, TxOut AlonzoEra)])
+-&gt; (Value -&gt; Bool) -&gt; MantraM IO [(TxIn, TxOut AlonzoEra)]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679283085"><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679283085"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetId -&gt; Quantity
@@ -429,17 +429,17 @@ forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679283081"><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679283081"><span class="hs-identifier hs-var">controlValue</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">TxOutDatumHash AlonzoEra
 </span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span class="annot"><span class="annottext">[(TxIn, TxOut AlonzoEra)]
-</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(TxIn, Value) -&gt; MantisM IO (TxIn, Value)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(TxIn, Value) -&gt; MantraM IO (TxIn, Value)
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxIn
 </span><a href="#local-6989586621679283082"><span class="hs-identifier hs-var">controlTxIn</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679283081"><span class="hs-identifier hs-var">controlValue</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-152"></span><span>        </span><span class="annot"><span class="annottext">[(TxIn, TxOut AlonzoEra)]
-</span><span class="hs-identifier">_</span></span><span>                                                        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; MantisM IO (TxIn, Value)
+</span><span class="hs-identifier">_</span></span><span>                                                        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; MantraM IO (TxIn, Value)
 forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
 </span><span class="hs-identifier hs-var">throwError</span></span><span>
-</span><span id="line-153"></span><span>                                                                      </span><span class="annot"><span class="annottext">(String -&gt; MantisM IO (TxIn, Value))
--&gt; String -&gt; MantisM IO (TxIn, Value)
+</span><span id="line-153"></span><span>                                                                      </span><span class="annot"><span class="annottext">(String -&gt; MantraM IO (TxIn, Value))
+-&gt; String -&gt; MantraM IO (TxIn, Value)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;UTxO with single control token not found: &quot;</span></span><span>
@@ -454,12 +454,12 @@ forall a. Show a =&gt; a -&gt; String
 </span><span id="line-156"></span><span>      </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 -&gt; AddressAny
 -&gt; (Value -&gt; Bool)
--&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
-</span><a href="Mantis.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-var">findUTxO</span></a></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; MantraM IO [(TxIn, TxOut AlonzoEra)]
+</span><a href="Mantra.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-var">findUTxO</span></a></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 </span><a href="#local-6989586621679283125"><span class="hs-identifier hs-var">connection</span></a></span><span> </span><span class="annot"><span class="annottext">AddressAny
 </span><a href="#local-6989586621679283122"><span class="hs-identifier hs-var">controlAddress</span></a></span><span>
-</span><span id="line-157"></span><span>        </span><span class="annot"><span class="annottext">((Value -&gt; Bool) -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)])
--&gt; (Value -&gt; Bool) -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+</span><span id="line-157"></span><span>        </span><span class="annot"><span class="annottext">((Value -&gt; Bool) -&gt; MantraM IO [(TxIn, TxOut AlonzoEra)])
+-&gt; (Value -&gt; Bool) -&gt; MantraM IO [(TxIn, TxOut AlonzoEra)]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679283079"><span class="annot"><span class="annottext">Value
 </span><a href="#local-6989586621679283079"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[(AssetId, Quantity)] -&gt; Int
@@ -477,15 +477,15 @@ forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span id="line-160"></span><span>        </span><span class="hs-special">(</span><span id="local-6989586621679283075"><span class="annot"><span class="annottext">TxIn
 </span><a href="#local-6989586621679283075"><span class="hs-identifier hs-var">collateralTxIn</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">TxOut AlonzoEra
 </span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span class="annot"><span class="annottext">[(TxIn, TxOut AlonzoEra)]
-</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TxIn -&gt; MantisM IO TxIn
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TxIn -&gt; MantraM IO TxIn
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">TxIn
 </span><a href="#local-6989586621679283075"><span class="hs-identifier hs-var">collateralTxIn</span></a></span><span>
 </span><span id="line-161"></span><span>        </span><span class="annot"><span class="annottext">[(TxIn, TxOut AlonzoEra)]
-</span><span class="hs-identifier">_</span></span><span>                       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; MantisM IO TxIn
+</span><span class="hs-identifier">_</span></span><span>                       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; MantraM IO TxIn
 forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
 </span><span class="hs-identifier hs-var">throwError</span></span><span>
-</span><span id="line-162"></span><span>                                     </span><span class="annot"><span class="annottext">(String -&gt; MantisM IO TxIn) -&gt; String -&gt; MantisM IO TxIn
+</span><span id="line-162"></span><span>                                     </span><span class="annot"><span class="annottext">(String -&gt; MantraM IO TxIn) -&gt; String -&gt; MantraM IO TxIn
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;UTxO with no tokens not found: &quot;</span></span><span>
@@ -582,7 +582,7 @@ forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 -&gt; TxIn
 -&gt; (Maybe Value, Maybe Value)
 -&gt; Maybe TxMetadata
--&gt; MantisM IO (TxBody AlonzoEra)
+-&gt; MantraM IO (TxBody AlonzoEra)
 forall a.
 Maybe Action
 -&gt; LocalNodeConnectInfo CardanoMode
@@ -595,8 +595,8 @@ Maybe Action
 -&gt; TxIn
 -&gt; (Maybe Value, Maybe Value)
 -&gt; Maybe TxMetadata
--&gt; MantisM IO (TxBody AlonzoEra)
-</span><a href="Mantis.Oracle.Submit.html#build"><span class="hs-identifier hs-var">build</span></a></span><span>
+-&gt; MantraM IO (TxBody AlonzoEra)
+</span><a href="Mantra.Oracle.Submit.html#build"><span class="hs-identifier hs-var">build</span></a></span><span>
 </span><span id="line-182"></span><span>        </span><span class="annot"><span class="annottext">Maybe Action
 </span><a href="#local-6989586621679283130"><span class="hs-identifier hs-var">action</span></a></span><span>
 </span><span id="line-183"></span><span>        </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
@@ -623,15 +623,15 @@ Maybe Action
 </span><span id="line-192"></span><span>        </span><span class="annot"><span class="annottext">Maybe TxMetadata
 </span><a href="#local-6989586621679283105"><span class="hs-identifier hs-var">metadata</span></a></span><span>
 </span><span id="line-193"></span><span>    </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
--&gt; TxBody AlonzoEra -&gt; SigningKey PaymentKey -&gt; MantisM IO TxId
-</span><a href="Mantis.Oracle.Submit.html#submit"><span class="hs-identifier hs-var">submit</span></a></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; TxBody AlonzoEra -&gt; SigningKey PaymentKey -&gt; MantraM IO TxId
+</span><a href="Mantra.Oracle.Submit.html#submit"><span class="hs-identifier hs-var">submit</span></a></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 </span><a href="#local-6989586621679283125"><span class="hs-identifier hs-var">connection</span></a></span><span> </span><span class="annot"><span class="annottext">TxBody AlonzoEra
 </span><a href="#local-6989586621679283059"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">SigningKey PaymentKey
 </span><a href="#local-6989586621679283121"><span class="hs-identifier hs-var">controlSigning</span></a></span><span>
 </span><span id="line-194"></span><span>
 </span><span id="line-195"></span><span>
 </span><span id="line-196"></span><span class="hs-comment">-- | Build an oracle transaction.</span><span>
-</span><span id="line-197"></span><span id="local-6989586621679283309"><span class="annot"><a href="Mantis.Oracle.Submit.html#build"><span class="hs-identifier hs-type">build</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>                     </span><span class="hs-comment">-- ^ The redeemer, if any.</span><span>
+</span><span id="line-197"></span><span id="local-6989586621679283309"><span class="annot"><a href="Mantra.Oracle.Submit.html#build"><span class="hs-identifier hs-type">build</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>                     </span><span class="hs-comment">-- ^ The redeemer, if any.</span><span>
 </span><span id="line-198"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span> </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
 </span><span id="line-199"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">PlutusScript</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PlutusScriptV1</span></span><span>      </span><span class="hs-comment">-- ^ The Plutus script.</span><span>
 </span><span id="line-200"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span>                       </span><span class="hs-comment">-- ^ The address of the Plutus script.</span><span>
@@ -642,7 +642,7 @@ Maybe Action
 </span><span id="line-205"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxIn</span></span><span>                             </span><span class="hs-comment">-- ^ The UTxO for collateral.</span><span>
 </span><span id="line-206"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">A.Value</span></span><span class="hs-special">)</span><span>   </span><span class="hs-comment">-- ^ The existing datum and the datum to replace it, if any.</span><span>
 </span><span id="line-207"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxMetadata</span></span><span>                 </span><span class="hs-comment">-- ^ The message metadata, if any.</span><span>
-</span><span id="line-208"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxBody</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span class="hs-special">)</span><span>    </span><span class="hs-comment">-- ^ The action to build the transaction.</span></span><span>
+</span><span id="line-208"></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantraM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxBody</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span class="hs-special">)</span><span>    </span><span class="hs-comment">-- ^ The action to build the transaction.</span></span><span>
 </span><span id="line-209"></span><span id="build"><span class="annot"><span class="annottext">build :: Maybe Action
 -&gt; LocalNodeConnectInfo CardanoMode
 -&gt; PlutusScript PlutusScriptV1
@@ -654,8 +654,8 @@ Maybe Action
 -&gt; TxIn
 -&gt; (Maybe Value, Maybe Value)
 -&gt; Maybe TxMetadata
--&gt; MantisM IO (TxBody AlonzoEra)
-</span><a href="Mantis.Oracle.Submit.html#build"><span class="hs-identifier hs-var hs-var">build</span></a></span></span><span> </span><span id="local-6989586621679283056"><span class="annot"><span class="annottext">Maybe Action
+-&gt; MantraM IO (TxBody AlonzoEra)
+</span><a href="Mantra.Oracle.Submit.html#build"><span class="hs-identifier hs-var hs-var">build</span></a></span></span><span> </span><span id="local-6989586621679283056"><span class="annot"><span class="annottext">Maybe Action
 </span><a href="#local-6989586621679283056"><span class="hs-identifier hs-var">action</span></a></span></span><span> </span><span id="local-6989586621679283055"><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 </span><a href="#local-6989586621679283055"><span class="hs-identifier hs-var">connection</span></a></span></span><span> </span><span id="local-6989586621679283054"><span class="annot"><span class="annottext">PlutusScript PlutusScriptV1
 </span><a href="#local-6989586621679283054"><span class="hs-identifier hs-var">script</span></a></span></span><span> </span><span id="local-6989586621679283053"><span class="annot"><span class="annottext">AddressAny
@@ -674,15 +674,15 @@ Maybe Action
 </span><span id="line-211"></span><span>    </span><span id="local-6989586621679283042"><span class="annot"><span class="annottext">Maybe ScriptData
 </span><a href="#local-6989586621679283042"><span class="hs-identifier hs-var">oldData'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
 </span><span id="line-212"></span><span>      </span><span class="annot"><span class="annottext">Either ScriptDataJsonError (Maybe ScriptData)
--&gt; MantisM IO (Maybe ScriptData)
+-&gt; MantraM IO (Maybe ScriptData)
 forall (m :: * -&gt; *) e a.
 (Monad m, Show e) =&gt;
-Either e a -&gt; MantisM m a
-</span><span class="hs-identifier hs-var">foistMantisEither</span></span><span>
+Either e a -&gt; MantraM m a
+</span><span class="hs-identifier hs-var">foistMantraEither</span></span><span>
 </span><span id="line-213"></span><span>        </span><span class="annot"><span class="annottext">(Either ScriptDataJsonError (Maybe ScriptData)
- -&gt; MantisM IO (Maybe ScriptData))
+ -&gt; MantraM IO (Maybe ScriptData))
 -&gt; Either ScriptDataJsonError (Maybe ScriptData)
--&gt; MantisM IO (Maybe ScriptData)
+-&gt; MantraM IO (Maybe ScriptData)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Either ScriptDataJsonError (Maybe ScriptData)
 -&gt; (Value -&gt; Either ScriptDataJsonError (Maybe ScriptData))
@@ -716,15 +716,15 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span id="line-217"></span><span>    </span><span id="local-6989586621679283039"><span class="annot"><span class="annottext">Maybe ScriptData
 </span><a href="#local-6989586621679283039"><span class="hs-identifier hs-var">newData'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
 </span><span id="line-218"></span><span>      </span><span class="annot"><span class="annottext">Either ScriptDataJsonError (Maybe ScriptData)
--&gt; MantisM IO (Maybe ScriptData)
+-&gt; MantraM IO (Maybe ScriptData)
 forall (m :: * -&gt; *) e a.
 (Monad m, Show e) =&gt;
-Either e a -&gt; MantisM m a
-</span><span class="hs-identifier hs-var">foistMantisEither</span></span><span>
+Either e a -&gt; MantraM m a
+</span><span class="hs-identifier hs-var">foistMantraEither</span></span><span>
 </span><span id="line-219"></span><span>        </span><span class="annot"><span class="annottext">(Either ScriptDataJsonError (Maybe ScriptData)
- -&gt; MantisM IO (Maybe ScriptData))
+ -&gt; MantraM IO (Maybe ScriptData))
 -&gt; Either ScriptDataJsonError (Maybe ScriptData)
--&gt; MantisM IO (Maybe ScriptData)
+-&gt; MantraM IO (Maybe ScriptData)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Either ScriptDataJsonError (Maybe ScriptData)
 -&gt; (Value -&gt; Either ScriptDataJsonError (Maybe ScriptData))
@@ -759,14 +759,14 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><a href="#local-6989586621679283038"><span class="hs-identifier hs-var">scriptAddress'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
 </span><span id="line-224"></span><span>      </span><span class="annot"><span class="annottext">String
 -&gt; Maybe (AddressInEra AlonzoEra)
--&gt; MantisM IO (AddressInEra AlonzoEra)
-forall (m :: * -&gt; *) a. Monad m =&gt; String -&gt; Maybe a -&gt; MantisM m a
-</span><span class="hs-identifier hs-var">foistMantisMaybe</span></span><span> </span><span class="annot"><span class="annottext">String
+-&gt; MantraM IO (AddressInEra AlonzoEra)
+forall (m :: * -&gt; *) a. Monad m =&gt; String -&gt; Maybe a -&gt; MantraM m a
+</span><span class="hs-identifier hs-var">foistMantraMaybe</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;Failed to convert script address.&quot;</span></span><span>
 </span><span id="line-225"></span><span>        </span><span class="annot"><span class="annottext">(Maybe (AddressInEra AlonzoEra)
- -&gt; MantisM IO (AddressInEra AlonzoEra))
+ -&gt; MantraM IO (AddressInEra AlonzoEra))
 -&gt; Maybe (AddressInEra AlonzoEra)
--&gt; MantisM IO (AddressInEra AlonzoEra)
+-&gt; MantraM IO (AddressInEra AlonzoEra)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">CardanoEra AlonzoEra
 -&gt; AddressAny -&gt; Maybe (AddressInEra AlonzoEra)
@@ -779,14 +779,14 @@ CardanoEra era -&gt; AddressAny -&gt; Maybe (AddressInEra era)
 </span><a href="#local-6989586621679283035"><span class="hs-identifier hs-var">controlAddress'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
 </span><span id="line-227"></span><span>      </span><span class="annot"><span class="annottext">String
 -&gt; Maybe (AddressInEra AlonzoEra)
--&gt; MantisM IO (AddressInEra AlonzoEra)
-forall (m :: * -&gt; *) a. Monad m =&gt; String -&gt; Maybe a -&gt; MantisM m a
-</span><span class="hs-identifier hs-var">foistMantisMaybe</span></span><span> </span><span class="annot"><span class="annottext">String
+-&gt; MantraM IO (AddressInEra AlonzoEra)
+forall (m :: * -&gt; *) a. Monad m =&gt; String -&gt; Maybe a -&gt; MantraM m a
+</span><span class="hs-identifier hs-var">foistMantraMaybe</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;Failed to convert control address.&quot;</span></span><span>
 </span><span id="line-228"></span><span>        </span><span class="annot"><span class="annottext">(Maybe (AddressInEra AlonzoEra)
- -&gt; MantisM IO (AddressInEra AlonzoEra))
+ -&gt; MantraM IO (AddressInEra AlonzoEra))
 -&gt; Maybe (AddressInEra AlonzoEra)
--&gt; MantisM IO (AddressInEra AlonzoEra)
+-&gt; MantraM IO (AddressInEra AlonzoEra)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">CardanoEra AlonzoEra
 -&gt; AddressAny -&gt; Maybe (AddressInEra AlonzoEra)
@@ -797,13 +797,13 @@ CardanoEra era -&gt; AddressAny -&gt; Maybe (AddressInEra era)
 </span><a href="#local-6989586621679283052"><span class="hs-identifier hs-var">controlAddress</span></a></span><span>
 </span><span id="line-229"></span><span>    </span><span id="local-6989586621679283034"><span class="annot"><span class="annottext">SystemStart
 </span><a href="#local-6989586621679283034"><span class="hs-identifier hs-var">start</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
-</span><span id="line-230"></span><span>      </span><span class="annot"><span class="annottext">IO (Either AcquireFailure SystemStart) -&gt; MantisM IO SystemStart
+</span><span id="line-230"></span><span>      </span><span class="annot"><span class="annottext">IO (Either AcquireFailure SystemStart) -&gt; MantraM IO SystemStart
 forall (m :: * -&gt; *) e a.
 (MonadIO m, Show e) =&gt;
-IO (Either e a) -&gt; MantisM m a
-</span><span class="hs-identifier hs-var">foistMantisEitherIO</span></span><span>
-</span><span id="line-231"></span><span>        </span><span class="annot"><span class="annottext">(IO (Either AcquireFailure SystemStart) -&gt; MantisM IO SystemStart)
--&gt; IO (Either AcquireFailure SystemStart) -&gt; MantisM IO SystemStart
+IO (Either e a) -&gt; MantraM m a
+</span><span class="hs-identifier hs-var">foistMantraEitherIO</span></span><span>
+</span><span id="line-231"></span><span>        </span><span class="annot"><span class="annottext">(IO (Either AcquireFailure SystemStart) -&gt; MantraM IO SystemStart)
+-&gt; IO (Either AcquireFailure SystemStart) -&gt; MantraM IO SystemStart
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 -&gt; Maybe ChainPoint
@@ -823,17 +823,17 @@ forall mode. QueryInMode mode SystemStart
 </span><span id="line-232"></span><span>    </span><span id="local-6989586621679283031"><span class="annot"><span class="annottext">EraHistory CardanoMode
 </span><a href="#local-6989586621679283031"><span class="hs-identifier hs-var">history</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
 </span><span id="line-233"></span><span>      </span><span class="annot"><span class="annottext">IO (Either AcquireFailure (EraHistory CardanoMode))
--&gt; MantisM IO (EraHistory CardanoMode)
+-&gt; MantraM IO (EraHistory CardanoMode)
 forall (m :: * -&gt; *) e a.
 (MonadIO m, Show e) =&gt;
-IO (Either e a) -&gt; MantisM m a
-</span><span class="hs-identifier hs-var">foistMantisEitherIO</span></span><span>
+IO (Either e a) -&gt; MantraM m a
+</span><span class="hs-identifier hs-var">foistMantraEitherIO</span></span><span>
 </span><span id="line-234"></span><span>        </span><span class="annot"><span class="annottext">(IO (Either AcquireFailure (EraHistory CardanoMode))
- -&gt; MantisM IO (EraHistory CardanoMode))
+ -&gt; MantraM IO (EraHistory CardanoMode))
 -&gt; (QueryInMode CardanoMode (EraHistory CardanoMode)
     -&gt; IO (Either AcquireFailure (EraHistory CardanoMode)))
 -&gt; QueryInMode CardanoMode (EraHistory CardanoMode)
--&gt; MantisM IO (EraHistory CardanoMode)
+-&gt; MantraM IO (EraHistory CardanoMode)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 -&gt; Maybe ChainPoint
@@ -849,9 +849,9 @@ LocalNodeConnectInfo mode
 forall a. Maybe a
 </span><span class="hs-identifier hs-var">Nothing</span></span><span>
 </span><span id="line-235"></span><span>        </span><span class="annot"><span class="annottext">(QueryInMode CardanoMode (EraHistory CardanoMode)
- -&gt; MantisM IO (EraHistory CardanoMode))
+ -&gt; MantraM IO (EraHistory CardanoMode))
 -&gt; QueryInMode CardanoMode (EraHistory CardanoMode)
--&gt; MantisM IO (EraHistory CardanoMode)
+-&gt; MantraM IO (EraHistory CardanoMode)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ConsensusModeIsMultiEra CardanoMode
 -&gt; QueryInMode CardanoMode (EraHistory CardanoMode)
@@ -862,18 +862,18 @@ ConsensusModeIsMultiEra mode -&gt; QueryInMode mode (EraHistory mode)
 </span><span id="line-236"></span><span>    </span><span id="local-6989586621679283028"><span class="annot"><span class="annottext">ProtocolParameters
 </span><a href="#local-6989586621679283028"><span class="hs-identifier hs-var">protocol</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
 </span><span id="line-237"></span><span>      </span><span class="annot"><span class="annottext">IO (Either AcquireFailure (Either EraMismatch ProtocolParameters))
--&gt; MantisM IO ProtocolParameters
+-&gt; MantraM IO ProtocolParameters
 forall e e' a.
 (Show e, Show e') =&gt;
-IO (Either e (Either e' a)) -&gt; MantisM IO a
-</span><a href="Mantis.Oracle.Submit.html#foistMantisEitherIO%27"><span class="hs-identifier hs-var">foistMantisEitherIO'</span></a></span><span>
+IO (Either e (Either e' a)) -&gt; MantraM IO a
+</span><a href="Mantra.Oracle.Submit.html#foistMantraEitherIO%27"><span class="hs-identifier hs-var">foistMantraEitherIO'</span></a></span><span>
 </span><span id="line-238"></span><span>        </span><span class="annot"><span class="annottext">(IO (Either AcquireFailure (Either EraMismatch ProtocolParameters))
- -&gt; MantisM IO ProtocolParameters)
+ -&gt; MantraM IO ProtocolParameters)
 -&gt; (QueryInEra AlonzoEra ProtocolParameters
     -&gt; IO
          (Either AcquireFailure (Either EraMismatch ProtocolParameters)))
 -&gt; QueryInEra AlonzoEra ProtocolParameters
--&gt; MantisM IO ProtocolParameters
+-&gt; MantraM IO ProtocolParameters
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 -&gt; Maybe ChainPoint
@@ -908,9 +908,9 @@ EraInMode era mode
 </span><span class="hs-identifier hs-var">QueryInEra</span></span><span> </span><span class="annot"><span class="annottext">EraInMode AlonzoEra CardanoMode
 </span><span class="hs-identifier hs-var">AlonzoEraInCardanoMode</span></span><span>
 </span><span id="line-240"></span><span>        </span><span class="annot"><span class="annottext">(QueryInEra AlonzoEra ProtocolParameters
- -&gt; MantisM IO ProtocolParameters)
+ -&gt; MantraM IO ProtocolParameters)
 -&gt; QueryInEra AlonzoEra ProtocolParameters
--&gt; MantisM IO ProtocolParameters
+-&gt; MantraM IO ProtocolParameters
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ShelleyBasedEra AlonzoEra
 -&gt; QueryInShelleyBasedEra AlonzoEra ProtocolParameters
@@ -925,18 +925,18 @@ forall era. QueryInShelleyBasedEra era ProtocolParameters
 </span><span id="line-241"></span><span>    </span><span id="local-6989586621679283021"><span class="annot"><span class="annottext">UTxO AlonzoEra
 </span><a href="#local-6989586621679283021"><span class="hs-identifier hs-var">utxo</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
 </span><span id="line-242"></span><span>      </span><span class="annot"><span class="annottext">IO (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra)))
--&gt; MantisM IO (UTxO AlonzoEra)
+-&gt; MantraM IO (UTxO AlonzoEra)
 forall e e' a.
 (Show e, Show e') =&gt;
-IO (Either e (Either e' a)) -&gt; MantisM IO a
-</span><a href="Mantis.Oracle.Submit.html#foistMantisEitherIO%27"><span class="hs-identifier hs-var">foistMantisEitherIO'</span></a></span><span>
+IO (Either e (Either e' a)) -&gt; MantraM IO a
+</span><a href="Mantra.Oracle.Submit.html#foistMantraEitherIO%27"><span class="hs-identifier hs-var">foistMantraEitherIO'</span></a></span><span>
 </span><span id="line-243"></span><span>        </span><span class="annot"><span class="annottext">(IO (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra)))
- -&gt; MantisM IO (UTxO AlonzoEra))
+ -&gt; MantraM IO (UTxO AlonzoEra))
 -&gt; ([TxIn]
     -&gt; IO
          (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra))))
 -&gt; [TxIn]
--&gt; MantisM IO (UTxO AlonzoEra)
+-&gt; MantraM IO (UTxO AlonzoEra)
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 -&gt; Maybe ChainPoint
@@ -1007,8 +1007,8 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[TxIn] -&gt; Set TxIn
 forall a. Ord a =&gt; [a] -&gt; Set a
 </span><span class="hs-identifier hs-var">S.fromList</span></span><span>
-</span><span id="line-249"></span><span>        </span><span class="annot"><span class="annottext">([TxIn] -&gt; MantisM IO (UTxO AlonzoEra))
--&gt; [TxIn] -&gt; MantisM IO (UTxO AlonzoEra)
+</span><span id="line-249"></span><span>        </span><span class="annot"><span class="annottext">([TxIn] -&gt; MantraM IO (UTxO AlonzoEra))
+-&gt; [TxIn] -&gt; MantraM IO (UTxO AlonzoEra)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">TxIn
 </span><a href="#local-6989586621679283051"><span class="hs-identifier hs-var">datumTxIn</span></a></span><span>
@@ -1312,15 +1312,15 @@ forall a. a -&gt; BuildTxWith BuildTx a
 forall era. TxScriptValidity era
 </span><span class="hs-identifier hs-var">TxScriptValidityNone</span></span><span> </span><span>
 </span><span id="line-308"></span><span>    </span><span class="annot"><span class="annottext">Either TxBodyErrorAutoBalance (TxBody AlonzoEra)
--&gt; MantisM IO (TxBody AlonzoEra)
+-&gt; MantraM IO (TxBody AlonzoEra)
 forall (m :: * -&gt; *) e a.
 (Monad m, Show e) =&gt;
-Either e a -&gt; MantisM m a
-</span><span class="hs-identifier hs-var">foistMantisEither</span></span><span>
+Either e a -&gt; MantraM m a
+</span><span class="hs-identifier hs-var">foistMantraEither</span></span><span>
 </span><span id="line-309"></span><span>      </span><span class="annot"><span class="annottext">(Either TxBodyErrorAutoBalance (TxBody AlonzoEra)
- -&gt; MantisM IO (TxBody AlonzoEra))
+ -&gt; MantraM IO (TxBody AlonzoEra))
 -&gt; Either TxBodyErrorAutoBalance (TxBody AlonzoEra)
--&gt; MantisM IO (TxBody AlonzoEra)
+-&gt; MantraM IO (TxBody AlonzoEra)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">EraInMode AlonzoEra CardanoMode
 -&gt; SystemStart
@@ -1440,13 +1440,13 @@ forall a. Maybe a
 </span><span id="line-319"></span><span>
 </span><span id="line-320"></span><span>
 </span><span id="line-321"></span><span class="hs-comment">-- | Sign and submit a transaction.</span><span>
-</span><span id="line-322"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#submit"><span class="hs-identifier hs-type">submit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span> </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
+</span><span id="line-322"></span><span class="annot"><a href="Mantra.Oracle.Submit.html#submit"><span class="hs-identifier hs-type">submit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span> </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
 </span><span id="line-323"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxBody</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span>                 </span><span class="hs-comment">-- ^ The transaction body.</span><span>
 </span><span id="line-324"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SigningKey</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PaymentKey</span></span><span>            </span><span class="hs-comment">-- ^ The signing key.</span><span>
-</span><span id="line-325"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                  </span><span class="hs-comment">-- ^ The action to submit the transaction.</span><span>
+</span><span id="line-325"></span><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantraM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxId</span></span><span>                  </span><span class="hs-comment">-- ^ The action to submit the transaction.</span><span>
 </span><span id="line-326"></span><span id="submit"><span class="annot"><span class="annottext">submit :: LocalNodeConnectInfo CardanoMode
--&gt; TxBody AlonzoEra -&gt; SigningKey PaymentKey -&gt; MantisM IO TxId
-</span><a href="Mantis.Oracle.Submit.html#submit"><span class="hs-identifier hs-var hs-var">submit</span></a></span></span><span> </span><span id="local-6989586621679282946"><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; TxBody AlonzoEra -&gt; SigningKey PaymentKey -&gt; MantraM IO TxId
+</span><a href="Mantra.Oracle.Submit.html#submit"><span class="hs-identifier hs-var hs-var">submit</span></a></span></span><span> </span><span id="local-6989586621679282946"><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 </span><a href="#local-6989586621679282946"><span class="hs-identifier hs-var">connection</span></a></span></span><span> </span><span id="local-6989586621679282945"><span class="annot"><span class="annottext">TxBody AlonzoEra
 </span><a href="#local-6989586621679282945"><span class="hs-identifier hs-var">body</span></a></span></span><span> </span><span id="local-6989586621679282944"><span class="annot"><span class="annottext">SigningKey PaymentKey
 </span><a href="#local-6989586621679282944"><span class="hs-identifier hs-var">controlSigning</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
@@ -1469,15 +1469,15 @@ TxBody era -&gt; [ShelleyWitnessSigningKey] -&gt; Tx era
 </span><span id="line-335"></span><span>    </span><span id="local-6989586621679282940"><span class="annot"><span class="annottext">SubmitResult (TxValidationErrorInMode CardanoMode)
 </span><a href="#local-6989586621679282940"><span class="hs-identifier hs-var">result</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
 </span><span id="line-336"></span><span>      </span><span class="annot"><span class="annottext">IO (SubmitResult (TxValidationErrorInMode CardanoMode))
--&gt; MantisM IO (SubmitResult (TxValidationErrorInMode CardanoMode))
+-&gt; MantraM IO (SubmitResult (TxValidationErrorInMode CardanoMode))
 forall (m :: * -&gt; *) a. MonadIO m =&gt; IO a -&gt; m a
 </span><span class="hs-identifier hs-var">liftIO</span></span><span>
 </span><span id="line-337"></span><span>        </span><span class="annot"><span class="annottext">(IO (SubmitResult (TxValidationErrorInMode CardanoMode))
- -&gt; MantisM IO (SubmitResult (TxValidationErrorInMode CardanoMode)))
+ -&gt; MantraM IO (SubmitResult (TxValidationErrorInMode CardanoMode)))
 -&gt; (TxInMode CardanoMode
     -&gt; IO (SubmitResult (TxValidationErrorInMode CardanoMode)))
 -&gt; TxInMode CardanoMode
--&gt; MantisM IO (SubmitResult (TxValidationErrorInMode CardanoMode))
+-&gt; MantraM IO (SubmitResult (TxValidationErrorInMode CardanoMode))
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 -&gt; TxInMode CardanoMode
@@ -1489,9 +1489,9 @@ LocalNodeConnectInfo mode
 </span><span class="hs-identifier hs-var">submitTxToNodeLocal</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 </span><a href="#local-6989586621679282946"><span class="hs-identifier hs-var">connection</span></a></span><span>
 </span><span id="line-338"></span><span>        </span><span class="annot"><span class="annottext">(TxInMode CardanoMode
- -&gt; MantisM IO (SubmitResult (TxValidationErrorInMode CardanoMode)))
+ -&gt; MantraM IO (SubmitResult (TxValidationErrorInMode CardanoMode)))
 -&gt; TxInMode CardanoMode
--&gt; MantisM IO (SubmitResult (TxValidationErrorInMode CardanoMode))
+-&gt; MantraM IO (SubmitResult (TxValidationErrorInMode CardanoMode))
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Tx AlonzoEra
 -&gt; EraInMode AlonzoEra CardanoMode -&gt; TxInMode CardanoMode
@@ -1502,18 +1502,18 @@ forall era mode. Tx era -&gt; EraInMode era mode -&gt; TxInMode mode
 </span><span id="line-339"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">SubmitResult (TxValidationErrorInMode CardanoMode)
 </span><a href="#local-6989586621679282940"><span class="hs-identifier hs-var">result</span></a></span><span> </span><span class="hs-keyword">of</span><span>
 </span><span id="line-340"></span><span>      </span><span class="annot"><span class="annottext">SubmitResult (TxValidationErrorInMode CardanoMode)
-</span><span class="hs-identifier hs-var">SubmitSuccess</span></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TxId -&gt; MantisM IO TxId
+</span><span class="hs-identifier hs-var">SubmitSuccess</span></span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TxId -&gt; MantraM IO TxId
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
-</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(TxId -&gt; MantisM IO TxId) -&gt; TxId -&gt; MantisM IO TxId
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(TxId -&gt; MantraM IO TxId) -&gt; TxId -&gt; MantraM IO TxId
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">TxBody AlonzoEra -&gt; TxId
 forall era. TxBody era -&gt; TxId
 </span><span class="hs-identifier hs-var">getTxId</span></span><span> </span><span class="annot"><span class="annottext">TxBody AlonzoEra
 </span><a href="#local-6989586621679282945"><span class="hs-identifier hs-var">body</span></a></span><span>
 </span><span id="line-341"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">SubmitFail</span></span><span> </span><span id="local-6989586621679282934"><span class="annot"><span class="annottext">TxValidationErrorInMode CardanoMode
-</span><a href="#local-6989586621679282934"><span class="hs-identifier hs-var">reason</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; MantisM IO TxId
+</span><a href="#local-6989586621679282934"><span class="hs-identifier hs-var">reason</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; MantraM IO TxId
 forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
-</span><span class="hs-identifier hs-var">throwError</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; MantisM IO TxId) -&gt; String -&gt; MantisM IO TxId
+</span><span class="hs-identifier hs-var">throwError</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; MantraM IO TxId) -&gt; String -&gt; MantraM IO TxId
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">TxValidationErrorInMode CardanoMode -&gt; String
 forall a. Show a =&gt; a -&gt; String
@@ -1522,15 +1522,15 @@ forall a. Show a =&gt; a -&gt; String
 </span><span id="line-342"></span><span>
 </span><span id="line-343"></span><span>
 </span><span id="line-344"></span><span class="hs-comment">-- | Find the UTxOs meeting a criterion.</span><span>
-</span><span id="line-345"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-type">findUTxO</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span>     </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
+</span><span id="line-345"></span><span class="annot"><a href="Mantra.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-type">findUTxO</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">LocalNodeConnectInfo</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">CardanoMode</span></span><span>     </span><span class="hs-comment">-- ^ The connection info for the local node.</span><span>
 </span><span id="line-346"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span>                           </span><span class="hs-comment">-- ^ The address to query.</span><span>
 </span><span id="line-347"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Value</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span><span>                      </span><span class="hs-comment">-- ^ The condition on values in the UTxO.</span><span>
-</span><span id="line-348"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxIn</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-comment">-- ^ The action to find the UTxOs.</span><span>
+</span><span id="line-348"></span><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantraM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">TxIn</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AlonzoEra</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-comment">-- ^ The action to find the UTxOs.</span><span>
 </span><span id="line-349"></span><span id="findUTxO"><span class="annot"><span class="annottext">findUTxO :: LocalNodeConnectInfo CardanoMode
 -&gt; AddressAny
 -&gt; (Value -&gt; Bool)
--&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
-</span><a href="Mantis.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-var hs-var">findUTxO</span></a></span></span><span> </span><span id="local-6989586621679282933"><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
+-&gt; MantraM IO [(TxIn, TxOut AlonzoEra)]
+</span><a href="Mantra.Oracle.Submit.html#findUTxO"><span class="hs-identifier hs-var hs-var">findUTxO</span></a></span></span><span> </span><span id="local-6989586621679282933"><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 </span><a href="#local-6989586621679282933"><span class="hs-identifier hs-var">localConnInfo</span></a></span></span><span> </span><span id="local-6989586621679282932"><span class="annot"><span class="annottext">AddressAny
 </span><a href="#local-6989586621679282932"><span class="hs-identifier hs-var">address</span></a></span></span><span> </span><span id="local-6989586621679282931"><span class="annot"><span class="annottext">Value -&gt; Bool
 </span><a href="#local-6989586621679282931"><span class="hs-identifier hs-var">condition</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
@@ -1616,15 +1616,15 @@ forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
 </span><span id="line-361"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">UTxO</span></span><span> </span><span id="local-6989586621679282922"><span class="annot"><span class="annottext">Map TxIn (TxOut AlonzoEra)
 </span><a href="#local-6989586621679282922"><span class="hs-identifier hs-var">utxos</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
 </span><span id="line-362"></span><span>      </span><span class="annot"><span class="annottext">IO (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra)))
--&gt; MantisM IO (UTxO AlonzoEra)
+-&gt; MantraM IO (UTxO AlonzoEra)
 forall e e' a.
 (Show e, Show e') =&gt;
-IO (Either e (Either e' a)) -&gt; MantisM IO a
-</span><a href="Mantis.Oracle.Submit.html#foistMantisEitherIO%27"><span class="hs-identifier hs-var">foistMantisEitherIO'</span></a></span><span>
+IO (Either e (Either e' a)) -&gt; MantraM IO a
+</span><a href="Mantra.Oracle.Submit.html#foistMantraEitherIO%27"><span class="hs-identifier hs-var">foistMantraEitherIO'</span></a></span><span>
 </span><span id="line-363"></span><span>        </span><span class="annot"><span class="annottext">(IO (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra)))
- -&gt; MantisM IO (UTxO AlonzoEra))
+ -&gt; MantraM IO (UTxO AlonzoEra))
 -&gt; IO (Either AcquireFailure (Either EraMismatch (UTxO AlonzoEra)))
--&gt; MantisM IO (UTxO AlonzoEra)
+-&gt; MantraM IO (UTxO AlonzoEra)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">LocalNodeConnectInfo CardanoMode
 -&gt; Maybe ChainPoint
@@ -1640,12 +1640,12 @@ LocalNodeConnectInfo mode
 forall a. Maybe a
 </span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="annot"><span class="annottext">QueryInMode CardanoMode (Either EraMismatch (UTxO AlonzoEra))
 </span><a href="#local-6989586621679282930"><span class="hs-identifier hs-var">query</span></a></span><span>
-</span><span id="line-364"></span><span>    </span><span class="annot"><span class="annottext">[(TxIn, TxOut AlonzoEra)] -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+</span><span id="line-364"></span><span>    </span><span class="annot"><span class="annottext">[(TxIn, TxOut AlonzoEra)] -&gt; MantraM IO [(TxIn, TxOut AlonzoEra)]
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span>
-</span><span id="line-365"></span><span>      </span><span class="annot"><span class="annottext">([(TxIn, TxOut AlonzoEra)] -&gt; MantisM IO [(TxIn, TxOut AlonzoEra)])
+</span><span id="line-365"></span><span>      </span><span class="annot"><span class="annottext">([(TxIn, TxOut AlonzoEra)] -&gt; MantraM IO [(TxIn, TxOut AlonzoEra)])
 -&gt; [(TxIn, TxOut AlonzoEra)]
--&gt; MantisM IO [(TxIn, TxOut AlonzoEra)]
+-&gt; MantraM IO [(TxIn, TxOut AlonzoEra)]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">((TxIn, TxOut AlonzoEra) -&gt; (TxIn, TxOut AlonzoEra) -&gt; Ordering)
 -&gt; [(TxIn, TxOut AlonzoEra)] -&gt; [(TxIn, TxOut AlonzoEra)]
@@ -1674,23 +1674,23 @@ forall k a. Map k a -&gt; [(k, a)]
 </span><span id="line-372"></span><span>
 </span><span id="line-373"></span><span>
 </span><span id="line-374"></span><span class="hs-comment">-- | Convert a Plutus `AssetClass` to a Cardano `AssetId`.</span><span>
-</span><span id="line-375"></span><span class="annot"><a href="Mantis.Oracle.Submit.html#classToId"><span class="hs-identifier hs-type">classToId</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AssetClass</span></span><span>         </span><span class="hs-comment">-- ^ The asset class.</span><span>
-</span><span id="line-376"></span><span>          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AssetId</span></span><span> </span><span class="hs-comment">-- ^ The asset identifier.</span><span>
-</span><span id="line-377"></span><span id="classToId"><span class="annot"><span class="annottext">classToId :: AssetClass -&gt; MantisM IO AssetId
-</span><a href="Mantis.Oracle.Submit.html#classToId"><span class="hs-identifier hs-var hs-var">classToId</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AssetClass</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CurrencySymbol</span></span><span> </span><span id="local-6989586621679282916"><span class="annot"><span class="annottext">BuiltinByteString
+</span><span id="line-375"></span><span class="annot"><a href="Mantra.Oracle.Submit.html#classToId"><span class="hs-identifier hs-type">classToId</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AssetClass</span></span><span>         </span><span class="hs-comment">-- ^ The asset class.</span><span>
+</span><span id="line-376"></span><span>          </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantraM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AssetId</span></span><span> </span><span class="hs-comment">-- ^ The asset identifier.</span><span>
+</span><span id="line-377"></span><span id="classToId"><span class="annot"><span class="annottext">classToId :: AssetClass -&gt; MantraM IO AssetId
+</span><a href="Mantra.Oracle.Submit.html#classToId"><span class="hs-identifier hs-var hs-var">classToId</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">AssetClass</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">CurrencySymbol</span></span><span> </span><span id="local-6989586621679282916"><span class="annot"><span class="annottext">BuiltinByteString
 </span><a href="#local-6989586621679282916"><span class="hs-identifier hs-var">policy</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TokenName</span></span><span> </span><span id="local-6989586621679282914"><span class="annot"><span class="annottext">BuiltinByteString
 </span><a href="#local-6989586621679282914"><span class="hs-identifier hs-var">name</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-378"></span><span>   </span><span class="hs-keyword">do</span><span>
 </span><span id="line-379"></span><span>     </span><span id="local-6989586621679282913"><span class="annot"><span class="annottext">PolicyId
 </span><a href="#local-6989586621679282913"><span class="hs-identifier hs-var">policy'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
-</span><span id="line-380"></span><span>       </span><span class="annot"><span class="annottext">String -&gt; Maybe PolicyId -&gt; MantisM IO PolicyId
-forall (m :: * -&gt; *) a. Monad m =&gt; String -&gt; Maybe a -&gt; MantisM m a
-</span><span class="hs-identifier hs-var">foistMantisMaybe</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span id="line-380"></span><span>       </span><span class="annot"><span class="annottext">String -&gt; Maybe PolicyId -&gt; MantraM IO PolicyId
+forall (m :: * -&gt; *) a. Monad m =&gt; String -&gt; Maybe a -&gt; MantraM m a
+</span><span class="hs-identifier hs-var">foistMantraMaybe</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;Failed to convert policy.&quot;</span></span><span>
-</span><span id="line-381"></span><span>         </span><span class="annot"><span class="annottext">(Maybe PolicyId -&gt; MantisM IO PolicyId)
+</span><span id="line-381"></span><span>         </span><span class="annot"><span class="annottext">(Maybe PolicyId -&gt; MantraM IO PolicyId)
 -&gt; (ByteString -&gt; Maybe PolicyId)
 -&gt; ByteString
--&gt; MantisM IO PolicyId
+-&gt; MantraM IO PolicyId
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">AsType PolicyId -&gt; ByteString -&gt; Maybe PolicyId
 forall a.
@@ -1698,18 +1698,18 @@ SerialiseAsRawBytes a =&gt;
 AsType a -&gt; ByteString -&gt; Maybe a
 </span><span class="hs-identifier hs-var">deserialiseFromRawBytes</span></span><span> </span><span class="annot"><span class="annottext">AsType PolicyId
 </span><span class="hs-identifier hs-var">AsPolicyId</span></span><span>
-</span><span id="line-382"></span><span>         </span><span class="annot"><span class="annottext">(ByteString -&gt; MantisM IO PolicyId)
--&gt; ByteString -&gt; MantisM IO PolicyId
+</span><span id="line-382"></span><span>         </span><span class="annot"><span class="annottext">(ByteString -&gt; MantraM IO PolicyId)
+-&gt; ByteString -&gt; MantraM IO PolicyId
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">BuiltinByteString -&gt; ByteString
 forall arep a. FromBuiltin arep a =&gt; arep -&gt; a
 </span><span class="hs-identifier hs-var">fromBuiltin</span></span><span> </span><span class="annot"><span class="annottext">BuiltinByteString
 </span><a href="#local-6989586621679282916"><span class="hs-identifier hs-var">policy</span></a></span><span>
-</span><span id="line-383"></span><span>     </span><span class="annot"><span class="annottext">AssetId -&gt; MantisM IO AssetId
+</span><span id="line-383"></span><span>     </span><span class="annot"><span class="annottext">AssetId -&gt; MantraM IO AssetId
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span>
-</span><span id="line-384"></span><span>       </span><span class="annot"><span class="annottext">(AssetId -&gt; MantisM IO AssetId)
--&gt; (ByteString -&gt; AssetId) -&gt; ByteString -&gt; MantisM IO AssetId
+</span><span id="line-384"></span><span>       </span><span class="annot"><span class="annottext">(AssetId -&gt; MantraM IO AssetId)
+-&gt; (ByteString -&gt; AssetId) -&gt; ByteString -&gt; MantraM IO AssetId
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">PolicyId -&gt; AssetName -&gt; AssetId
 </span><span class="hs-identifier hs-var">AssetId</span></span><span> </span><span class="annot"><span class="annottext">PolicyId
@@ -1719,8 +1719,8 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; AssetName
 </span><span class="hs-identifier hs-var">AssetName</span></span><span>
-</span><span id="line-386"></span><span>       </span><span class="annot"><span class="annottext">(ByteString -&gt; MantisM IO AssetId)
--&gt; ByteString -&gt; MantisM IO AssetId
+</span><span id="line-386"></span><span>       </span><span class="annot"><span class="annottext">(ByteString -&gt; MantraM IO AssetId)
+-&gt; ByteString -&gt; MantraM IO AssetId
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">BuiltinByteString -&gt; ByteString
 forall arep a. FromBuiltin arep a =&gt; arep -&gt; a
@@ -1729,25 +1729,25 @@ forall arep a. FromBuiltin arep a =&gt; arep -&gt; a
 </span><span id="line-387"></span><span>
 </span><span id="line-388"></span><span>
 </span><span id="line-389"></span><span class="hs-comment">-- | Hoist doublely nested `Either`s.</span><span>
-</span><span id="line-390"></span><span id="local-6989586621679283283"><span id="local-6989586621679283284"><span id="local-6989586621679283285"><span class="annot"><a href="Mantis.Oracle.Submit.html#foistMantisEitherIO%27"><span class="hs-identifier hs-type">foistMantisEitherIO'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679283285"><span class="hs-identifier hs-type">e</span></a></span><span>
+</span><span id="line-390"></span><span id="local-6989586621679283283"><span id="local-6989586621679283284"><span id="local-6989586621679283285"><span class="annot"><a href="Mantra.Oracle.Submit.html#foistMantraEitherIO%27"><span class="hs-identifier hs-type">foistMantraEitherIO'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679283285"><span class="hs-identifier hs-type">e</span></a></span><span>
 </span><span id="line-391"></span><span>                     </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="#local-6989586621679283284"><span class="hs-identifier hs-type">e'</span></a></span><span>
 </span><span id="line-392"></span><span>                     </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><a href="#local-6989586621679283285"><span class="hs-identifier hs-type">e</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><a href="#local-6989586621679283284"><span class="hs-identifier hs-type">e'</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679283283"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ The action with the nested `Either`s.</span><span>
-</span><span id="line-393"></span><span>                     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantisM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="#local-6989586621679283283"><span class="hs-identifier hs-type">a</span></a></span><span>                </span><span class="hs-comment">-- ^ The hoisted action.</span></span></span></span><span>
-</span><span id="line-394"></span><span id="foistMantisEitherIO%27"><span class="annot"><span class="annottext">foistMantisEitherIO' :: IO (Either e (Either e' a)) -&gt; MantisM IO a
-</span><a href="Mantis.Oracle.Submit.html#foistMantisEitherIO%27"><span class="hs-identifier hs-var hs-var">foistMantisEitherIO'</span></a></span></span><span> </span><span id="local-6989586621679282908"><span class="annot"><span class="annottext">IO (Either e (Either e' a))
+</span><span id="line-393"></span><span>                     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MantraM</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="#local-6989586621679283283"><span class="hs-identifier hs-type">a</span></a></span><span>                </span><span class="hs-comment">-- ^ The hoisted action.</span></span></span></span><span>
+</span><span id="line-394"></span><span id="foistMantraEitherIO%27"><span class="annot"><span class="annottext">foistMantraEitherIO' :: IO (Either e (Either e' a)) -&gt; MantraM IO a
+</span><a href="Mantra.Oracle.Submit.html#foistMantraEitherIO%27"><span class="hs-identifier hs-var hs-var">foistMantraEitherIO'</span></a></span></span><span> </span><span id="local-6989586621679282908"><span class="annot"><span class="annottext">IO (Either e (Either e' a))
 </span><a href="#local-6989586621679282908"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-395"></span><span>  </span><span class="hs-keyword">do</span><span>
 </span><span id="line-396"></span><span>    </span><span id="local-6989586621679282907"><span class="annot"><span class="annottext">Either e' a
-</span><a href="#local-6989586621679282907"><span class="hs-identifier hs-var">a'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO (Either e (Either e' a)) -&gt; MantisM IO (Either e' a)
+</span><a href="#local-6989586621679282907"><span class="hs-identifier hs-var">a'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO (Either e (Either e' a)) -&gt; MantraM IO (Either e' a)
 forall (m :: * -&gt; *) e a.
 (MonadIO m, Show e) =&gt;
-IO (Either e a) -&gt; MantisM m a
-</span><span class="hs-identifier hs-var">foistMantisEitherIO</span></span><span> </span><span class="annot"><span class="annottext">IO (Either e (Either e' a))
+IO (Either e a) -&gt; MantraM m a
+</span><span class="hs-identifier hs-var">foistMantraEitherIO</span></span><span> </span><span class="annot"><span class="annottext">IO (Either e (Either e' a))
 </span><a href="#local-6989586621679282908"><span class="hs-identifier hs-var">a</span></a></span><span>
-</span><span id="line-397"></span><span>    </span><span class="annot"><span class="annottext">Either e' a -&gt; MantisM IO a
+</span><span id="line-397"></span><span>    </span><span class="annot"><span class="annottext">Either e' a -&gt; MantraM IO a
 forall (m :: * -&gt; *) e a.
 (Monad m, Show e) =&gt;
-Either e a -&gt; MantisM m a
-</span><span class="hs-identifier hs-var">foistMantisEither</span></span><span> </span><span class="annot"><span class="annottext">Either e' a
+Either e a -&gt; MantraM m a
+</span><span class="hs-identifier hs-var">foistMantraEither</span></span><span> </span><span class="annot"><span class="annottext">Either e' a
 </span><a href="#local-6989586621679282907"><span class="hs-identifier hs-var">a'</span></a></span><span>
 </span><span id="line-398"></span></pre></body></html>

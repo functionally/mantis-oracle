@@ -31,11 +31,11 @@ import Data.String          (fromString)
 import Data.Version         (showVersion)
 import Data.Word            (Word32, Word64)
 import Ledger.Value         (AssetClass, CurrencySymbol(..), TokenName(..), assetClass)
-import Mantis.Oracle        (exportOracle)
-import Mantis.Oracle.Submit (createOracle, deleteOracle, writeOracle)
-import Mantis.Oracle.Types  (Parameters(..), makeOracle)
-import Mantis.Types
-import Paths_mantis_oracle  (version)
+import Mantra.Oracle        (exportOracle)
+import Mantra.Oracle.Submit (createOracle, deleteOracle, writeOracle)
+import Mantra.Oracle.Types  (Parameters(..), makeOracle)
+import Mantra.Types
+import Paths_mantra_oracle  (version)
 
 import qualified Data.Aeson             as A
 import qualified Data.ByteString.Base16 as Base16 (decode)
@@ -47,13 +47,13 @@ import qualified PlutusTx.Prelude       as P      (toBuiltin)
 #if USE_PAB
 
 import Data.Text                    (Text)
-import Mantis.Oracle.Client.PAB     (readOraclePAB)
-import Mantis.Oracle.Controller.PAB (runOraclePAB)
-import Mantis.Oracle.SOFR           (fetchSOFR)
+import Mantra.Oracle.Client.PAB     (readOraclePAB)
+import Mantra.Oracle.Controller.PAB (runOraclePAB)
+import Mantra.Oracle.SOFR           (fetchSOFR)
 import Wallet.Emulator.Wallet       (Wallet(..))
 
-import qualified Mantis.Oracle.Simulate     as Simulate (main)
-import qualified Mantis.Oracle.Simulate.PAB as Simulate (runPAB)
+import qualified Mantra.Oracle.Simulate     as Simulate (main)
+import qualified Mantra.Oracle.Simulate.PAB as Simulate (runPAB)
 
 #endif
 
@@ -155,7 +155,7 @@ main =
     let
       versionOption =
         O.infoOption
-          ("Mantis Oracle " ++ showVersion version ++ ", (c) 2021 Brian W Bush <code@functionally.io>")
+          ("Mantra Oracle " ++ showVersion version ++ ", (c) 2021 Brian W Bush <code@functionally.io>")
           (O.long "version" <> O.help "Show version.")
       parser =
         O.info
@@ -277,14 +277,14 @@ main =
         (
              O.fullDesc
           <> O.progDesc "Utilities for a Cardano oracle."
-          <> O.header "Mantis oracle tool."
+          <> O.header "Mantra oracle tool."
         )
     command <- O.execParser parser
     let
       -- Run a command to `IO`.
       run action =
         do
-          result <- runMantisToIO action
+          result <- runMantraToIO action
           case result of
             Right txId    -> putStrLn $ "TxId " ++ show txId
             Left message' -> putStrLn message'
@@ -314,20 +314,20 @@ main =
                   lovelaceAmount
           -- Read the signing address.
           signingAddress' <-
-            foistMantisMaybe "Failed to parse signing address"
+            foistMantraMaybe "Failed to parse signing address"
               . deserialiseAddress AsAddressAny
               . T.pack
               $ signingAddress command
           -- Read the signing key.
           signingKey <-
-            foistMantisEitherIO
+            foistMantraEitherIO
               . readFileTextEnvelope (AsSigningKey AsPaymentKey)
               $ signingKeyFile command
           -- Read the metadata message, if any.
           message <-
             maybe
               (return Nothing)
-              (foistMantisMaybeIO "Failed reading message JSON." . A.decodeFileStrict)
+              (foistMantraMaybeIO "Failed reading message JSON." . A.decodeFileStrict)
               $ messageFile command
           -- Operate the oracle.
           op
@@ -357,7 +357,7 @@ main =
       Create{..}   -> run
                         $ do
                           newData <-
-                            foistMantisMaybeIO "Failed reading new data JSON."
+                            foistMantraMaybeIO "Failed reading new data JSON."
                               . A.decodeFileStrict
                               $ newDataFile
                           operate
@@ -367,7 +367,7 @@ main =
       Delete{..}   -> run
                         $ do
                           oldData <-
-                            foistMantisMaybeIO "Failed reading old data JSON."
+                            foistMantraMaybeIO "Failed reading old data JSON."
                               . A.decodeFileStrict
                               $ oldDataFile
                           operate
@@ -376,11 +376,11 @@ main =
       Write{..}    -> run
                         $ do
                           oldData <-
-                            foistMantisMaybeIO "Failed reading old data JSON."
+                            foistMantraMaybeIO "Failed reading old data JSON."
                               . A.decodeFileStrict
                               $ oldDataFile
                           newData <-
-                            foistMantisMaybeIO "Failed reading new data JSON."
+                            foistMantraMaybeIO "Failed reading new data JSON."
                               . A.decodeFileStrict
                               $ newDataFile
                           operate

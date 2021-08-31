@@ -18,7 +18,7 @@
 {-# LANGUAGE TupleSections     #-}
 
 
-module Mantis.Oracle.Submit (
+module Mantra.Oracle.Submit (
 -- * Operations
   createOracle
 , deleteOracle
@@ -33,9 +33,9 @@ import Data.Function                                     (on)
 import Data.Maybe                                        (catMaybes, fromJust)
 import Data.Word                                         (Word64)
 import Ledger.Value                                      (AssetClass(..), CurrencySymbol(..), TokenName(..))
-import Mantis.Oracle                                     (oracleAddress, plutusOracle)
-import Mantis.Oracle.Types                               (Action(..), Oracle(..))
-import Mantis.Types                                      (MantisM, foistMantisEither, foistMantisEitherIO, foistMantisMaybe)
+import Mantra.Oracle                                     (oracleAddress, plutusOracle)
+import Mantra.Oracle.Types                               (Action(..), Oracle(..))
+import Mantra.Types                                      (MantraM, foistMantraEither, foistMantraEitherIO, foistMantraMaybe)
 import Ouroboros.Network.Protocol.LocalTxSubmission.Type (SubmitResult(..))
 import PlutusTx.Builtins                                 (fromBuiltin)
 
@@ -58,7 +58,7 @@ createOracle :: A.Value                          -- ^ The initial datum.
              -> SigningKey PaymentKey            -- ^ The signing key for the payment address.
              -> Lovelace                         -- ^ The maximum value for collateral.
              -> Quantity                         -- ^ The Lovelace to be sent to the script.
-             -> MantisM IO TxId                  -- ^ Action to submit the creation transaction.
+             -> MantraM IO TxId                  -- ^ Action to submit the creation transaction.
 createOracle newData =
   operateOracle
     Nothing
@@ -76,7 +76,7 @@ deleteOracle :: A.Value                           -- ^ The datum currently held 
              -> SigningKey PaymentKey             -- ^ The signing key for the payment address.
              -> Lovelace                          -- ^ The maximum value for collateral.
              -> Quantity                          -- ^ The Lovelace to be sent to the script.
-             -> MantisM IO TxId                   -- ^ Action to submit the deletion transaction.
+             -> MantraM IO TxId                   -- ^ Action to submit the deletion transaction.
 deleteOracle oldData =
   operateOracle
     (Just Delete)
@@ -97,7 +97,7 @@ writeOracle :: A.Value                          -- ^ The datum currently held in
             -> SigningKey PaymentKey            -- ^ The signing key for the payment address.
             -> Lovelace                         -- ^ The maximum value for collateral.
             -> Quantity                         -- ^ The Lovelace to be sent to the script.
-            -> MantisM IO TxId                  -- ^ Action to submit the writing transaction.
+            -> MantraM IO TxId                  -- ^ Action to submit the writing transaction.
 writeOracle oldData newData =
   operateOracle
     (Just Write)
@@ -118,7 +118,7 @@ operateOracle :: Maybe Action                     -- ^ The redeemer, if any.
               -> SigningKey PaymentKey            -- ^ The signing key for the payment address.
               -> Lovelace                         -- ^ The maximum value for collateral.
               -> Quantity                         -- ^ The Lovelace to be sent to the script.
-              -> MantisM IO TxId                  -- ^ Action to submit the deletion transaction.
+              -> MantraM IO TxId                  -- ^ Action to submit the deletion transaction.
 operateOracle action oldData newData metadataKey message connection network oracle controlAddress controlSigning maxCollateral scriptLovelace =
   do
     let
@@ -134,7 +134,7 @@ operateOracle action oldData newData metadataKey message connection network orac
     metadata <-
       case catMaybes [messageMetadata, oracleMetadata] of
         []        -> return Nothing
-        metadata' -> foistMantisEither
+        metadata' -> foistMantraEither
                        . fmap Just
                        . metadataFromJson TxMetadataJsonNoSchema
                        . A.Object
@@ -210,7 +210,7 @@ build :: Maybe Action                     -- ^ The redeemer, if any.
       -> (TxIn, Lovelace)                 -- ^ The UTXO for collateral and the value for new collateral.
       -> (Maybe A.Value, Maybe A.Value)   -- ^ The existing datum and the datum to replace it, if any.
       -> Maybe TxMetadata                 -- ^ The message metadata, if any.
-      -> MantisM IO (TxBody AlonzoEra)    -- ^ The action to build the transaction.
+      -> MantraM IO (TxBody AlonzoEra)    -- ^ The action to build the transaction.
 build action connection script scriptAddress controlAddress (datumTxIn,  datumValue) (controlTxIn, controlValue) plainUTxOs (collateralTxIn, collateralValue) (oldData, newData) metadata =
   do
     oldData' <- datumFromJSON oldData
@@ -288,7 +288,7 @@ build action connection script scriptAddress controlAddress (datumTxIn,  datumVa
       txUpdateProposal  = TxUpdateProposalNone
       txMintValue       = TxMintNone
       txScriptValidity  = TxScriptValidityNone
-    foistMantisEither
+    foistMantraEither
       $ makeTransactionBodyAutoBalance
           AlonzoEraInCardanoMode
           start
@@ -305,7 +305,7 @@ build action connection script scriptAddress controlAddress (datumTxIn,  datumVa
 submit :: LocalNodeConnectInfo CardanoMode -- ^ The connection info for the local node.
        -> TxBody AlonzoEra                 -- ^ The transaction body.
        -> SigningKey PaymentKey            -- ^ The signing key.
-       -> MantisM IO TxId                  -- ^ The action to submit the transaction.
+       -> MantraM IO TxId                  -- ^ The action to submit the transaction.
 submit connection body controlSigning =
   do
     let
@@ -326,9 +326,9 @@ submit connection body controlSigning =
 
 -- | Read JSON data as script data.
 datumFromJSON :: Maybe A.Value                 -- ^ The JSON, if any.
-              -> MantisM IO (Maybe ScriptData) -- ^ Action for converting the JSON to script data.
+              -> MantraM IO (Maybe ScriptData) -- ^ Action for converting the JSON to script data.
 datumFromJSON =
-  foistMantisEither
+  foistMantraEither
     . maybe
       (return Nothing)
       (fmap Just . scriptDataFromJson ScriptDataJsonNoSchema)
@@ -337,25 +337,25 @@ datumFromJSON =
 -- | Convert an address to Alonzo.
 asAlonzoAddress :: String                              -- ^ The error message.
                 -> AddressAny                          -- ^ The address.
-                -> MantisM IO (AddressInEra AlonzoEra) -- ^ Action for converting the address.
+                -> MantraM IO (AddressInEra AlonzoEra) -- ^ Action for converting the address.
 asAlonzoAddress message =
-  foistMantisMaybe message
+  foistMantraMaybe message
     . anyAddressInEra AlonzoEra
 
 
 -- | Query the node.
 queryAny :: LocalNodeConnectInfo CardanoMode -- ^ The connection info for the local node.
          -> QueryInMode CardanoMode a        -- ^ The query.
-         -> MantisM IO a                     -- ^ Action for running the query.
+         -> MantraM IO a                     -- ^ Action for running the query.
 queryAny connection =
- foistMantisEitherIO
+ foistMantraEitherIO
    . queryNodeLocalState connection Nothing
 
 queryAlonzo :: LocalNodeConnectInfo CardanoMode   -- ^ The connection info for the local node.
             -> QueryInShelleyBasedEra AlonzoEra a -- ^ The query.
-            -> MantisM IO a                       -- ^ Action for running the query.
+            -> MantraM IO a                       -- ^ Action for running the query.
 queryAlonzo connection =
-  foistMantisEitherIO'
+  foistMantraEitherIO'
     . queryNodeLocalState connection Nothing
     . QueryInEra AlonzoEraInCardanoMode
     . QueryInShelleyBasedEra ShelleyBasedEraAlonzo
@@ -365,7 +365,7 @@ queryAlonzo connection =
 findUTxO :: LocalNodeConnectInfo CardanoMode     -- ^ The connection info for the local node.
          -> AddressAny                           -- ^ The address to query.
          -> (Value -> Bool)                      -- ^ The condition on values in the UTxO.
-         -> MantisM IO [(TxIn, TxOut AlonzoEra)] -- ^ The action to find the UTxOs.
+         -> MantraM IO [(TxIn, TxOut AlonzoEra)] -- ^ The action to find the UTxOs.
 findUTxO connection address condition =
   do
     let
@@ -389,11 +389,11 @@ findUTxO connection address condition =
 
 -- | Convert a Plutus `AssetClass` to a Cardano `AssetId`.
 classToId :: AssetClass         -- ^ The asset class.
-          -> MantisM IO AssetId -- ^ The asset identifier.
+          -> MantraM IO AssetId -- ^ The asset identifier.
 classToId (AssetClass (CurrencySymbol policy, TokenName name)) =
    do
      policy' <-
-       foistMantisMaybe "Failed to convert policy."
+       foistMantraMaybe "Failed to convert policy."
          . deserialiseFromRawBytes AsPolicyId
          $ fromBuiltin policy
      return
@@ -403,11 +403,11 @@ classToId (AssetClass (CurrencySymbol policy, TokenName name)) =
 
 
 -- | Hoist doublely nested `Either`s.
-foistMantisEitherIO' :: Show e
+foistMantraEitherIO' :: Show e
                      => Show e'
                      => IO (Either e (Either e' a)) -- ^ The action with the nested `Either`s.
-                     -> MantisM IO a                -- ^ The hoisted action.
-foistMantisEitherIO' a =
+                     -> MantraM IO a                -- ^ The hoisted action.
+foistMantraEitherIO' a =
   do
-    a' <- foistMantisEitherIO a
-    foistMantisEither a'
+    a' <- foistMantraEitherIO a
+    foistMantraEither a'

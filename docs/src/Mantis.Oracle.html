@@ -29,19 +29,19 @@
 </span><span id="line-29"></span><span class="hs-pragma">{-# OPTIONS_GHC -fno-warn-orphans #-}</span><span>
 </span><span id="line-30"></span><span>
 </span><span id="line-31"></span><span>
-</span><span id="line-32"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Mantis.Oracle</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-32"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Mantra.Oracle</span><span> </span><span class="hs-special">(</span><span>
 </span><span id="line-33"></span><span class="annot"><span class="hs-comment">-- * Oracle</span></span><span>
-</span><span id="line-34"></span><span>  </span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier">OracleScript</span></a></span><span>
-</span><span id="line-35"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#oracleInstance"><span class="hs-identifier">oracleInstance</span></a></span><span>
-</span><span id="line-36"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#oracleValidator"><span class="hs-identifier">oracleValidator</span></a></span><span>
-</span><span id="line-37"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#oracleAddress"><span class="hs-identifier">oracleAddress</span></a></span><span>
-</span><span id="line-38"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#plutusOracle"><span class="hs-identifier">plutusOracle</span></a></span><span>
-</span><span id="line-39"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#exportOracle"><span class="hs-identifier">exportOracle</span></a></span><span>
+</span><span id="line-34"></span><span>  </span><span class="annot"><a href="Mantra.Oracle.html#OracleScript"><span class="hs-identifier">OracleScript</span></a></span><span>
+</span><span id="line-35"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantra.Oracle.html#oracleInstance"><span class="hs-identifier">oracleInstance</span></a></span><span>
+</span><span id="line-36"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantra.Oracle.html#oracleValidator"><span class="hs-identifier">oracleValidator</span></a></span><span>
+</span><span id="line-37"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantra.Oracle.html#oracleAddress"><span class="hs-identifier">oracleAddress</span></a></span><span>
+</span><span id="line-38"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantra.Oracle.html#plutusOracle"><span class="hs-identifier">plutusOracle</span></a></span><span>
+</span><span id="line-39"></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantra.Oracle.html#exportOracle"><span class="hs-identifier">exportOracle</span></a></span><span>
 </span><span id="line-40"></span><span class="annot"><span class="hs-comment">-- * Access</span></span><span class="hs-cpp">
 #if USE_PAB
 </span><span class="hs-special">,</span><span> </span><span class="hs-identifier">findOracle</span><span class="hs-cpp">
 #endif
-</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#fetchDatum"><span class="hs-identifier">fetchDatum</span></a></span><span>
+</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantra.Oracle.html#fetchDatum"><span class="hs-identifier">fetchDatum</span></a></span><span>
 </span><span id="line-45"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-46"></span><span>
 </span><span id="line-47"></span><span>
@@ -54,7 +54,7 @@
 </span><span id="line-54"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ledger</span></span><span>               </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Datum</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">DatumHash</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ScriptContext</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">TxOut</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">findOwnInput</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">getContinuingOutputs</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">txInInfoResolved</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">txOutValue</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">unValidatorScript</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">valueSpent</span></span><span class="hs-special">)</span><span>
 </span><span id="line-55"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ledger.Typed.Scripts</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">DatumType</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">RedeemerType</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">TypedValidator</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">Validator</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ValidatorTypes</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">mkTypedValidator</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">validatorScript</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">wrapValidator</span></span><span class="hs-special">)</span><span>
 </span><span id="line-56"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Ledger.Value</span></span><span>         </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">assetClassValueOf</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">geq</span></span><span class="hs-special">)</span><span>
-</span><span id="line-57"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html"><span class="hs-identifier">Mantis.Oracle.Types</span></a></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier">Action</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier">Oracle</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-57"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html"><span class="hs-identifier">Mantra.Oracle.Types</span></a></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier">Action</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier">Oracle</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-58"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Prelude</span></span><span>              </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">FilePath</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">IO</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(&lt;&gt;)</span></span><span class="hs-special">)</span><span>
 </span><span id="line-59"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">PlutusTx</span></span><span>             </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">FromData</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">ToData</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">UnsafeFromData</span></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">applyCode</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">compile</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">liftCode</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">makeLift</span></span><span class="hs-special">)</span><span>
 </span><span id="line-60"></span><span>
@@ -79,7 +79,7 @@
 </span><span id="line-79"></span><span class="hs-comment">-- FIXME: Temporarily map actions to integers, in order to accommodate Alonzo Purple.</span><span class="hs-cpp">
 #if USE_PAB
 </span><span class="hs-cpp">#else
-</span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromData</span></span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromData</span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-83"></span><span>  </span><span id="local-6989586621679282733"><span class="annot"><span class="annottext">fromBuiltinData :: BuiltinData -&gt; Maybe Action
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var">fromBuiltinData</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Action) -&gt; Maybe Integer -&gt; Maybe Action
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
@@ -91,7 +91,7 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">BuiltinData -&gt; Maybe Integer
 forall a. FromData a =&gt; BuiltinData -&gt; Maybe a
 </span><span class="hs-identifier hs-var">fromBuiltinData</span></span><span>
-</span><span id="line-84"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">UnsafeFromData</span></span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-84"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">UnsafeFromData</span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-85"></span><span>  </span><span id="local-6989586621679282726"><span class="annot"><span class="annottext">unsafeFromBuiltinData :: BuiltinData -&gt; Action
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var">unsafeFromBuiltinData</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Action
 forall a. Enum a =&gt; Integer -&gt; a
@@ -101,7 +101,7 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">BuiltinData -&gt; Integer
 forall a. UnsafeFromData a =&gt; BuiltinData -&gt; a
 </span><span class="hs-identifier hs-var">unsafeFromBuiltinData</span></span><span>
-</span><span id="line-86"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ToData</span></span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-86"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ToData</span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-87"></span><span>  </span><span id="local-6989586621679282722"><span class="annot"><span class="annottext">toBuiltinData :: Action -&gt; BuiltinData
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var">toBuiltinData</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; BuiltinData
 forall a. ToData a =&gt; a -&gt; BuiltinData
@@ -114,16 +114,16 @@ forall a. Enum a =&gt; a -&gt; Integer
 #endif
 </span><span>
 </span><span id="line-90"></span><span>
-</span><span id="line-91"></span><span class="hs-pragma">{-# INLINABLE</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#makeValidator"><span class="hs-pragma hs-type">makeValidator</span></a></span><span> </span><span class="hs-pragma">#-}</span><span>
+</span><span id="line-91"></span><span class="hs-pragma">{-# INLINABLE</span><span> </span><span class="annot"><a href="Mantra.Oracle.html#makeValidator"><span class="hs-pragma hs-type">makeValidator</span></a></span><span> </span><span class="hs-pragma">#-}</span><span>
 </span><span id="line-92"></span><span>
 </span><span id="line-93"></span><span class="hs-comment">-- | Make the validator for the oracle.</span><span>
-</span><span id="line-94"></span><span class="annot"><a href="Mantis.Oracle.html#makeValidator"><span class="hs-identifier hs-type">makeValidator</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>         </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-94"></span><span class="annot"><a href="Mantra.Oracle.html#makeValidator"><span class="hs-identifier hs-type">makeValidator</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>         </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-95"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BuiltinData</span></span><span>    </span><span class="hs-comment">-- ^ The datum.</span><span>
-</span><span id="line-96"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>         </span><span class="hs-comment">-- ^ The redeemer.</span><span>
+</span><span id="line-96"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>         </span><span class="hs-comment">-- ^ The redeemer.</span><span>
 </span><span id="line-97"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ScriptContext</span></span><span>  </span><span class="hs-comment">-- ^ The context.</span><span>
 </span><span id="line-98"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>           </span><span class="hs-comment">-- ^ Whether the transaction is valid.</span><span>
 </span><span id="line-99"></span><span id="makeValidator"><span class="annot"><span class="annottext">makeValidator :: Oracle -&gt; BuiltinData -&gt; Action -&gt; ScriptContext -&gt; Bool
-</span><a href="Mantis.Oracle.html#makeValidator"><span class="hs-identifier hs-var hs-var">makeValidator</span></a></span></span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span class="hs-special">{</span><span id="local-6989586621679282715"><span id="local-6989586621679282716"><span id="local-6989586621679282717"><span class="annot"><span class="annottext">Value
+</span><a href="Mantra.Oracle.html#makeValidator"><span class="hs-identifier hs-var hs-var">makeValidator</span></a></span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span class="hs-special">{</span><span id="local-6989586621679282715"><span id="local-6989586621679282716"><span id="local-6989586621679282717"><span class="annot"><span class="annottext">Value
 AssetClass
 requiredFee :: Oracle -&gt; Value
 datumToken :: Oracle -&gt; AssetClass
@@ -131,7 +131,7 @@ controlToken :: Oracle -&gt; AssetClass
 requiredFee :: Value
 datumToken :: AssetClass
 controlToken :: AssetClass
-</span><a href="Mantis.Oracle.Types.html#requiredFee"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span class="annot"><span class="annottext">BuiltinData
+</span><a href="Mantra.Oracle.Types.html#requiredFee"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span class="annot"><span class="annottext">BuiltinData
 </span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679282711"><span class="annot"><span class="annottext">Action
 </span><a href="#local-6989586621679282711"><span class="hs-identifier hs-var">redeemer</span></a></span></span><span> </span><span id="local-6989586621679282710"><span class="annot"><span class="annottext">context :: ScriptContext
 </span><a href="#local-6989586621679282710"><span class="hs-identifier hs-var">context</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><span class="hs-identifier hs-type">ScriptContext</span></span><span class="hs-special">{</span><span id="local-6989586621679282707"><span id="local-6989586621679282708"><span class="annot"><span class="annottext">ScriptPurpose
@@ -325,19 +325,19 @@ forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span id="line-151"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Action
 </span><a href="#local-6989586621679282711"><span class="hs-identifier hs-var">redeemer</span></a></span><span> </span><span class="hs-keyword">of</span><span>
 </span><span id="line-152"></span><span>      </span><span class="annot"><span class="annottext">Action
-</span><a href="Mantis.Oracle.Types.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="Mantra.Oracle.Types.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
 </span><a href="#local-6989586621679282677"><span class="hs-identifier hs-var">deleting</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
 </span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
 </span><a href="#local-6989586621679282678"><span class="hs-identifier hs-var">controlled</span></a></span><span>
 </span><span id="line-153"></span><span>      </span><span class="annot"><span class="annottext">Action
-</span><a href="Mantis.Oracle.Types.html#Read"><span class="hs-identifier hs-var">Read</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="Mantra.Oracle.Types.html#Read"><span class="hs-identifier hs-var">Read</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
 </span><a href="#local-6989586621679282694"><span class="hs-identifier hs-var">singleDatum</span></a></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
 </span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
 </span><a href="#local-6989586621679282686"><span class="hs-identifier hs-var">unchangedDatum</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
 </span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
 </span><a href="#local-6989586621679282675"><span class="hs-identifier hs-var">feePaid</span></a></span><span>
 </span><span id="line-154"></span><span>      </span><span class="annot"><span class="annottext">Action
-</span><a href="Mantis.Oracle.Types.html#Write"><span class="hs-identifier hs-var">Write</span></a></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="Mantra.Oracle.Types.html#Write"><span class="hs-identifier hs-var">Write</span></a></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
 </span><a href="#local-6989586621679282694"><span class="hs-identifier hs-var">singleDatum</span></a></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
 </span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
 </span><a href="#local-6989586621679282678"><span class="hs-identifier hs-var">controlled</span></a></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
@@ -346,18 +346,18 @@ forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span id="line-155"></span><span>
 </span><span id="line-156"></span><span>
 </span><span id="line-157"></span><span class="hs-comment">-- | Type for the script.</span><span>
-</span><span id="line-158"></span><span class="hs-keyword">data</span><span> </span><span id="OracleScript"><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-var">OracleScript</span></a></span></span><span>
+</span><span id="line-158"></span><span class="hs-keyword">data</span><span> </span><span id="OracleScript"><span class="annot"><a href="Mantra.Oracle.html#OracleScript"><span class="hs-identifier hs-var">OracleScript</span></a></span></span><span>
 </span><span id="line-159"></span><span>
-</span><span id="line-160"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ValidatorTypes</span></span><span> </span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-161"></span><span>    </span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="DatumType"><span class="annot"><span class="hs-identifier hs-var">DatumType</span></span></span><span>    </span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BuiltinData</span></span><span>
-</span><span id="line-162"></span><span>    </span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="RedeemerType"><span class="annot"><span class="hs-identifier hs-var">RedeemerType</span></span></span><span> </span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>
+</span><span id="line-160"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ValidatorTypes</span></span><span> </span><span class="annot"><a href="Mantra.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-161"></span><span>    </span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="DatumType"><span class="annot"><span class="hs-identifier hs-var">DatumType</span></span></span><span>    </span><span class="annot"><a href="Mantra.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">BuiltinData</span></span><span>
+</span><span id="line-162"></span><span>    </span><span class="hs-keyword">type</span><span> </span><span class="hs-keyword">instance</span><span> </span><span id="RedeemerType"><span class="annot"><span class="hs-identifier hs-var">RedeemerType</span></span></span><span> </span><span class="annot"><a href="Mantra.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>
 </span><span id="line-163"></span><span>
 </span><span id="line-164"></span><span>
 </span><span id="line-165"></span><span class="hs-comment">-- | Compute the instance for an oracle.</span><span>
-</span><span id="line-166"></span><span class="annot"><a href="Mantis.Oracle.html#oracleInstance"><span class="hs-identifier hs-type">oracleInstance</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                      </span><span class="hs-comment">-- ^ The oracle.</span><span>
-</span><span id="line-167"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TypedValidator</span></span><span> </span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span> </span><span class="hs-comment">-- ^ The instance.</span><span>
+</span><span id="line-166"></span><span class="annot"><a href="Mantra.Oracle.html#oracleInstance"><span class="hs-identifier hs-type">oracleInstance</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                      </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-167"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TypedValidator</span></span><span> </span><span class="annot"><a href="Mantra.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span> </span><span class="hs-comment">-- ^ The instance.</span><span>
 </span><span id="line-168"></span><span id="oracleInstance"><span class="annot"><span class="annottext">oracleInstance :: Oracle -&gt; TypedValidator OracleScript
-</span><a href="Mantis.Oracle.html#oracleInstance"><span class="hs-identifier hs-var hs-var">oracleInstance</span></a></span></span><span> </span><span id="local-6989586621679282670"><span class="annot"><span class="annottext">Oracle
+</span><a href="Mantra.Oracle.html#oracleInstance"><span class="hs-identifier hs-var hs-var">oracleInstance</span></a></span></span><span> </span><span id="local-6989586621679282670"><span class="annot"><span class="annottext">Oracle
 </span><a href="#local-6989586621679282670"><span class="hs-identifier hs-var">oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-169"></span><span>  </span><span class="annot"><span class="annottext">CompiledCode (ValidatorType OracleScript)
 -&gt; CompiledCode
@@ -367,7 +367,7 @@ forall a.
 CompiledCode (ValidatorType a)
 -&gt; CompiledCode (ValidatorType a -&gt; WrappedValidatorType)
 -&gt; TypedValidator a
-</span><span class="hs-identifier hs-var">mkTypedValidator</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Mantis.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span>
+</span><span class="hs-identifier hs-var">mkTypedValidator</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Mantra.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span>
 </span><span id="line-170"></span><span>    </span><span class="hs-special">(</span><span class="hs-special">$$(</span><span class="annot"><span class="hs-identifier hs-type">compile</span></span><span> </span><span class="hs-special">[||</span><span> </span><span class="hs-identifier">makeValidator</span><span> </span><span class="hs-special">||]</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">CompiledCode
   (Oracle -&gt; BuiltinData -&gt; Action -&gt; ScriptContext -&gt; Bool)
 -&gt; CompiledCodeIn DefaultUni DefaultFun Oracle
@@ -396,28 +396,28 @@ a -&gt; CompiledCodeIn uni fun a
 forall d r.
 (UnsafeFromData d, UnsafeFromData r) =&gt;
 (d -&gt; r -&gt; ScriptContext -&gt; Bool) -&gt; WrappedValidatorType
-</span><span class="hs-identifier hs-var">wrapValidator</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><span class="hs-identifier hs-type">BuiltinData</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Mantis.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>
+</span><span class="hs-identifier hs-var">wrapValidator</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><span class="hs-identifier hs-type">BuiltinData</span></span><span> </span><span class="hs-glyph">@</span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span>
 </span><span id="line-174"></span><span>
 </span><span id="line-175"></span><span>
 </span><span id="line-176"></span><span class="hs-comment">-- | Compute the validator for an oracle.</span><span>
-</span><span id="line-177"></span><span class="annot"><a href="Mantis.Oracle.html#oracleValidator"><span class="hs-identifier hs-type">oracleValidator</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>    </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-177"></span><span class="annot"><a href="Mantra.Oracle.html#oracleValidator"><span class="hs-identifier hs-type">oracleValidator</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>    </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-178"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Validator</span></span><span> </span><span class="hs-comment">-- ^ The validator.</span><span>
 </span><span id="line-179"></span><span id="oracleValidator"><span class="annot"><span class="annottext">oracleValidator :: Oracle -&gt; Validator
-</span><a href="Mantis.Oracle.html#oracleValidator"><span class="hs-identifier hs-var hs-var">oracleValidator</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TypedValidator OracleScript -&gt; Validator
+</span><a href="Mantra.Oracle.html#oracleValidator"><span class="hs-identifier hs-var hs-var">oracleValidator</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TypedValidator OracleScript -&gt; Validator
 forall a. TypedValidator a -&gt; Validator
 </span><span class="hs-identifier hs-var">validatorScript</span></span><span> </span><span class="annot"><span class="annottext">(TypedValidator OracleScript -&gt; Validator)
 -&gt; (Oracle -&gt; TypedValidator OracleScript) -&gt; Oracle -&gt; Validator
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; TypedValidator OracleScript
-</span><a href="Mantis.Oracle.html#oracleInstance"><span class="hs-identifier hs-var">oracleInstance</span></a></span><span>
+</span><a href="Mantra.Oracle.html#oracleInstance"><span class="hs-identifier hs-var">oracleInstance</span></a></span><span>
 </span><span id="line-180"></span><span>
 </span><span id="line-181"></span><span>
 </span><span id="line-182"></span><span class="hs-comment">-- | Compute the address for an oracle.</span><span>
-</span><span id="line-183"></span><span class="annot"><a href="Mantis.Oracle.html#oracleAddress"><span class="hs-identifier hs-type">oracleAddress</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NetworkId</span></span><span>  </span><span class="hs-comment">-- ^ The network identifier.</span><span>
-</span><span id="line-184"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>     </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-183"></span><span class="annot"><a href="Mantra.Oracle.html#oracleAddress"><span class="hs-identifier hs-type">oracleAddress</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NetworkId</span></span><span>  </span><span class="hs-comment">-- ^ The network identifier.</span><span>
+</span><span id="line-184"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>     </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-185"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span> </span><span class="hs-comment">-- ^ The script address.</span><span>
 </span><span id="line-186"></span><span id="oracleAddress"><span class="annot"><span class="annottext">oracleAddress :: NetworkId -&gt; Oracle -&gt; AddressAny
-</span><a href="Mantis.Oracle.html#oracleAddress"><span class="hs-identifier hs-var hs-var">oracleAddress</span></a></span></span><span> </span><span id="local-6989586621679282666"><span class="annot"><span class="annottext">NetworkId
+</span><a href="Mantra.Oracle.html#oracleAddress"><span class="hs-identifier hs-var hs-var">oracleAddress</span></a></span></span><span> </span><span id="local-6989586621679282666"><span class="annot"><span class="annottext">NetworkId
 </span><a href="#local-6989586621679282666"><span class="hs-identifier hs-var">network</span></a></span></span><span> </span><span id="local-6989586621679282665"><span class="annot"><span class="annottext">Oracle
 </span><a href="#local-6989586621679282665"><span class="hs-identifier hs-var">oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span>
 </span><span id="line-187"></span><span>  </span><span class="annot"><span class="annottext">Address ShelleyAddr -&gt; AddressAny
@@ -458,7 +458,7 @@ PlutusScriptVersion lang -&gt; PlutusScript lang -&gt; Script lang
 -&gt; PlutusScript PlutusScriptV1 -&gt; PaymentCredential
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; PlutusScript PlutusScriptV1
-</span><a href="Mantis.Oracle.html#plutusOracle"><span class="hs-identifier hs-var">plutusOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="Mantra.Oracle.html#plutusOracle"><span class="hs-identifier hs-var">plutusOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
 </span><a href="#local-6989586621679282665"><span class="hs-identifier hs-var">oracle</span></a></span><span>
 </span><span id="line-194"></span><span>      </span><span class="hs-special">)</span><span>
 </span><span id="line-195"></span><span>      </span><span class="annot"><span class="annottext">StakeAddressReference
@@ -490,14 +490,14 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 #endif
 </span><span>
 </span><span id="line-222"></span><span>
-</span><span id="line-223"></span><span class="hs-pragma">{-# INLINABLE</span><span> </span><span class="annot"><a href="Mantis.Oracle.html#fetchDatum"><span class="hs-pragma hs-type">fetchDatum</span></a></span><span> </span><span class="hs-pragma">#-}</span><span>
+</span><span id="line-223"></span><span class="hs-pragma">{-# INLINABLE</span><span> </span><span class="annot"><a href="Mantra.Oracle.html#fetchDatum"><span class="hs-pragma hs-type">fetchDatum</span></a></span><span> </span><span class="hs-pragma">#-}</span><span>
 </span><span id="line-224"></span><span>
 </span><span id="line-225"></span><span class="hs-comment">-- | Retrieve the oracle's datum from a transaction output.</span><span>
-</span><span id="line-226"></span><span class="annot"><a href="Mantis.Oracle.html#fetchDatum"><span class="hs-identifier hs-type">fetchDatum</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span>                      </span><span class="hs-comment">-- ^ The transaction output.</span><span>
+</span><span id="line-226"></span><span class="annot"><a href="Mantra.Oracle.html#fetchDatum"><span class="hs-identifier hs-type">fetchDatum</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span>                      </span><span class="hs-comment">-- ^ The transaction output.</span><span>
 </span><span id="line-227"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">DatumHash</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Datum</span></span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ Function for looking up the datum, given its hash.</span><span>
 </span><span id="line-228"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BuiltinData</span></span><span>          </span><span class="hs-comment">-- ^ The datum, if it was found.</span><span>
 </span><span id="line-229"></span><span id="fetchDatum"><span class="annot"><span class="annottext">fetchDatum :: TxOut -&gt; (DatumHash -&gt; Maybe Datum) -&gt; Maybe BuiltinData
-</span><a href="Mantis.Oracle.html#fetchDatum"><span class="hs-identifier hs-var hs-var">fetchDatum</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span class="hs-special">{</span><span id="local-6989586621679282657"><span id="local-6989586621679282658"><span id="local-6989586621679282659"><span class="annot"><span class="annottext">Maybe DatumHash
+</span><a href="Mantra.Oracle.html#fetchDatum"><span class="hs-identifier hs-var hs-var">fetchDatum</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span class="hs-special">{</span><span id="local-6989586621679282657"><span id="local-6989586621679282658"><span id="local-6989586621679282659"><span class="annot"><span class="annottext">Maybe DatumHash
 Value
 Address
 txOutAddress :: TxOut -&gt; Address
@@ -523,10 +523,10 @@ forall a. FromData a =&gt; BuiltinData -&gt; Maybe a
 </span><span id="line-234"></span><span>
 </span><span id="line-235"></span><span>
 </span><span id="line-236"></span><span class="hs-comment">-- | Serialize the oracle as bytes.</span><span>
-</span><span id="line-237"></span><span class="annot"><a href="Mantis.Oracle.html#serialiseOracle"><span class="hs-identifier hs-type">serialiseOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>              </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-237"></span><span class="annot"><a href="Mantra.Oracle.html#serialiseOracle"><span class="hs-identifier hs-type">serialiseOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>              </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-238"></span><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">SBS.ShortByteString</span></span><span> </span><span class="hs-comment">-- ^ Its serialization.</span><span>
 </span><span id="line-239"></span><span id="serialiseOracle"><span class="annot"><span class="annottext">serialiseOracle :: Oracle -&gt; ShortByteString
-</span><a href="Mantis.Oracle.html#serialiseOracle"><span class="hs-identifier hs-var hs-var">serialiseOracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ShortByteString
+</span><a href="Mantra.Oracle.html#serialiseOracle"><span class="hs-identifier hs-var hs-var">serialiseOracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; ShortByteString
 </span><span class="hs-identifier hs-var">SBS.toShort</span></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; ShortByteString)
 -&gt; (Oracle -&gt; ByteString) -&gt; Oracle -&gt; ShortByteString
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
@@ -543,14 +543,14 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-identifier hs-var">unValidatorScript</span></span><span> </span><span class="annot"><span class="annottext">(Validator -&gt; Script) -&gt; (Oracle -&gt; Validator) -&gt; Oracle -&gt; Script
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; Validator
-</span><a href="Mantis.Oracle.html#oracleValidator"><span class="hs-identifier hs-var">oracleValidator</span></a></span><span>
+</span><a href="Mantra.Oracle.html#oracleValidator"><span class="hs-identifier hs-var">oracleValidator</span></a></span><span>
 </span><span id="line-240"></span><span>
 </span><span id="line-241"></span><span>
 </span><span id="line-242"></span><span class="hs-comment">-- | Serialise the oracle as a Plutus script.</span><span>
-</span><span id="line-243"></span><span class="annot"><a href="Mantis.Oracle.html#plutusOracle"><span class="hs-identifier hs-type">plutusOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                      </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-243"></span><span class="annot"><a href="Mantra.Oracle.html#plutusOracle"><span class="hs-identifier hs-type">plutusOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                      </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-244"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">PlutusScript</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">PlutusScriptV1</span></span><span> </span><span class="hs-comment">-- ^ The Plutus script.</span><span>
 </span><span id="line-245"></span><span id="plutusOracle"><span class="annot"><span class="annottext">plutusOracle :: Oracle -&gt; PlutusScript PlutusScriptV1
-</span><a href="Mantis.Oracle.html#plutusOracle"><span class="hs-identifier hs-var hs-var">plutusOracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShortByteString -&gt; PlutusScript PlutusScriptV1
+</span><a href="Mantra.Oracle.html#plutusOracle"><span class="hs-identifier hs-var hs-var">plutusOracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShortByteString -&gt; PlutusScript PlutusScriptV1
 forall lang. ShortByteString -&gt; PlutusScript lang
 </span><span class="hs-identifier hs-var">PlutusScriptSerialised</span></span><span> </span><span class="annot"><span class="annottext">(ShortByteString -&gt; PlutusScript PlutusScriptV1)
 -&gt; (Oracle -&gt; ShortByteString)
@@ -558,16 +558,16 @@ forall lang. ShortByteString -&gt; PlutusScript lang
 -&gt; PlutusScript PlutusScriptV1
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; ShortByteString
-</span><a href="Mantis.Oracle.html#serialiseOracle"><span class="hs-identifier hs-var">serialiseOracle</span></a></span><span>
+</span><a href="Mantra.Oracle.html#serialiseOracle"><span class="hs-identifier hs-var">serialiseOracle</span></a></span><span>
 </span><span id="line-246"></span><span>
 </span><span id="line-247"></span><span>
 </span><span id="line-248"></span><span class="hs-comment">-- | Export the validator for an oracle and compute its address.</span><span>
-</span><span id="line-249"></span><span class="annot"><a href="Mantis.Oracle.html#exportOracle"><span class="hs-identifier hs-type">exportOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span>      </span><span class="hs-comment">-- ^ The filename for writing the validator bytes.</span><span>
+</span><span id="line-249"></span><span class="annot"><a href="Mantra.Oracle.html#exportOracle"><span class="hs-identifier hs-type">exportOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span>      </span><span class="hs-comment">-- ^ The filename for writing the validator bytes.</span><span>
 </span><span id="line-250"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NetworkId</span></span><span>     </span><span class="hs-comment">-- ^ The network identifier.</span><span>
-</span><span id="line-251"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantis.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>        </span><span class="hs-comment">-- ^ The oracle.</span><span>
+</span><span id="line-251"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>        </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-252"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span> </span><span class="hs-comment">-- ^ Action writing the validator and returning its address.</span><span>
 </span><span id="line-253"></span><span id="exportOracle"><span class="annot"><span class="annottext">exportOracle :: FilePath -&gt; NetworkId -&gt; Oracle -&gt; IO AddressAny
-</span><a href="Mantis.Oracle.html#exportOracle"><span class="hs-identifier hs-var hs-var">exportOracle</span></a></span></span><span> </span><span id="local-6989586621679282649"><span class="annot"><span class="annottext">FilePath
+</span><a href="Mantra.Oracle.html#exportOracle"><span class="hs-identifier hs-var hs-var">exportOracle</span></a></span></span><span> </span><span id="local-6989586621679282649"><span class="annot"><span class="annottext">FilePath
 </span><a href="#local-6989586621679282649"><span class="hs-identifier hs-var">filename</span></a></span></span><span> </span><span id="local-6989586621679282648"><span class="annot"><span class="annottext">NetworkId
 </span><a href="#local-6989586621679282648"><span class="hs-identifier hs-var">network</span></a></span></span><span> </span><span id="local-6989586621679282647"><span class="annot"><span class="annottext">Oracle
 </span><a href="#local-6989586621679282647"><span class="hs-identifier hs-var">oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
@@ -596,7 +596,7 @@ forall a. Maybe a
 -&gt; PlutusScript PlutusScriptV1 -&gt; IO ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; PlutusScript PlutusScriptV1
-</span><a href="Mantis.Oracle.html#plutusOracle"><span class="hs-identifier hs-var">plutusOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="Mantra.Oracle.html#plutusOracle"><span class="hs-identifier hs-var">plutusOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
 </span><a href="#local-6989586621679282647"><span class="hs-identifier hs-var">oracle</span></a></span><span>
 </span><span id="line-258"></span><span>    </span><span class="annot"><span class="annottext">AddressAny -&gt; IO AddressAny
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
@@ -604,7 +604,7 @@ forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span id="line-259"></span><span>      </span><span class="annot"><span class="annottext">(AddressAny -&gt; IO AddressAny) -&gt; AddressAny -&gt; IO AddressAny
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">NetworkId -&gt; Oracle -&gt; AddressAny
-</span><a href="Mantis.Oracle.html#oracleAddress"><span class="hs-identifier hs-var">oracleAddress</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkId
+</span><a href="Mantra.Oracle.html#oracleAddress"><span class="hs-identifier hs-var">oracleAddress</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkId
 </span><a href="#local-6989586621679282648"><span class="hs-identifier hs-var">network</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
 </span><a href="#local-6989586621679282647"><span class="hs-identifier hs-var">oracle</span></a></span><span>
 </span><span id="line-260"></span></pre></body></html>

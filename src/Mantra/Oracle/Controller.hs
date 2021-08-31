@@ -22,7 +22,7 @@
 {-# LANGUAGE TypeOperators         #-}
 
 
-module Mantis.Oracle.Controller (
+module Mantra.Oracle.Controller (
 -- * Schema
   OracleSchema
 -- * Endpoints
@@ -41,9 +41,9 @@ import Data.Text            (Text)
 import Ledger               (Redeemer(..), pubKeyHash, txId)
 import Ledger.Constraints   (mustPayToPubKey, mustPayToTheScript, mustSpendScriptOutput, otherScript, scriptInstanceLookups, unspentOutputs)
 import Ledger.Value         (assetClassValue)
-import Mantis.Oracle        (OracleScript, findOracle, oracleInstance, oracleValidator)
-import Mantis.Oracle.Client (readOracle)
-import Mantis.Oracle.Types  (Action(..), Oracle(..), Parameters, makeOracle)
+import Mantra.Oracle        (OracleScript, findOracle, oracleInstance, oracleValidator)
+import Mantra.Oracle.Client (readOracle)
+import Mantra.Oracle.Types  (Action(..), Oracle(..), Parameters, makeOracle)
 import Plutus.Contract      (BlockchainActions, Contract, Endpoint, HasBlockchainActions, type (.\/), awaitTxConfirmed, endpoint, logError, logInfo, ownPubKey, select, submitTxConstraints, submitTxConstraintsWith, tell)
 import PlutusTx             (Data, toData)
 import Prelude              (String, (<>), show)

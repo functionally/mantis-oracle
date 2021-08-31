@@ -24,7 +24,7 @@
 {-# LANGUAGE TypeOperators      #-}
 
 
-module Mantis.Oracle.Simulate.PAB (
+module Mantra.Oracle.Simulate.PAB (
 -- * Types
   TheContracts(..)
 -- * Action
@@ -45,7 +45,7 @@ import GHC.Generics                        (Generic)
 import Ledger                              (pubKeyHash, txId)
 import Ledger.Constraints                  (mustPayToPubKey)
 import Ledger.Value                        (AssetClass(..), TokenName, singleton)
-import Mantis.Orphans                      ()
+import Mantra.Orphans                      ()
 import Plutus.Contract                     (BlockchainActions, Contract, ContractInstanceId, Empty, awaitTxConfirmed, mapError, ownPubKey, submitTx, tell)
 import Plutus.PAB.Effects.Contract         (ContractEffect (..))
 import Plutus.PAB.Effects.Contract.Builtin (Builtin, SomeBuiltin (..), type (.\\), endpointsToSchemas, handleBuiltin)
@@ -55,9 +55,9 @@ import Plutus.PAB.Types                    (PABError (..))
 import Wallet.Emulator.Types               (Wallet (..), walletPubKey)
 import Wallet.Types                        (ContractInstanceId (..))
 
-import qualified Mantis.Oracle.Client        as O (ClientSchema, runOracleClient)
-import qualified Mantis.Oracle.Controller    as O (OracleSchema, runOracleController)
-import qualified Mantis.Oracle.Types         as O (Oracle, Parameters(..))
+import qualified Mantra.Oracle.Client        as O (ClientSchema, runOracleClient)
+import qualified Mantra.Oracle.Controller    as O (OracleSchema, runOracleController)
+import qualified Mantra.Oracle.Types         as O (Oracle, Parameters(..))
 import qualified Plutus.Contracts.Currency   as C (CurrencyError, OneShotCurrency, currencySymbol, forgeContract)
 import qualified Plutus.PAB.Simulator        as S (Simulation, activateContract, logString, mkSimulatorHandlers, runSimulationWith, waitForState, waitUntilFinished)
 import qualified Plutus.PAB.Webserver.Server as P (startServerDebug)

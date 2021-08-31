@@ -22,7 +22,7 @@
 {-# LANGUAGE TypeApplications   #-}
 
 
-module Mantis.Oracle.Simulate (
+module Mantra.Oracle.Simulate (
 -- * Example
   main
 ) where
@@ -38,10 +38,10 @@ import Ledger.Ada               (fromValue, getLovelace, lovelaceValueOf)
 import Ledger.Address           (pubKeyAddress)
 import Ledger.Tx                (txOutTxOut, txOutValue)
 import Ledger.Value             (AssetClass(..), CurrencySymbol, TokenName, Value, assetClass, assetClassValueOf, flattenValue, toString)
-import Mantis.Oracle            (findOracle, oracleAddress)
-import Mantis.Oracle.Client     (runOracleClient)
-import Mantis.Oracle.Controller (runOracleController)
-import Mantis.Oracle.Types      (Oracle(..), Parameters(..))
+import Mantra.Oracle            (findOracle, oracleAddress)
+import Mantra.Oracle.Client     (runOracleClient)
+import Mantra.Oracle.Controller (runOracleController)
+import Mantra.Oracle.Types      (Oracle(..), Parameters(..))
 import Prelude                  (IO, String, (<>), div, show)
 import PlutusTx                 (Data(I))
 import Wallet.Emulator.Wallet   (Wallet(..))

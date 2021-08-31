@@ -1,8 +1,8 @@
 cradle:
   cabal:
     - path: "./src"
-      component: "lib:mantis-oracle"
+      component: "lib:mantra-oracle"
     - path: "./app/Main.hs"
-      component: "exe:mantis-oracle"
+      component: "exe:mantra-oracle"
     - path: "./dist-newstyle/build"
-      component: "exe:mantis-oracle"
+      component: "exe:mantra-oracle"

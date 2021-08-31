@@ -35,9 +35,9 @@ The oracle can perform three simple actions:
       | Read
       | Write
 
-*   The `Read` action simply reads the value of the oracle into a transaction, and corresponds to the `read` endpoint in [`Mantis.Oracle.Client`](src/Mantis/Oracle/Client.hs). The required fee must be paid to the oracle script, and the UTxO containing the oracle data must be consumed and paid back to the oracle script, with the data unchanged.
-*   The `Write` action updates the value of the oracle, and corresponds to the `write` endpoint in [`Mantis.Oracle.Controller`](src/Mantis/Oracle/Controller.hs). The control token (specified by `controlParameter`) must be present in the transaction, and the UTxO containing the oracle data must be consumed and paid back (with the revised data) to the oracle script.
-*   The `Delete` action shuts down the oracle by removing the data and associated NFT, and corresponds to the `delete` endpoint in [`Mantis.Oracle.Controller`](src/Mantis/Oracle/Controller.hs). The control token must be present in the transaction.
+*   The `Read` action simply reads the value of the oracle into a transaction, and corresponds to the `read` endpoint in [`Mantra.Oracle.Client`](src/Mantra/Oracle/Client.hs). The required fee must be paid to the oracle script, and the UTxO containing the oracle data must be consumed and paid back to the oracle script, with the data unchanged.
+*   The `Write` action updates the value of the oracle, and corresponds to the `write` endpoint in [`Mantra.Oracle.Controller`](src/Mantra/Oracle/Controller.hs). The control token (specified by `controlParameter`) must be present in the transaction, and the UTxO containing the oracle data must be consumed and paid back (with the revised data) to the oracle script.
+*   The `Delete` action shuts down the oracle by removing the data and associated NFT, and corresponds to the `delete` endpoint in [`Mantra.Oracle.Controller`](src/Mantra/Oracle/Controller.hs). The control token must be present in the transaction.
 
 
 Usage
@@ -53,9 +53,9 @@ Installation
 
 This package uses the [`haskell.nix`](https://input-output-hk.github.io/haskell.nix/) build system. Simply clone this repository and execute the build command:
 
-    nix-build -A mantis-oracle.components.exes.mantis-oracle -o build
+    nix-build -A mantra-oracle.components.exes.mantra-oracle -o build
 
-The executable result will be in `./build/bin/mantis-oracle`.
+The executable result will be in `./build/bin/mantra-oracle`.
 
 Alternatively, one can use the `cabal install` installation approach, which relies on the [cabal.project](cabal.project) file and which is known to succeed with cabal 3.4.0.0 and ghc 8.10.4.
 
@@ -75,7 +75,7 @@ This example assumes the following:
 *   The datum token for the oracle is named `tSOFR`.
 *   The fee token for the oracle is named `tPIGY`.
 *   Five of the `tPIGY` tokens are needed to read the oracle, but no additional ADA is needed, aside from the transaction fee.
-*   The `mantis-oracle` executable program is on the search path, given by the `PATH` environment variable.
+*   The `mantra-oracle` executable program is on the search path, given by the `PATH` environment variable.
 
 
 ### Set up the network.
@@ -106,7 +106,7 @@ This example assumes the following:
 
 ### Configure the command-line tool.
 
-We use a configuration file like [alonzo-purple.mantis-oracle](alonzo-purple.mantis-oracle). Modify the path to the local node socket, and modify policy ID for the three assets to match `$CURRENCY`.
+We use a configuration file like [alonzo-purple.mantra-oracle](alonzo-purple.mantra-oracle). Modify the path to the local node socket, and modify policy ID for the three assets to match `$CURRENCY`.
 
     Configuration
     {
@@ -125,9 +125,9 @@ We use a configuration file like [alonzo-purple.mantis-oracle](alonzo-purple.man
 
 First, learn about the `export` command:
 
-    $ mantis-oracle export --help
+    $ mantra-oracle export --help
     
-    Usage: mantis-oracle export CONFIG_FILE OUTPUT_FILE
+    Usage: mantra-oracle export CONFIG_FILE OUTPUT_FILE
     
       Export the validator code and compute its address.
     
@@ -140,7 +140,7 @@ Now export the Plutus script for the oracle and find its address:
 
     SCRIPT_FILE=alonzo-purple.plutus; echo $SCRIPT_FILE
     
-    mantis-oracle export alonzo-purple.mantis-oracle $SCRIPT_FILE
+    mantra-oracle export alonzo-purple.mantra-oracle $SCRIPT_FILE
     
     ADDRESS_S=$(cardano-cli address build $MAGIC --payment-script-file $SCRIPT_FILE); echo $ADDRESS_S
 
@@ -201,9 +201,9 @@ In this example, record that we have:
 
 First, learn about the `create` command:
 
-    $ mantis-oracle -- create --help
+    $ mantra-oracle -- create --help
 
-    Usage: mantis-oracle create CONFIG_FILE SIGNING_ADDRESS SIGNING_FILE
+    Usage: mantra-oracle create CONFIG_FILE SIGNING_ADDRESS SIGNING_FILE
                                 NEW_JSON_FILE [--collateral LOVELACE] 
                                 [--metadata INTEGER] [--message JSON_FILE] 
                                 [--lovelace LOVELACE]
@@ -223,7 +223,7 @@ First, learn about the `create` command:
 
 We create the oracle with the example datum in [example-data-0.json](example-data-0.json). Note that the datum may be any JSON that can be serialized to CBOR.
 
-    mantis-oracle create alonzo-purple.mantis-oracle     \
+    mantra-oracle create alonzo-purple.mantra-oracle     \
                   $(cat alonzo-purple.payment-1.address) \
                   alonzo-purple.payment-1.skey           \
                   example-data-0.json
@@ -311,9 +311,9 @@ In this example, record that we have:
 
 First, learn about the `write` command:
 
-    $ mantis-oracle -- write --help
+    $ mantra-oracle -- write --help
     
-    Usage: mantis-oracle write CONFIG_FILE SIGNING_ADDRESS SIGNING_FILE
+    Usage: mantra-oracle write CONFIG_FILE SIGNING_ADDRESS SIGNING_FILE
                                OLD_JSON_FILE NEW_JSON_FILE [--collateral LOVELACE] 
                                [--metadata INTEGER] [--message JSON_FILE] 
                                [--lovelace LOVELACE]
@@ -333,7 +333,7 @@ First, learn about the `write` command:
 
 We replace the oracle's datum from [example-data-0.json](example-data-0.json) with new data in [example-data-1.json](example-data-1.json).
 
-    mantis-oracle write alonzo-purple.mantis-oracle      \
+    mantra-oracle write alonzo-purple.mantra-oracle      \
                   $(cat alonzo-purple.payment-1.address) \
                   alonzo-purple.payment-1.skey           \
                   example-data-0.json                    \
@@ -371,9 +371,9 @@ The datum hash in the eUTxO will match the hash for the new file:
 
 First, learn about the `delete` command:
 
-    $ mantis-oracle -- delete --help
+    $ mantra-oracle -- delete --help
     
-    Usage: mantis-oracle delete CONFIG_FILE SIGNING_ADDRESS SIGNING_FILE
+    Usage: mantra-oracle delete CONFIG_FILE SIGNING_ADDRESS SIGNING_FILE
                                 OLD_JSON_FILE [--collateral LOVELACE] 
                                 [--message JSON_FILE] [--lovelace LOVELACE]
       Delete the oracle.
@@ -390,7 +390,7 @@ First, learn about the `delete` command:
 
 We delete the oracle with the example datum in [example-data-1.json](example-data-1.json).
 
-    mantis-oracle delete alonzo-purple.mantis-oracle     \
+    mantra-oracle delete alonzo-purple.mantra-oracle     \
                   $(cat alonzo-purple.payment-1.address) \
                   alonzo-purple.payment-1.skey           \
                   example-data-1.json
@@ -470,21 +470,21 @@ In this example, record that we have:
 Simulation and PAB Examples
 ---------------------------
 
-The oracle can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic via the `readOracleConstraints` function in [`Mantis.Oracle.Client`](src/Mantis/Oracle/Client.hs), which returns the correct lookups, transaction constraints, and datum for a script endpoint to employ the oracle. The `readOracle` function is the simplest example of an endpoint: it just reads the oracle value and performs no other actions.
+The oracle can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic via the `readOracleConstraints` function in [`Mantra.Oracle.Client`](src/Mantra/Oracle/Client.hs), which returns the correct lookups, transaction constraints, and datum for a script endpoint to employ the oracle. The `readOracle` function is the simplest example of an endpoint: it just reads the oracle value and performs no other actions.
 
-See the slighly older version of this tool at https://github.com/functionally/mantis-oracle/blob/51d21574dd2a11280ece72068d56ef33f5672404/ReadMe.md for examples use the Plutus simulator and the Plutus Application Backend. Full simulator and PAB support will be included when the PAB is released.
+See the slighly older version of this tool at https://github.com/functionally/mantra-oracle/blob/51d21574dd2a11280ece72068d56ef33f5672404/ReadMe.md for examples use the Plutus simulator and the Plutus Application Backend. Full simulator and PAB support will be included when the PAB is released.
 
 
 API documentation
 -----------------
 
-See https://functionally.github.io/mantis-oracle/ for API documentation.
+See https://functionally.github.io/mantra-oracle/ for API documentation.
 
 
 Development environment
 -----------------------
 
-Due to quirks in how [`haskell.nix`](https://input-output-hk.github.io/haskell.nix/) and [`cabal.project`](https://cabal.readthedocs.io/en/3.4/cabal-project.html) interact, the following procedure needs to be followed to create a development environment for compiling `mantis`:
+Due to quirks in how [`haskell.nix`](https://input-output-hk.github.io/haskell.nix/) and [`cabal.project`](https://cabal.readthedocs.io/en/3.4/cabal-project.html) interact, the following procedure needs to be followed to create a development environment for compiling `mantra`:
 
 1.  Run `nix-shell`. This takes a while to build unless you set `withHoogle = false` in [shell.nix](shell.nix).
 2.  Temporarily comment-out the `source-repository-package` lines in [cabal.project](cabal.project).

@@ -23,7 +23,7 @@
 {-# LANGUAGE TypeOperators     #-}
 
 
-module Mantis.Oracle.Client (
+module Mantra.Oracle.Client (
 -- * Script and Schema
   ClientScript
 , ClientSchema
@@ -42,8 +42,8 @@ import Data.Text            (Text)
 import Ledger               (Datum(..), Redeemer(..), Value, txId, txOutTxOut, txOutValue, validatorHash)
 import Ledger.Constraints   (ScriptLookups, TxConstraints, mustPayToOtherScript, mustSpendScriptOutput, otherScript, unspentOutputs)
 import Ledger.Typed.Scripts (DatumType, RedeemerType, ScriptType)
-import Mantis.Oracle        (findOracle, oracleValidator)
-import Mantis.Oracle.Types  (Oracle(..), Action(Read))
+import Mantra.Oracle        (findOracle, oracleValidator)
+import Mantra.Oracle.Types  (Oracle(..), Action(Read))
 import Plutus.Contract      (BlockchainActions, Contract, Endpoint, HasBlockchainActions, type (.\/), awaitTxConfirmed, endpoint, handleError, logError, logInfo, submitTxConstraintsWith)
 import PlutusTx             (Data, toData)
 import Prelude              (String, (<>), show)

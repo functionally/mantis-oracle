@@ -20,7 +20,7 @@
 {-# LANGUAGE RecordWildCards   #-}
 
 
-module Mantis.Oracle.Types (
+module Mantra.Oracle.Types (
 -- * Types
   Oracle(..)
 , Parameters(..)

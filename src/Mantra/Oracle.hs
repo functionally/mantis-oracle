@@ -29,7 +29,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 
-module Mantis.Oracle (
+module Mantra.Oracle (
 -- * Oracle
   OracleScript
 , oracleInstance
@@ -54,7 +54,7 @@ import Control.Monad        (void)
 import Ledger               (Datum(..), DatumHash, ScriptContext(..), TxOut(..), findOwnInput, getContinuingOutputs, txInInfoResolved, txOutValue, unValidatorScript, valueSpent)
 import Ledger.Typed.Scripts (DatumType, RedeemerType, TypedValidator, Validator, ValidatorTypes, mkTypedValidator, validatorScript, wrapValidator)
 import Ledger.Value         (assetClassValueOf, geq)
-import Mantis.Oracle.Types  (Action(..), Oracle(..))
+import Mantra.Oracle.Types  (Action(..), Oracle(..))
 import Prelude              (FilePath, IO, (<>))
 import PlutusTx             (FromData(..), ToData(..), UnsafeFromData(..), applyCode, compile, liftCode, makeLift)
 

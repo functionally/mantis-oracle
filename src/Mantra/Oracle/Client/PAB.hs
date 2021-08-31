@@ -18,7 +18,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 
-module Mantis.Oracle.Client.PAB (
+module Mantra.Oracle.Client.PAB (
 -- * Entry point
   readOraclePAB
 ) where
