@@ -1,5 +1,5 @@
-A General-Purpose Token-Based Oracle for Cardano
-================================================
+The Mantra Oracle: A General-Purpose Token-Based Oracle for Cardano
+===================================================================
 
 This Cardano oracle reports structured data (namely, the `PlutuxTx.BuiltinData` type) to a transaction if the fee, as a quantity of a fungible token, is paid. It can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic.
 
