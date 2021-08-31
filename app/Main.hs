@@ -36,6 +36,8 @@ import Mantra.Oracle.Submit (createOracle, deleteOracle, writeOracle)
 import Mantra.Oracle.Types  (Parameters(..), makeOracle)
 import Mantra.Types
 import Paths_mantra_oracle  (version)
+import System.Exit          (exitFailure)
+import System.IO            (hPutStrLn, stderr)
 
 import qualified Data.Aeson             as A
 import qualified Data.ByteString.Base16 as Base16 (decode)
@@ -286,8 +288,8 @@ main =
         do
           result <- runMantraToIO action
           case result of
-            Right txId    -> putStrLn $ "TxId " ++ show txId
-            Left message' -> putStrLn message'
+            Right txId   -> putStrLn $ "TxId " ++ show txId
+            Left message -> hPutStrLn stderr message >> exitFailure
       -- Execute an operation.
       operate op =
         do
