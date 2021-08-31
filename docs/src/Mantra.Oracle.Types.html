@@ -42,7 +42,7 @@
 </span><span id="line-42"></span><span>
 </span><span id="line-43"></span><span>
 </span><span id="line-44"></span><span class="hs-comment">-- | An oracle controlled by one token, holding another token, and requiring a fee for its use.</span><span>
-</span><span id="line-45"></span><span id="local-6989586621679282602"><span id="local-6989586621679282603"></span></span><span class="hs-keyword">data</span><span> </span><span id="Oracle"><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-var">Oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-45"></span><span id="local-6989586621679282777"><span id="local-6989586621679282778"></span></span><span class="hs-keyword">data</span><span> </span><span id="Oracle"><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-var">Oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-46"></span><span>  </span><span id="Oracle"><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-var">Oracle</span></a></span></span><span>
 </span><span id="line-47"></span><span>  </span><span class="hs-special">{</span><span>
 </span><span id="line-48"></span><span>    </span><span id="controlToken"><span class="annot"><span class="annottext">Oracle -&gt; AssetClass
@@ -52,7 +52,7 @@
 </span><span id="line-50"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="requiredFee"><span class="annot"><span class="annottext">Oracle -&gt; Value
 </span><a href="Mantra.Oracle.Types.html#requiredFee"><span class="hs-identifier hs-var hs-var">requiredFee</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="annot"><span class="hs-identifier hs-type">Value</span></span><span>      </span><span class="hs-comment">-- ^ The minimum fee required to read the oracle on-chain.</span><span>
 </span><span id="line-51"></span><span>  </span><span class="hs-special">}</span><span>
-</span><span id="line-52"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679282594"><span id="local-6989586621679282596"><span class="annot"><span class="annottext">Oracle -&gt; Oracle -&gt; Bool
+</span><span id="line-52"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679282769"><span id="local-6989586621679282771"><span class="annot"><span class="annottext">Oracle -&gt; Oracle -&gt; Bool
 (Oracle -&gt; Oracle -&gt; Bool)
 -&gt; (Oracle -&gt; Oracle -&gt; Bool) -&gt; Eq Oracle
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -68,7 +68,7 @@ forall a.
 (forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
 $cto :: forall x. Rep Oracle x -&gt; Oracle
 $cfrom :: forall x. Oracle -&gt; Rep Oracle x
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282586"><span id="local-6989586621679282588"><span class="annot"><span class="annottext">Value -&gt; Parser [Oracle]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282761"><span id="local-6989586621679282763"><span class="annot"><span class="annottext">Value -&gt; Parser [Oracle]
 Value -&gt; Parser Oracle
 (Value -&gt; Parser Oracle)
 -&gt; (Value -&gt; Parser [Oracle]) -&gt; FromJSON Oracle
@@ -78,7 +78,7 @@ parseJSONList :: Value -&gt; Parser [Oracle]
 $cparseJSONList :: Value -&gt; Parser [Oracle]
 parseJSON :: Value -&gt; Parser Oracle
 $cparseJSON :: Value -&gt; Parser Oracle
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">FromJSON</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282579"><span id="local-6989586621679282581"><span id="local-6989586621679282583"><span class="annot"><span class="annottext">Int -&gt; Oracle -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">FromJSON</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282754"><span id="local-6989586621679282756"><span id="local-6989586621679282758"><span class="annot"><span class="annottext">Int -&gt; Oracle -&gt; ShowS
 [Oracle] -&gt; ShowS
 Oracle -&gt; String
 (Int -&gt; Oracle -&gt; ShowS)
@@ -91,7 +91,7 @@ show :: Oracle -&gt; String
 $cshow :: Oracle -&gt; String
 showsPrec :: Int -&gt; Oracle -&gt; ShowS
 $cshowsPrec :: Int -&gt; Oracle -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Haskell.Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282570"><span id="local-6989586621679282572"><span id="local-6989586621679282574"><span id="local-6989586621679282576"><span class="annot"><span class="annottext">[Oracle] -&gt; Encoding
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Haskell.Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282745"><span id="local-6989586621679282747"><span id="local-6989586621679282749"><span id="local-6989586621679282751"><span class="annot"><span class="annottext">[Oracle] -&gt; Encoding
 [Oracle] -&gt; Value
 Oracle -&gt; Encoding
 Oracle -&gt; Value
@@ -118,7 +118,7 @@ $ctoJSON :: Oracle -&gt; Value
 </span><span id="line-53"></span><span>
 </span><span id="line-54"></span><span>
 </span><span id="line-55"></span><span class="hs-comment">-- | Parameters defining the oracle.</span><span>
-</span><span id="line-56"></span><span id="local-6989586621679282567"><span id="local-6989586621679282568"></span></span><span class="hs-keyword">data</span><span> </span><span id="Parameters"><span class="annot"><a href="Mantra.Oracle.Types.html#Parameters"><span class="hs-identifier hs-var">Parameters</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-56"></span><span id="local-6989586621679282742"><span id="local-6989586621679282743"></span></span><span class="hs-keyword">data</span><span> </span><span id="Parameters"><span class="annot"><a href="Mantra.Oracle.Types.html#Parameters"><span class="hs-identifier hs-var">Parameters</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-57"></span><span>  </span><span id="Parameters"><span class="annot"><a href="Mantra.Oracle.Types.html#Parameters"><span class="hs-identifier hs-var">Parameters</span></a></span></span><span>
 </span><span id="line-58"></span><span>  </span><span class="hs-special">{</span><span>
 </span><span id="line-59"></span><span>    </span><span id="controlParameter"><span class="annot"><span class="annottext">Parameters -&gt; AssetClass
@@ -132,7 +132,7 @@ $ctoJSON :: Oracle -&gt; Value
 </span><span id="line-63"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="lovelaceAmount"><span class="annot"><span class="annottext">Parameters -&gt; Integer
 </span><a href="Mantra.Oracle.Types.html#lovelaceAmount"><span class="hs-identifier hs-var hs-var">lovelaceAmount</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Integer</span></span><span>    </span><span class="hs-comment">-- ^ The amount of Lovelace needed for reading the oracle, if any.</span><span>
 </span><span id="line-64"></span><span>  </span><span class="hs-special">}</span><span>
-</span><span id="line-65"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679282557"><span id="local-6989586621679282559"><span class="annot"><span class="annottext">Parameters -&gt; Parameters -&gt; Bool
+</span><span id="line-65"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679282732"><span id="local-6989586621679282734"><span class="annot"><span class="annottext">Parameters -&gt; Parameters -&gt; Bool
 (Parameters -&gt; Parameters -&gt; Bool)
 -&gt; (Parameters -&gt; Parameters -&gt; Bool) -&gt; Eq Parameters
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -148,7 +148,7 @@ forall a.
 (forall x. a -&gt; Rep a x) -&gt; (forall x. Rep a x -&gt; a) -&gt; Generic a
 $cto :: forall x. Rep Parameters x -&gt; Parameters
 $cfrom :: forall x. Parameters -&gt; Rep Parameters x
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282551"><span id="local-6989586621679282553"><span class="annot"><span class="annottext">Value -&gt; Parser [Parameters]
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">Generic</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282726"><span id="local-6989586621679282728"><span class="annot"><span class="annottext">Value -&gt; Parser [Parameters]
 Value -&gt; Parser Parameters
 (Value -&gt; Parser Parameters)
 -&gt; (Value -&gt; Parser [Parameters]) -&gt; FromJSON Parameters
@@ -158,7 +158,7 @@ parseJSONList :: Value -&gt; Parser [Parameters]
 $cparseJSONList :: Value -&gt; Parser [Parameters]
 parseJSON :: Value -&gt; Parser Parameters
 $cparseJSON :: Value -&gt; Parser Parameters
-</span><a href="#local-6989586621679282551"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">FromJSON</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282545"><span id="local-6989586621679282547"><span id="local-6989586621679282549"><span class="annot"><span class="annottext">Int -&gt; Parameters -&gt; ShowS
+</span><a href="#local-6989586621679282726"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">FromJSON</span></a></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282720"><span id="local-6989586621679282722"><span id="local-6989586621679282724"><span class="annot"><span class="annottext">Int -&gt; Parameters -&gt; ShowS
 [Parameters] -&gt; ShowS
 Parameters -&gt; String
 (Int -&gt; Parameters -&gt; ShowS)
@@ -173,7 +173,7 @@ show :: Parameters -&gt; String
 $cshow :: Parameters -&gt; String
 showsPrec :: Int -&gt; Parameters -&gt; ShowS
 $cshowsPrec :: Int -&gt; Parameters -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Haskell.Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282537"><span id="local-6989586621679282539"><span id="local-6989586621679282541"><span id="local-6989586621679282543"><span class="annot"><span class="annottext">[Parameters] -&gt; Encoding
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Haskell.Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282712"><span id="local-6989586621679282714"><span id="local-6989586621679282716"><span id="local-6989586621679282718"><span class="annot"><span class="annottext">[Parameters] -&gt; Encoding
 [Parameters] -&gt; Value
 Parameters -&gt; Encoding
 Parameters -&gt; Value
@@ -196,14 +196,14 @@ toEncoding :: Parameters -&gt; Encoding
 $ctoEncoding :: Parameters -&gt; Encoding
 toJSON :: Parameters -&gt; Value
 $ctoJSON :: Parameters -&gt; Value
-</span><a href="#local-6989586621679282537"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">ToJSON</span></a></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679282712"><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">ToJSON</span></a></span></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-66"></span><span>
 </span><span id="line-67"></span><span>
 </span><span id="line-68"></span><span class="hs-comment">-- | Construct an oracle.</span><span>
 </span><span id="line-69"></span><span class="annot"><a href="Mantra.Oracle.Types.html#makeOracle"><span class="hs-identifier hs-type">makeOracle</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Parameters"><span class="hs-identifier hs-type">Parameters</span></a></span><span> </span><span class="hs-comment">-- ^ Parameters describing the oracle.</span><span>
 </span><span id="line-70"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>     </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-71"></span><span id="makeOracle"><span class="annot"><span class="annottext">makeOracle :: Parameters -&gt; Oracle
-</span><a href="Mantra.Oracle.Types.html#makeOracle"><span class="hs-identifier hs-var hs-var">makeOracle</span></a></span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Parameters"><span class="hs-identifier hs-type">Parameters</span></a></span><span class="hs-special">{</span><span id="local-6989586621679282532"><span id="local-6989586621679282533"><span id="local-6989586621679282534"><span id="local-6989586621679282535"><span id="local-6989586621679282536"><span class="annot"><span class="annottext">Integer
+</span><a href="Mantra.Oracle.Types.html#makeOracle"><span class="hs-identifier hs-var hs-var">makeOracle</span></a></span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Parameters"><span class="hs-identifier hs-type">Parameters</span></a></span><span class="hs-special">{</span><span id="local-6989586621679282707"><span id="local-6989586621679282708"><span id="local-6989586621679282709"><span id="local-6989586621679282710"><span id="local-6989586621679282711"><span class="annot"><span class="annottext">Integer
 AssetClass
 lovelaceAmount :: Integer
 feeAmount :: Integer
@@ -215,24 +215,24 @@ feeAmount :: Parameters -&gt; Integer
 feeToken :: Parameters -&gt; AssetClass
 datumParameter :: Parameters -&gt; AssetClass
 controlParameter :: Parameters -&gt; AssetClass
-</span><a href="#local-6989586621679282532"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="#local-6989586621679282707"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-72"></span><span>  </span><span class="hs-keyword">let</span><span>
-</span><span id="line-73"></span><span>    </span><span id="local-6989586621679282531"><span class="annot"><span class="annottext">controlToken :: AssetClass
-</span><a href="#local-6989586621679282531"><span class="hs-identifier hs-var hs-var">controlToken</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AssetClass
-</span><a href="#local-6989586621679282536"><span class="hs-identifier hs-var">controlParameter</span></a></span><span>
-</span><span id="line-74"></span><span>    </span><span id="local-6989586621679282530"><span class="annot"><span class="annottext">datumToken :: AssetClass
-</span><a href="#local-6989586621679282530"><span class="hs-identifier hs-var hs-var">datumToken</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AssetClass
-</span><a href="#local-6989586621679282535"><span class="hs-identifier hs-var">datumParameter</span></a></span><span>
-</span><span id="line-75"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679282529"><span class="annot"><span class="annottext">CurrencySymbol
-</span><a href="#local-6989586621679282529"><span class="hs-identifier hs-var">symbol</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282528"><span class="annot"><span class="annottext">TokenName
-</span><a href="#local-6989586621679282528"><span class="hs-identifier hs-var">name</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AssetClass -&gt; (CurrencySymbol, TokenName)
+</span><span id="line-73"></span><span>    </span><span id="local-6989586621679282706"><span class="annot"><span class="annottext">controlToken :: AssetClass
+</span><a href="#local-6989586621679282706"><span class="hs-identifier hs-var hs-var">controlToken</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679282711"><span class="hs-identifier hs-var">controlParameter</span></a></span><span>
+</span><span id="line-74"></span><span>    </span><span id="local-6989586621679282705"><span class="annot"><span class="annottext">datumToken :: AssetClass
+</span><a href="#local-6989586621679282705"><span class="hs-identifier hs-var hs-var">datumToken</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679282710"><span class="hs-identifier hs-var">datumParameter</span></a></span><span>
+</span><span id="line-75"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679282704"><span class="annot"><span class="annottext">CurrencySymbol
+</span><a href="#local-6989586621679282704"><span class="hs-identifier hs-var">symbol</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679282703"><span class="annot"><span class="annottext">TokenName
+</span><a href="#local-6989586621679282703"><span class="hs-identifier hs-var">name</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">AssetClass -&gt; (CurrencySymbol, TokenName)
 </span><span class="hs-identifier hs-var hs-var">unAssetClass</span></span><span> </span><span class="annot"><span class="annottext">AssetClass
-</span><a href="#local-6989586621679282534"><span class="hs-identifier hs-var">feeToken</span></a></span><span>
-</span><span id="line-76"></span><span>    </span><span id="local-6989586621679282526"><span class="annot"><span class="annottext">requiredFee :: Value
-</span><a href="#local-6989586621679282526"><span class="hs-identifier hs-var hs-var">requiredFee</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="#local-6989586621679282709"><span class="hs-identifier hs-var">feeToken</span></a></span><span>
+</span><span id="line-76"></span><span>    </span><span id="local-6989586621679282701"><span class="annot"><span class="annottext">requiredFee :: Value
+</span><a href="#local-6989586621679282701"><span class="hs-identifier hs-var hs-var">requiredFee</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-77"></span><span>      </span><span class="hs-keyword">case</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679282533"><span class="hs-identifier hs-var">feeAmount</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679282532"><span class="hs-identifier hs-var">lovelaceAmount</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
+</span><a href="#local-6989586621679282708"><span class="hs-identifier hs-var">feeAmount</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679282707"><span class="hs-identifier hs-var">lovelaceAmount</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
 </span><span id="line-78"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Value
@@ -242,24 +242,24 @@ forall a. Monoid a =&gt; a
 </span><span class="hs-number">0</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Value
 </span><span class="hs-identifier hs-var">lovelaceValueOf</span></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679282532"><span class="hs-identifier hs-var">lovelaceAmount</span></a></span><span>
+</span><a href="#local-6989586621679282707"><span class="hs-identifier hs-var">lovelaceAmount</span></a></span><span>
 </span><span id="line-80"></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">CurrencySymbol -&gt; TokenName -&gt; Integer -&gt; Value
 </span><span class="hs-identifier hs-var">Value.singleton</span></span><span> </span><span class="annot"><span class="annottext">CurrencySymbol
-</span><a href="#local-6989586621679282529"><span class="hs-identifier hs-var">symbol</span></a></span><span> </span><span class="annot"><span class="annottext">TokenName
-</span><a href="#local-6989586621679282528"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679282533"><span class="hs-identifier hs-var">feeAmount</span></a></span><span>
+</span><a href="#local-6989586621679282704"><span class="hs-identifier hs-var">symbol</span></a></span><span> </span><span class="annot"><span class="annottext">TokenName
+</span><a href="#local-6989586621679282703"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679282708"><span class="hs-identifier hs-var">feeAmount</span></a></span><span>
 </span><span id="line-81"></span><span>        </span><span class="annot"><span class="annottext">(Integer, Integer)
 </span><span class="hs-identifier">_</span></span><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">CurrencySymbol -&gt; TokenName -&gt; Integer -&gt; Value
 </span><span class="hs-identifier hs-var">Value.singleton</span></span><span> </span><span class="annot"><span class="annottext">CurrencySymbol
-</span><a href="#local-6989586621679282529"><span class="hs-identifier hs-var">symbol</span></a></span><span> </span><span class="annot"><span class="annottext">TokenName
-</span><a href="#local-6989586621679282528"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679282533"><span class="hs-identifier hs-var">feeAmount</span></a></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Value -&gt; Value
+</span><a href="#local-6989586621679282704"><span class="hs-identifier hs-var">symbol</span></a></span><span> </span><span class="annot"><span class="annottext">TokenName
+</span><a href="#local-6989586621679282703"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679282708"><span class="hs-identifier hs-var">feeAmount</span></a></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Value -&gt; Value
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Value
 </span><span class="hs-identifier hs-var">lovelaceValueOf</span></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679282532"><span class="hs-identifier hs-var">lovelaceAmount</span></a></span><span>
+</span><a href="#local-6989586621679282707"><span class="hs-identifier hs-var">lovelaceAmount</span></a></span><span>
 </span><span id="line-82"></span><span>  </span><span class="hs-keyword">in</span><span>
 </span><span id="line-83"></span><span>    </span><span class="annot"><span class="annottext">Oracle :: AssetClass -&gt; AssetClass -&gt; Value -&gt; Oracle
 </span><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">Value
@@ -270,7 +270,7 @@ controlToken :: AssetClass
 requiredFee :: Value
 datumToken :: AssetClass
 controlToken :: AssetClass
-</span><a href="#local-6989586621679282526"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span><span class="hs-special">}</span><span>
+</span><a href="#local-6989586621679282701"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span><span class="hs-special">}</span><span>
 </span><span id="line-84"></span><span>
 </span><span id="line-85"></span><span>
 </span><span id="line-86"></span><span class="hs-comment">-- | Redeemers for the oracle.</span><span>
@@ -278,7 +278,7 @@ controlToken :: AssetClass
 </span><span id="line-88"></span><span>    </span><span id="Delete"><span class="annot"><a href="Mantra.Oracle.Types.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span></span><span>        </span><span class="hs-comment">-- ^ Delete (close) the oracle.</span><span>
 </span><span id="line-89"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Read"><span class="annot"><a href="Mantra.Oracle.Types.html#Read"><span class="hs-identifier hs-var">Read</span></a></span></span><span>          </span><span class="hs-comment">-- ^ Read the oracle's datum.</span><span>
 </span><span id="line-90"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Write"><span class="annot"><a href="Mantra.Oracle.Types.html#Write"><span class="hs-identifier hs-var">Write</span></a></span></span><span>         </span><span class="hs-comment">-- ^ Set or update the oracle's datum.</span><span>
-</span><span id="line-91"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679282515"><span id="local-6989586621679282517"><span id="local-6989586621679282519"><span class="annot"><span class="annottext">Int -&gt; Action -&gt; ShowS
+</span><span id="line-91"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679282690"><span id="local-6989586621679282692"><span id="local-6989586621679282694"><span class="annot"><span class="annottext">Int -&gt; Action -&gt; ShowS
 [Action] -&gt; ShowS
 Action -&gt; String
 (Int -&gt; Action -&gt; ShowS)
@@ -297,34 +297,34 @@ $cshowsPrec :: Int -&gt; Action -&gt; ShowS
 #if USE_PAB
 </span><span class="hs-cpp">#else
 </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Enum</span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-97"></span><span>  </span><span id="local-6989586621679282509"><span class="annot"><span class="annottext">pred :: Action -&gt; Action
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">pred</span></span></span><span> </span><span id="local-6989586621679282507"><span class="annot"><span class="annottext">Action
-</span><a href="#local-6989586621679282507"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Action
+</span><span id="line-97"></span><span>  </span><span id="local-6989586621679282684"><span class="annot"><span class="annottext">pred :: Action -&gt; Action
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">pred</span></span></span><span> </span><span id="local-6989586621679282682"><span class="annot"><span class="annottext">Action
+</span><a href="#local-6989586621679282682"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Action
 forall a. Enum a =&gt; Integer -&gt; a
 </span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Action) -&gt; Integer -&gt; Action
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Action -&gt; Integer
 forall a. Enum a =&gt; a -&gt; Integer
 </span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">Action
-</span><a href="#local-6989586621679282507"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
+</span><a href="#local-6989586621679282682"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
 forall a. AdditiveGroup a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">1</span></span><span>
-</span><span id="line-98"></span><span>  </span><span id="local-6989586621679282502"><span class="annot"><span class="annottext">succ :: Action -&gt; Action
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">succ</span></span></span><span> </span><span id="local-6989586621679282500"><span class="annot"><span class="annottext">Action
-</span><a href="#local-6989586621679282500"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Action
+</span><span id="line-98"></span><span>  </span><span id="local-6989586621679282677"><span class="annot"><span class="annottext">succ :: Action -&gt; Action
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">succ</span></span></span><span> </span><span id="local-6989586621679282675"><span class="annot"><span class="annottext">Action
+</span><a href="#local-6989586621679282675"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Action
 forall a. Enum a =&gt; Integer -&gt; a
 </span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Action) -&gt; Integer -&gt; Action
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Action -&gt; Integer
 forall a. Enum a =&gt; a -&gt; Integer
 </span><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">Action
-</span><a href="#local-6989586621679282500"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
+</span><a href="#local-6989586621679282675"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Integer
 forall a. AdditiveSemigroup a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">1</span></span><span>
-</span><span id="line-99"></span><span>  </span><span id="local-6989586621679282498"><span class="annot"><span class="annottext">fromEnum :: Action -&gt; Integer
-</span><a href="#local-6989586621679282498"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromEnum</span></a></span></span><span> </span><span class="annot"><span class="annottext">Action
+</span><span id="line-99"></span><span>  </span><span id="local-6989586621679282673"><span class="annot"><span class="annottext">fromEnum :: Action -&gt; Integer
+</span><a href="#local-6989586621679282673"><span class="hs-identifier hs-var hs-var hs-var hs-var">fromEnum</span></a></span></span><span> </span><span class="annot"><span class="annottext">Action
 </span><a href="Mantra.Oracle.Types.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">0</span></span><span>
 </span><span id="line-100"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">Action
@@ -333,23 +333,23 @@ forall a. AdditiveSemigroup a =&gt; a -&gt; a -&gt; a
 </span><span id="line-101"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">fromEnum</span></span><span> </span><span class="annot"><span class="annottext">Action
 </span><a href="Mantra.Oracle.Types.html#Write"><span class="hs-identifier hs-var">Write</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">2</span></span><span>
-</span><span id="line-102"></span><span>  </span><span id="local-6989586621679282497"><span class="annot"><span class="annottext">toEnum :: Integer -&gt; Action
-</span><a href="#local-6989586621679282497"><span class="hs-identifier hs-var hs-var hs-var hs-var">toEnum</span></a></span></span><span> </span><span id="local-6989586621679282496"><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679282496"><span class="hs-identifier hs-var">i</span></a></span></span><span>
+</span><span id="line-102"></span><span>  </span><span id="local-6989586621679282672"><span class="annot"><span class="annottext">toEnum :: Integer -&gt; Action
+</span><a href="#local-6989586621679282672"><span class="hs-identifier hs-var hs-var hs-var hs-var">toEnum</span></a></span></span><span> </span><span id="local-6989586621679282671"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679282671"><span class="hs-identifier hs-var">i</span></a></span></span><span>
 </span><span id="line-103"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679282496"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
+</span><a href="#local-6989586621679282671"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">0</span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Action
 </span><a href="Mantra.Oracle.Types.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span><span>
 </span><span id="line-104"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679282496"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
+</span><a href="#local-6989586621679282671"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">1</span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Action
 </span><a href="Mantra.Oracle.Types.html#Read"><span class="hs-identifier hs-var">Read</span></a></span><span>
 </span><span id="line-105"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679282496"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
+</span><a href="#local-6989586621679282671"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">2</span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Action

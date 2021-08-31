@@ -73,14 +73,14 @@
 #endif
 </span><span>
 </span><span id="line-75"></span><span>
-</span><span id="line-76"></span><span id="local-6989586621679282740"><span id="local-6989586621679282742"><span class="hs-identifier">makeLift</span><span> </span><span class="hs-special">''</span><span class="hs-identifier">Oracle</span></span></span><span>
+</span><span id="line-76"></span><span id="local-6989586621679282915"><span id="local-6989586621679282917"><span class="hs-identifier">makeLift</span><span> </span><span class="hs-special">''</span><span class="hs-identifier">Oracle</span></span></span><span>
 </span><span id="line-77"></span><span>
 </span><span id="line-78"></span><span>
 </span><span id="line-79"></span><span class="hs-comment">-- FIXME: Temporarily map actions to integers, in order to accommodate Alonzo Purple.</span><span class="hs-cpp">
 #if USE_PAB
 </span><span class="hs-cpp">#else
 </span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FromData</span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-83"></span><span>  </span><span id="local-6989586621679282733"><span class="annot"><span class="annottext">fromBuiltinData :: BuiltinData -&gt; Maybe Action
+</span><span id="line-83"></span><span>  </span><span id="local-6989586621679282908"><span class="annot"><span class="annottext">fromBuiltinData :: BuiltinData -&gt; Maybe Action
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var">fromBuiltinData</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Action) -&gt; Maybe Integer -&gt; Maybe Action
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Action
@@ -92,7 +92,7 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 forall a. FromData a =&gt; BuiltinData -&gt; Maybe a
 </span><span class="hs-identifier hs-var">fromBuiltinData</span></span><span>
 </span><span id="line-84"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">UnsafeFromData</span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-85"></span><span>  </span><span id="local-6989586621679282726"><span class="annot"><span class="annottext">unsafeFromBuiltinData :: BuiltinData -&gt; Action
+</span><span id="line-85"></span><span>  </span><span id="local-6989586621679282901"><span class="annot"><span class="annottext">unsafeFromBuiltinData :: BuiltinData -&gt; Action
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var">unsafeFromBuiltinData</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Action
 forall a. Enum a =&gt; Integer -&gt; a
 </span><span class="hs-identifier hs-var">toEnum</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Action)
@@ -102,7 +102,7 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 forall a. UnsafeFromData a =&gt; BuiltinData -&gt; a
 </span><span class="hs-identifier hs-var">unsafeFromBuiltinData</span></span><span>
 </span><span id="line-86"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ToData</span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Action"><span class="hs-identifier hs-type">Action</span></a></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-87"></span><span>  </span><span id="local-6989586621679282722"><span class="annot"><span class="annottext">toBuiltinData :: Action -&gt; BuiltinData
+</span><span id="line-87"></span><span>  </span><span id="local-6989586621679282897"><span class="annot"><span class="annottext">toBuiltinData :: Action -&gt; BuiltinData
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var">toBuiltinData</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; BuiltinData
 forall a. ToData a =&gt; a -&gt; BuiltinData
 </span><span class="hs-identifier hs-var">toBuiltinData</span></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; BuiltinData)
@@ -123,7 +123,7 @@ forall a. Enum a =&gt; a -&gt; Integer
 </span><span id="line-97"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ScriptContext</span></span><span>  </span><span class="hs-comment">-- ^ The context.</span><span>
 </span><span id="line-98"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>           </span><span class="hs-comment">-- ^ Whether the transaction is valid.</span><span>
 </span><span id="line-99"></span><span id="makeValidator"><span class="annot"><span class="annottext">makeValidator :: Oracle -&gt; BuiltinData -&gt; Action -&gt; ScriptContext -&gt; Bool
-</span><a href="Mantra.Oracle.html#makeValidator"><span class="hs-identifier hs-var hs-var">makeValidator</span></a></span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span class="hs-special">{</span><span id="local-6989586621679282715"><span id="local-6989586621679282716"><span id="local-6989586621679282717"><span class="annot"><span class="annottext">Value
+</span><a href="Mantra.Oracle.html#makeValidator"><span class="hs-identifier hs-var hs-var">makeValidator</span></a></span></span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span class="hs-special">{</span><span id="local-6989586621679282890"><span id="local-6989586621679282891"><span id="local-6989586621679282892"><span class="annot"><span class="annottext">Value
 AssetClass
 requiredFee :: Oracle -&gt; Value
 datumToken :: Oracle -&gt; AssetClass
@@ -132,9 +132,9 @@ requiredFee :: Value
 datumToken :: AssetClass
 controlToken :: AssetClass
 </span><a href="Mantra.Oracle.Types.html#requiredFee"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span class="annot"><span class="annottext">BuiltinData
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679282711"><span class="annot"><span class="annottext">Action
-</span><a href="#local-6989586621679282711"><span class="hs-identifier hs-var">redeemer</span></a></span></span><span> </span><span id="local-6989586621679282710"><span class="annot"><span class="annottext">context :: ScriptContext
-</span><a href="#local-6989586621679282710"><span class="hs-identifier hs-var">context</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><span class="hs-identifier hs-type">ScriptContext</span></span><span class="hs-special">{</span><span id="local-6989586621679282707"><span id="local-6989586621679282708"><span class="annot"><span class="annottext">ScriptPurpose
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679282886"><span class="annot"><span class="annottext">Action
+</span><a href="#local-6989586621679282886"><span class="hs-identifier hs-var">redeemer</span></a></span></span><span> </span><span id="local-6989586621679282885"><span class="annot"><span class="annottext">context :: ScriptContext
+</span><a href="#local-6989586621679282885"><span class="hs-identifier hs-var">context</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><span class="hs-identifier hs-type">ScriptContext</span></span><span class="hs-special">{</span><span id="local-6989586621679282882"><span id="local-6989586621679282883"><span class="annot"><span class="annottext">ScriptPurpose
 TxInfo
 scriptContextTxInfo :: ScriptContext -&gt; TxInfo
 scriptContextPurpose :: ScriptContext -&gt; ScriptPurpose
@@ -145,12 +145,12 @@ scriptContextTxInfo :: TxInfo
 </span><span id="line-101"></span><span>  </span><span class="hs-keyword">let</span><span>
 </span><span id="line-102"></span><span>
 </span><span id="line-103"></span><span>    </span><span class="hs-comment">-- Oracle input and output.</span><span>
-</span><span id="line-104"></span><span>    </span><span id="local-6989586621679282704"><span class="annot"><span class="annottext">continuingOutputs :: [TxOut]
-</span><a href="#local-6989586621679282704"><span class="hs-identifier hs-var hs-var">continuingOutputs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ScriptContext -&gt; [TxOut]
+</span><span id="line-104"></span><span>    </span><span id="local-6989586621679282879"><span class="annot"><span class="annottext">continuingOutputs :: [TxOut]
+</span><a href="#local-6989586621679282879"><span class="hs-identifier hs-var hs-var">continuingOutputs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ScriptContext -&gt; [TxOut]
 </span><span class="hs-identifier hs-var">getContinuingOutputs</span></span><span> </span><span class="annot"><span class="annottext">ScriptContext
-</span><a href="#local-6989586621679282710"><span class="hs-identifier hs-var">context</span></a></span><span>
-</span><span id="line-105"></span><span>    </span><span id="local-6989586621679282703"><span class="annot"><span class="annottext">oracleInput :: TxOut
-</span><a href="#local-6989586621679282703"><span class="hs-identifier hs-var hs-var">oracleInput</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="#local-6989586621679282885"><span class="hs-identifier hs-var">context</span></a></span><span>
+</span><span id="line-105"></span><span>    </span><span id="local-6989586621679282878"><span class="annot"><span class="annottext">oracleInput :: TxOut
+</span><a href="#local-6989586621679282878"><span class="hs-identifier hs-var hs-var">oracleInput</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-106"></span><span>      </span><span class="annot"><span class="annottext">TxOut -&gt; (TxInInfo -&gt; TxOut) -&gt; Maybe TxInInfo -&gt; TxOut
 forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
 </span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">BuiltinString -&gt; TxOut
@@ -162,14 +162,14 @@ forall a. BuiltinString -&gt; a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ScriptContext -&gt; Maybe TxInInfo
 </span><span class="hs-identifier hs-var">findOwnInput</span></span><span> </span><span class="annot"><span class="annottext">ScriptContext
-</span><a href="#local-6989586621679282710"><span class="hs-identifier hs-var">context</span></a></span><span>
-</span><span id="line-108"></span><span>    </span><span id="local-6989586621679282699"><span class="annot"><span class="annottext">oracleOutput :: TxOut
-</span><a href="#local-6989586621679282699"><span class="hs-identifier hs-var hs-var">oracleOutput</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="#local-6989586621679282885"><span class="hs-identifier hs-var">context</span></a></span><span>
+</span><span id="line-108"></span><span>    </span><span id="local-6989586621679282874"><span class="annot"><span class="annottext">oracleOutput :: TxOut
+</span><a href="#local-6989586621679282874"><span class="hs-identifier hs-var hs-var">oracleOutput</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-109"></span><span>      </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[TxOut]
-</span><a href="#local-6989586621679282704"><span class="hs-identifier hs-var">continuingOutputs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-110"></span><span>        </span><span class="hs-special">[</span><span id="local-6989586621679282698"><span class="annot"><span class="annottext">TxOut
-</span><a href="#local-6989586621679282698"><span class="hs-identifier hs-var">output</span></a></span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TxOut
-</span><a href="#local-6989586621679282698"><span class="hs-identifier hs-var">output</span></a></span><span>
+</span><a href="#local-6989586621679282879"><span class="hs-identifier hs-var">continuingOutputs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-110"></span><span>        </span><span class="hs-special">[</span><span id="local-6989586621679282873"><span class="annot"><span class="annottext">TxOut
+</span><a href="#local-6989586621679282873"><span class="hs-identifier hs-var">output</span></a></span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">TxOut
+</span><a href="#local-6989586621679282873"><span class="hs-identifier hs-var">output</span></a></span><span>
 </span><span id="line-111"></span><span>        </span><span class="annot"><span class="annottext">[TxOut]
 </span><span class="hs-identifier">_</span></span><span>        </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">BuiltinString -&gt; TxOut
 forall a. BuiltinString -&gt; a
@@ -177,47 +177,47 @@ forall a. BuiltinString -&gt; a
 </span><span class="hs-string">&quot;Not exactly one oracle output.&quot;</span></span><span>
 </span><span id="line-112"></span><span>
 </span><span id="line-113"></span><span>    </span><span class="hs-comment">-- Datum token.</span><span>
-</span><span id="line-114"></span><span>    </span><span id="local-6989586621679282697"><span class="annot"><span class="annottext">datumTokenInput :: Bool
-</span><a href="#local-6989586621679282697"><span class="hs-identifier hs-var hs-var">datumTokenInput</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetClass -&gt; Integer
+</span><span id="line-114"></span><span>    </span><span id="local-6989586621679282872"><span class="annot"><span class="annottext">datumTokenInput :: Bool
+</span><a href="#local-6989586621679282872"><span class="hs-identifier hs-var hs-var">datumTokenInput</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetClass -&gt; Integer
 </span><span class="hs-identifier hs-var">assetClassValueOf</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxOut -&gt; Value
 </span><span class="hs-identifier hs-var hs-var">txOutValue</span></span><span> </span><span class="annot"><span class="annottext">TxOut
-</span><a href="#local-6989586621679282703"><span class="hs-identifier hs-var">oracleInput</span></a></span><span> </span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AssetClass
-</span><a href="#local-6989586621679282716"><span class="hs-identifier hs-var">datumToken</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
+</span><a href="#local-6989586621679282878"><span class="hs-identifier hs-var">oracleInput</span></a></span><span> </span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679282891"><span class="hs-identifier hs-var">datumToken</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">1</span></span><span>
-</span><span id="line-115"></span><span>    </span><span id="local-6989586621679282695"><span class="annot"><span class="annottext">datumTokenOutput :: Bool
-</span><a href="#local-6989586621679282695"><span class="hs-identifier hs-var hs-var">datumTokenOutput</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetClass -&gt; Integer
+</span><span id="line-115"></span><span>    </span><span id="local-6989586621679282870"><span class="annot"><span class="annottext">datumTokenOutput :: Bool
+</span><a href="#local-6989586621679282870"><span class="hs-identifier hs-var hs-var">datumTokenOutput</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetClass -&gt; Integer
 </span><span class="hs-identifier hs-var">assetClassValueOf</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxOut -&gt; Value
 </span><span class="hs-identifier hs-var hs-var">txOutValue</span></span><span> </span><span class="annot"><span class="annottext">TxOut
-</span><a href="#local-6989586621679282699"><span class="hs-identifier hs-var">oracleOutput</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AssetClass
-</span><a href="#local-6989586621679282716"><span class="hs-identifier hs-var">datumToken</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
+</span><a href="#local-6989586621679282874"><span class="hs-identifier hs-var">oracleOutput</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679282891"><span class="hs-identifier hs-var">datumToken</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">1</span></span><span>
-</span><span id="line-116"></span><span>    </span><span id="local-6989586621679282694"><span class="annot"><span class="annottext">singleDatum :: Bool
-</span><a href="#local-6989586621679282694"><span class="hs-identifier hs-var hs-var">singleDatum</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-116"></span><span>    </span><span id="local-6989586621679282869"><span class="annot"><span class="annottext">singleDatum :: Bool
+</span><a href="#local-6989586621679282869"><span class="hs-identifier hs-var hs-var">singleDatum</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-117"></span><span>         </span><span class="annot"><span class="annottext">BuiltinString -&gt; Bool -&gt; Bool
 </span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">BuiltinString
 </span><span class="hs-string">&quot;Missing single oracle token input.&quot;</span></span><span>  </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679282697"><span class="hs-identifier hs-var">datumTokenInput</span></a></span><span>
+</span><a href="#local-6989586621679282872"><span class="hs-identifier hs-var">datumTokenInput</span></a></span><span>
 </span><span id="line-118"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
 </span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">BuiltinString -&gt; Bool -&gt; Bool
 </span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">BuiltinString
 </span><span class="hs-string">&quot;Missing single oracle token output.&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679282695"><span class="hs-identifier hs-var">datumTokenOutput</span></a></span><span>
+</span><a href="#local-6989586621679282870"><span class="hs-identifier hs-var">datumTokenOutput</span></a></span><span>
 </span><span id="line-119"></span><span>
 </span><span id="line-120"></span><span>    </span><span class="hs-comment">-- Datum value.</span><span>
-</span><span id="line-121"></span><span>    </span><span id="local-6989586621679282691"><span class="annot"><span class="annottext">inputDatumHash :: Maybe DatumHash
-</span><a href="#local-6989586621679282691"><span class="hs-identifier hs-var hs-var">inputDatumHash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxOut -&gt; Maybe DatumHash
+</span><span id="line-121"></span><span>    </span><span id="local-6989586621679282866"><span class="annot"><span class="annottext">inputDatumHash :: Maybe DatumHash
+</span><a href="#local-6989586621679282866"><span class="hs-identifier hs-var hs-var">inputDatumHash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxOut -&gt; Maybe DatumHash
 </span><span class="hs-identifier hs-var hs-var">txOutDatumHash</span></span><span> </span><span class="annot"><span class="annottext">TxOut
-</span><a href="#local-6989586621679282703"><span class="hs-identifier hs-var">oracleInput</span></a></span><span>
-</span><span id="line-122"></span><span>    </span><span id="local-6989586621679282689"><span class="annot"><span class="annottext">outputDatumHash :: Maybe DatumHash
-</span><a href="#local-6989586621679282689"><span class="hs-identifier hs-var hs-var">outputDatumHash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxOut -&gt; Maybe DatumHash
+</span><a href="#local-6989586621679282878"><span class="hs-identifier hs-var">oracleInput</span></a></span><span>
+</span><span id="line-122"></span><span>    </span><span id="local-6989586621679282864"><span class="annot"><span class="annottext">outputDatumHash :: Maybe DatumHash
+</span><a href="#local-6989586621679282864"><span class="hs-identifier hs-var hs-var">outputDatumHash</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TxOut -&gt; Maybe DatumHash
 </span><span class="hs-identifier hs-var hs-var">txOutDatumHash</span></span><span> </span><span class="annot"><span class="annottext">TxOut
-</span><a href="#local-6989586621679282699"><span class="hs-identifier hs-var">oracleOutput</span></a></span><span>
-</span><span id="line-123"></span><span>    </span><span id="local-6989586621679282688"><span class="annot"><span class="annottext">datumPresent :: Bool
-</span><a href="#local-6989586621679282688"><span class="hs-identifier hs-var hs-var">datumPresent</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="#local-6989586621679282874"><span class="hs-identifier hs-var">oracleOutput</span></a></span><span>
+</span><span id="line-123"></span><span>    </span><span id="local-6989586621679282863"><span class="annot"><span class="annottext">datumPresent :: Bool
+</span><a href="#local-6989586621679282863"><span class="hs-identifier hs-var hs-var">datumPresent</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-124"></span><span>      </span><span class="annot"><span class="annottext">BuiltinString -&gt; Bool -&gt; Bool
 </span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">BuiltinString
 </span><span class="hs-string">&quot;Missing output datum.&quot;</span></span><span>
@@ -226,29 +226,29 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Maybe DatumHash -&gt; Bool
 forall a. Maybe a -&gt; Bool
 </span><span class="hs-identifier hs-var">isJust</span></span><span> </span><span class="annot"><span class="annottext">Maybe DatumHash
-</span><a href="#local-6989586621679282689"><span class="hs-identifier hs-var">outputDatumHash</span></a></span><span>
-</span><span id="line-126"></span><span>    </span><span id="local-6989586621679282686"><span class="annot"><span class="annottext">unchangedDatum :: Bool
-</span><a href="#local-6989586621679282686"><span class="hs-identifier hs-var hs-var">unchangedDatum</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="#local-6989586621679282864"><span class="hs-identifier hs-var">outputDatumHash</span></a></span><span>
+</span><span id="line-126"></span><span>    </span><span id="local-6989586621679282861"><span class="annot"><span class="annottext">unchangedDatum :: Bool
+</span><a href="#local-6989586621679282861"><span class="hs-identifier hs-var hs-var">unchangedDatum</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-127"></span><span>      </span><span class="annot"><span class="annottext">BuiltinString -&gt; Bool -&gt; Bool
 </span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">BuiltinString
 </span><span class="hs-string">&quot;Datum illegally changed.&quot;</span></span><span>
 </span><span id="line-128"></span><span>        </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Maybe DatumHash
-</span><a href="#local-6989586621679282689"><span class="hs-identifier hs-var">outputDatumHash</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe DatumHash -&gt; Maybe DatumHash -&gt; Bool
+</span><a href="#local-6989586621679282864"><span class="hs-identifier hs-var">outputDatumHash</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe DatumHash -&gt; Maybe DatumHash -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Maybe DatumHash
-</span><a href="#local-6989586621679282691"><span class="hs-identifier hs-var">inputDatumHash</span></a></span><span>
+</span><a href="#local-6989586621679282866"><span class="hs-identifier hs-var">inputDatumHash</span></a></span><span>
 </span><span id="line-129"></span><span>
 </span><span id="line-130"></span><span>    </span><span class="hs-comment">-- Control token.</span><span>
-</span><span id="line-131"></span><span>    </span><span id="local-6989586621679282685"><span class="annot"><span class="annottext">controlTokenInput :: Integer
-</span><a href="#local-6989586621679282685"><span class="hs-identifier hs-var hs-var">controlTokenInput</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetClass -&gt; Integer
+</span><span id="line-131"></span><span>    </span><span id="local-6989586621679282860"><span class="annot"><span class="annottext">controlTokenInput :: Integer
+</span><a href="#local-6989586621679282860"><span class="hs-identifier hs-var hs-var">controlTokenInput</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetClass -&gt; Integer
 </span><span class="hs-identifier hs-var">assetClassValueOf</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxInfo -&gt; Value
 </span><span class="hs-identifier hs-var">valueSpent</span></span><span> </span><span class="annot"><span class="annottext">TxInfo
-</span><a href="#local-6989586621679282708"><span class="hs-identifier hs-var">scriptContextTxInfo</span></a></span><span>        </span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AssetClass
-</span><a href="#local-6989586621679282717"><span class="hs-identifier hs-var">controlToken</span></a></span><span>
-</span><span id="line-132"></span><span>    </span><span id="local-6989586621679282684"><span class="annot"><span class="annottext">controlTokenOutput :: Integer
-</span><a href="#local-6989586621679282684"><span class="hs-identifier hs-var hs-var">controlTokenOutput</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetClass -&gt; Integer
+</span><a href="#local-6989586621679282883"><span class="hs-identifier hs-var">scriptContextTxInfo</span></a></span><span>        </span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679282892"><span class="hs-identifier hs-var">controlToken</span></a></span><span>
+</span><span id="line-132"></span><span>    </span><span id="local-6989586621679282859"><span class="annot"><span class="annottext">controlTokenOutput :: Integer
+</span><a href="#local-6989586621679282859"><span class="hs-identifier hs-var hs-var">controlTokenOutput</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Value -&gt; AssetClass -&gt; Integer
 </span><span class="hs-identifier hs-var">assetClassValueOf</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Value] -&gt; Value
 forall (t :: * -&gt; *) a. (Foldable t, AdditiveMonoid a) =&gt; t a -&gt; a
 </span><span class="hs-identifier hs-var">sum</span></span><span> </span><span class="annot"><span class="annottext">([Value] -&gt; Value) -&gt; [Value] -&gt; Value
@@ -257,54 +257,54 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-identifier hs-var hs-var">txOutValue</span></span><span> </span><span class="annot"><span class="annottext">(TxOut -&gt; Value) -&gt; [TxOut] -&gt; [Value]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[TxOut]
-</span><a href="#local-6989586621679282704"><span class="hs-identifier hs-var">continuingOutputs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AssetClass
-</span><a href="#local-6989586621679282717"><span class="hs-identifier hs-var">controlToken</span></a></span><span>
-</span><span id="line-133"></span><span>    </span><span id="local-6989586621679282681"><span class="annot"><span class="annottext">signedByControl :: Bool
-</span><a href="#local-6989586621679282681"><span class="hs-identifier hs-var hs-var">signedByControl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BuiltinString -&gt; Bool -&gt; Bool
+</span><a href="#local-6989586621679282879"><span class="hs-identifier hs-var">continuingOutputs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">AssetClass
+</span><a href="#local-6989586621679282892"><span class="hs-identifier hs-var">controlToken</span></a></span><span>
+</span><span id="line-133"></span><span>    </span><span id="local-6989586621679282856"><span class="annot"><span class="annottext">signedByControl :: Bool
+</span><a href="#local-6989586621679282856"><span class="hs-identifier hs-var hs-var">signedByControl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BuiltinString -&gt; Bool -&gt; Bool
 </span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">BuiltinString
 </span><span class="hs-string">&quot;Not accompanied by control token.&quot;</span></span><span>
 </span><span id="line-134"></span><span>      </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679282685"><span class="hs-identifier hs-var">controlTokenInput</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
+</span><a href="#local-6989586621679282860"><span class="hs-identifier hs-var">controlTokenInput</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">0</span></span><span>
-</span><span id="line-135"></span><span>    </span><span id="local-6989586621679282679"><span class="annot"><span class="annottext">noScriptControl :: Bool
-</span><a href="#local-6989586621679282679"><span class="hs-identifier hs-var hs-var">noScriptControl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BuiltinString -&gt; Bool -&gt; Bool
+</span><span id="line-135"></span><span>    </span><span id="local-6989586621679282854"><span class="annot"><span class="annottext">noScriptControl :: Bool
+</span><a href="#local-6989586621679282854"><span class="hs-identifier hs-var hs-var">noScriptControl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">BuiltinString -&gt; Bool -&gt; Bool
 </span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">BuiltinString
 </span><span class="hs-string">&quot;Control token may not be sent to script.&quot;</span></span><span>
 </span><span id="line-136"></span><span>      </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Integer
-</span><a href="#local-6989586621679282684"><span class="hs-identifier hs-var">controlTokenOutput</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
+</span><a href="#local-6989586621679282859"><span class="hs-identifier hs-var">controlTokenOutput</span></a></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Integer -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Integer
 </span><span class="hs-number">0</span></span><span>
-</span><span id="line-137"></span><span>    </span><span id="local-6989586621679282678"><span class="annot"><span class="annottext">controlled :: Bool
-</span><a href="#local-6989586621679282678"><span class="hs-identifier hs-var hs-var">controlled</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679282681"><span class="hs-identifier hs-var">signedByControl</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span id="line-137"></span><span>    </span><span id="local-6989586621679282853"><span class="annot"><span class="annottext">controlled :: Bool
+</span><a href="#local-6989586621679282853"><span class="hs-identifier hs-var hs-var">controlled</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679282856"><span class="hs-identifier hs-var">signedByControl</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
 </span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679282679"><span class="hs-identifier hs-var">noScriptControl</span></a></span><span>
+</span><a href="#local-6989586621679282854"><span class="hs-identifier hs-var">noScriptControl</span></a></span><span>
 </span><span id="line-138"></span><span>
 </span><span id="line-139"></span><span>    </span><span class="hs-comment">-- Deletion.</span><span>
-</span><span id="line-140"></span><span>    </span><span id="local-6989586621679282677"><span class="annot"><span class="annottext">deleting :: Bool
-</span><a href="#local-6989586621679282677"><span class="hs-identifier hs-var hs-var">deleting</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-140"></span><span>    </span><span id="local-6989586621679282852"><span class="annot"><span class="annottext">deleting :: Bool
+</span><a href="#local-6989586621679282852"><span class="hs-identifier hs-var hs-var">deleting</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-141"></span><span>         </span><span class="annot"><span class="annottext">BuiltinString -&gt; Bool -&gt; Bool
 </span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">BuiltinString
 </span><span class="hs-string">&quot;Missing single oracle token input.&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679282697"><span class="hs-identifier hs-var">datumTokenInput</span></a></span><span>
+</span><a href="#local-6989586621679282872"><span class="hs-identifier hs-var">datumTokenInput</span></a></span><span>
 </span><span id="line-142"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
 </span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">BuiltinString -&gt; Bool -&gt; Bool
 </span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">BuiltinString
 </span><span class="hs-string">&quot;No continuing outputs allowed.&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[TxOut] -&gt; Bool
 forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
 </span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">[TxOut]
-</span><a href="#local-6989586621679282704"><span class="hs-identifier hs-var">continuingOutputs</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679282879"><span class="hs-identifier hs-var">continuingOutputs</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-143"></span><span>
 </span><span id="line-144"></span><span>    </span><span class="hs-comment">-- Fee amount.</span><span>
-</span><span id="line-145"></span><span>    </span><span id="local-6989586621679282675"><span class="annot"><span class="annottext">feePaid :: Bool
-</span><a href="#local-6989586621679282675"><span class="hs-identifier hs-var hs-var">feePaid</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-145"></span><span>    </span><span id="local-6989586621679282850"><span class="annot"><span class="annottext">feePaid :: Bool
+</span><a href="#local-6989586621679282850"><span class="hs-identifier hs-var hs-var">feePaid</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-146"></span><span>      </span><span class="annot"><span class="annottext">BuiltinString -&gt; Bool -&gt; Bool
 </span><span class="hs-identifier hs-var">traceIfFalse</span></span><span> </span><span class="annot"><span class="annottext">BuiltinString
 </span><span class="hs-string">&quot;Insufficient fee.&quot;</span></span><span>
@@ -312,37 +312,37 @@ forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">TxOut -&gt; Value
 </span><span class="hs-identifier hs-var hs-var">txOutValue</span></span><span> </span><span class="annot"><span class="annottext">TxOut
-</span><a href="#local-6989586621679282699"><span class="hs-identifier hs-var">oracleOutput</span></a></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Value -&gt; Bool
+</span><a href="#local-6989586621679282874"><span class="hs-identifier hs-var">oracleOutput</span></a></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Value -&gt; Bool
 </span><span class="hs-operator hs-var">`geq`</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TxOut -&gt; Value
 </span><span class="hs-identifier hs-var hs-var">txOutValue</span></span><span> </span><span class="annot"><span class="annottext">TxOut
-</span><a href="#local-6989586621679282703"><span class="hs-identifier hs-var">oracleInput</span></a></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Value -&gt; Value
+</span><a href="#local-6989586621679282878"><span class="hs-identifier hs-var">oracleInput</span></a></span><span> </span><span class="annot"><span class="annottext">Value -&gt; Value -&gt; Value
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Value
-</span><a href="#local-6989586621679282715"><span class="hs-identifier hs-var">requiredFee</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679282890"><span class="hs-identifier hs-var">requiredFee</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-148"></span><span>
 </span><span id="line-149"></span><span>  </span><span class="hs-keyword">in</span><span>
 </span><span id="line-150"></span><span>
 </span><span id="line-151"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Action
-</span><a href="#local-6989586621679282711"><span class="hs-identifier hs-var">redeemer</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><a href="#local-6989586621679282886"><span class="hs-identifier hs-var">redeemer</span></a></span><span> </span><span class="hs-keyword">of</span><span>
 </span><span id="line-152"></span><span>      </span><span class="annot"><span class="annottext">Action
 </span><a href="Mantra.Oracle.Types.html#Delete"><span class="hs-identifier hs-var">Delete</span></a></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679282677"><span class="hs-identifier hs-var">deleting</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><a href="#local-6989586621679282852"><span class="hs-identifier hs-var">deleting</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
 </span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679282678"><span class="hs-identifier hs-var">controlled</span></a></span><span>
+</span><a href="#local-6989586621679282853"><span class="hs-identifier hs-var">controlled</span></a></span><span>
 </span><span id="line-153"></span><span>      </span><span class="annot"><span class="annottext">Action
 </span><a href="Mantra.Oracle.Types.html#Read"><span class="hs-identifier hs-var">Read</span></a></span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679282694"><span class="hs-identifier hs-var">singleDatum</span></a></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><a href="#local-6989586621679282869"><span class="hs-identifier hs-var">singleDatum</span></a></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
 </span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679282686"><span class="hs-identifier hs-var">unchangedDatum</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><a href="#local-6989586621679282861"><span class="hs-identifier hs-var">unchangedDatum</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
 </span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679282675"><span class="hs-identifier hs-var">feePaid</span></a></span><span>
+</span><a href="#local-6989586621679282850"><span class="hs-identifier hs-var">feePaid</span></a></span><span>
 </span><span id="line-154"></span><span>      </span><span class="annot"><span class="annottext">Action
 </span><a href="Mantra.Oracle.Types.html#Write"><span class="hs-identifier hs-var">Write</span></a></span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679282694"><span class="hs-identifier hs-var">singleDatum</span></a></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><a href="#local-6989586621679282869"><span class="hs-identifier hs-var">singleDatum</span></a></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
 </span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679282678"><span class="hs-identifier hs-var">controlled</span></a></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><a href="#local-6989586621679282853"><span class="hs-identifier hs-var">controlled</span></a></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
 </span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679282688"><span class="hs-identifier hs-var">datumPresent</span></a></span><span>
+</span><a href="#local-6989586621679282863"><span class="hs-identifier hs-var">datumPresent</span></a></span><span>
 </span><span id="line-155"></span><span>
 </span><span id="line-156"></span><span>
 </span><span id="line-157"></span><span class="hs-comment">-- | Type for the script.</span><span>
@@ -357,8 +357,8 @@ forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span id="line-166"></span><span class="annot"><a href="Mantra.Oracle.html#oracleInstance"><span class="hs-identifier hs-type">oracleInstance</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>                      </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-167"></span><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">TypedValidator</span></span><span> </span><span class="annot"><a href="Mantra.Oracle.html#OracleScript"><span class="hs-identifier hs-type">OracleScript</span></a></span><span> </span><span class="hs-comment">-- ^ The instance.</span><span>
 </span><span id="line-168"></span><span id="oracleInstance"><span class="annot"><span class="annottext">oracleInstance :: Oracle -&gt; TypedValidator OracleScript
-</span><a href="Mantra.Oracle.html#oracleInstance"><span class="hs-identifier hs-var hs-var">oracleInstance</span></a></span></span><span> </span><span id="local-6989586621679282670"><span class="annot"><span class="annottext">Oracle
-</span><a href="#local-6989586621679282670"><span class="hs-identifier hs-var">oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="Mantra.Oracle.html#oracleInstance"><span class="hs-identifier hs-var hs-var">oracleInstance</span></a></span></span><span> </span><span id="local-6989586621679282845"><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679282845"><span class="hs-identifier hs-var">oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-169"></span><span>  </span><span class="annot"><span class="annottext">CompiledCode (ValidatorType OracleScript)
 -&gt; CompiledCode
      (ValidatorType OracleScript -&gt; WrappedValidatorType)
@@ -385,12 +385,12 @@ forall (uni :: * -&gt; *) a fun.
 (Lift uni a, Throwable uni fun, Typecheckable uni fun) =&gt;
 a -&gt; CompiledCodeIn uni fun a
 </span><span class="hs-identifier hs-var">liftCode</span></span><span> </span><span class="annot"><span class="annottext">Oracle
-</span><a href="#local-6989586621679282670"><span class="hs-identifier hs-var">oracle</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679282845"><span class="hs-identifier hs-var">oracle</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-171"></span><span>      </span><span class="hs-special">$$(</span><span class="annot"><span class="hs-identifier hs-type">compile</span></span><span> </span><span class="hs-special">[||</span><span> </span><span class="hs-identifier">wrap</span><span> </span><span class="hs-special">||]</span><span class="hs-special">)</span><span>
 </span><span id="line-172"></span><span>    </span><span class="hs-keyword">where</span><span>
-</span><span id="line-173"></span><span>      </span><span id="local-6989586621679282667"><span class="annot"><span class="annottext">wrap :: (BuiltinData -&gt; Action -&gt; ScriptContext -&gt; Bool)
+</span><span id="line-173"></span><span>      </span><span id="local-6989586621679282842"><span class="annot"><span class="annottext">wrap :: (BuiltinData -&gt; Action -&gt; ScriptContext -&gt; Bool)
 -&gt; WrappedValidatorType
-</span><a href="#local-6989586621679282667"><span class="hs-identifier hs-var hs-var">wrap</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(UnsafeFromData BuiltinData, UnsafeFromData Action) =&gt;
+</span><a href="#local-6989586621679282842"><span class="hs-identifier hs-var hs-var">wrap</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(UnsafeFromData BuiltinData, UnsafeFromData Action) =&gt;
 (BuiltinData -&gt; Action -&gt; ScriptContext -&gt; Bool)
 -&gt; WrappedValidatorType
 forall d r.
@@ -417,9 +417,9 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span id="line-184"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>     </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-185"></span><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span> </span><span class="hs-comment">-- ^ The script address.</span><span>
 </span><span id="line-186"></span><span id="oracleAddress"><span class="annot"><span class="annottext">oracleAddress :: NetworkId -&gt; Oracle -&gt; AddressAny
-</span><a href="Mantra.Oracle.html#oracleAddress"><span class="hs-identifier hs-var hs-var">oracleAddress</span></a></span></span><span> </span><span id="local-6989586621679282666"><span class="annot"><span class="annottext">NetworkId
-</span><a href="#local-6989586621679282666"><span class="hs-identifier hs-var">network</span></a></span></span><span> </span><span id="local-6989586621679282665"><span class="annot"><span class="annottext">Oracle
-</span><a href="#local-6989586621679282665"><span class="hs-identifier hs-var">oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span>
+</span><a href="Mantra.Oracle.html#oracleAddress"><span class="hs-identifier hs-var hs-var">oracleAddress</span></a></span></span><span> </span><span id="local-6989586621679282841"><span class="annot"><span class="annottext">NetworkId
+</span><a href="#local-6989586621679282841"><span class="hs-identifier hs-var">network</span></a></span></span><span> </span><span id="local-6989586621679282840"><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679282840"><span class="hs-identifier hs-var">oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span>
 </span><span id="line-187"></span><span>  </span><span class="annot"><span class="annottext">Address ShelleyAddr -&gt; AddressAny
 forall addr. Address addr -&gt; AddressAny
 </span><span class="hs-identifier hs-var">toAddressAny</span></span><span>
@@ -431,7 +431,7 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 -&gt; StakeAddressReference
 -&gt; Address ShelleyAddr
 </span><span class="hs-identifier hs-var">makeShelleyAddress</span></span><span> </span><span class="annot"><span class="annottext">NetworkId
-</span><a href="#local-6989586621679282666"><span class="hs-identifier hs-var">network</span></a></span><span>
+</span><a href="#local-6989586621679282841"><span class="hs-identifier hs-var">network</span></a></span><span>
 </span><span id="line-189"></span><span>      </span><span class="hs-special">(</span><span>
 </span><span id="line-190"></span><span>        </span><span class="annot"><span class="annottext">ScriptHash -&gt; PaymentCredential
 </span><span class="hs-identifier hs-var">PaymentCredentialByScript</span></span><span> </span><span>
@@ -459,7 +459,7 @@ PlutusScriptVersion lang -&gt; PlutusScript lang -&gt; Script lang
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; PlutusScript PlutusScriptV1
 </span><a href="Mantra.Oracle.html#plutusOracle"><span class="hs-identifier hs-var">plutusOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
-</span><a href="#local-6989586621679282665"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><a href="#local-6989586621679282840"><span class="hs-identifier hs-var">oracle</span></a></span><span>
 </span><span id="line-194"></span><span>      </span><span class="hs-special">)</span><span>
 </span><span id="line-195"></span><span>      </span><span class="annot"><span class="annottext">StakeAddressReference
 </span><span class="hs-identifier hs-var">NoStakeAddress</span></span><span class="hs-cpp">
@@ -497,7 +497,7 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span id="line-227"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">DatumHash</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Datum</span></span><span class="hs-special">)</span><span> </span><span class="hs-comment">-- ^ Function for looking up the datum, given its hash.</span><span>
 </span><span id="line-228"></span><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">BuiltinData</span></span><span>          </span><span class="hs-comment">-- ^ The datum, if it was found.</span><span>
 </span><span id="line-229"></span><span id="fetchDatum"><span class="annot"><span class="annottext">fetchDatum :: TxOut -&gt; (DatumHash -&gt; Maybe Datum) -&gt; Maybe BuiltinData
-</span><a href="Mantra.Oracle.html#fetchDatum"><span class="hs-identifier hs-var hs-var">fetchDatum</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span class="hs-special">{</span><span id="local-6989586621679282657"><span id="local-6989586621679282658"><span id="local-6989586621679282659"><span class="annot"><span class="annottext">Maybe DatumHash
+</span><a href="Mantra.Oracle.html#fetchDatum"><span class="hs-identifier hs-var hs-var">fetchDatum</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">TxOut</span></span><span class="hs-special">{</span><span id="local-6989586621679282832"><span id="local-6989586621679282833"><span id="local-6989586621679282834"><span class="annot"><span class="annottext">Maybe DatumHash
 Value
 Address
 txOutAddress :: TxOut -&gt; Address
@@ -506,20 +506,20 @@ txOutValue :: Value
 txOutAddress :: Address
 txOutDatumHash :: TxOut -&gt; Maybe DatumHash
 txOutValue :: TxOut -&gt; Value
-</span><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></span></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679282655"><span class="annot"><span class="annottext">DatumHash -&gt; Maybe Datum
-</span><a href="#local-6989586621679282655"><span class="hs-identifier hs-var">fetch</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></span></span></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679282830"><span class="annot"><span class="annottext">DatumHash -&gt; Maybe Datum
+</span><a href="#local-6989586621679282830"><span class="hs-identifier hs-var">fetch</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-230"></span><span>  </span><span class="hs-keyword">do</span><span>
-</span><span id="line-231"></span><span>    </span><span id="local-6989586621679282654"><span class="annot"><span class="annottext">DatumHash
-</span><a href="#local-6989586621679282654"><span class="hs-identifier hs-var">hash</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Maybe DatumHash
-</span><a href="#local-6989586621679282657"><span class="hs-identifier hs-var">txOutDatumHash</span></a></span><span>
-</span><span id="line-232"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Datum</span></span><span> </span><span id="local-6989586621679282652"><span class="annot"><span class="annottext">BuiltinData
-</span><a href="#local-6989586621679282652"><span class="hs-identifier hs-var">datum</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">DatumHash -&gt; Maybe Datum
-</span><a href="#local-6989586621679282655"><span class="hs-identifier hs-var">fetch</span></a></span><span> </span><span class="annot"><span class="annottext">DatumHash
-</span><a href="#local-6989586621679282654"><span class="hs-identifier hs-var">hash</span></a></span><span>
+</span><span id="line-231"></span><span>    </span><span id="local-6989586621679282829"><span class="annot"><span class="annottext">DatumHash
+</span><a href="#local-6989586621679282829"><span class="hs-identifier hs-var">hash</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Maybe DatumHash
+</span><a href="#local-6989586621679282832"><span class="hs-identifier hs-var">txOutDatumHash</span></a></span><span>
+</span><span id="line-232"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Datum</span></span><span> </span><span id="local-6989586621679282827"><span class="annot"><span class="annottext">BuiltinData
+</span><a href="#local-6989586621679282827"><span class="hs-identifier hs-var">datum</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">DatumHash -&gt; Maybe Datum
+</span><a href="#local-6989586621679282830"><span class="hs-identifier hs-var">fetch</span></a></span><span> </span><span class="annot"><span class="annottext">DatumHash
+</span><a href="#local-6989586621679282829"><span class="hs-identifier hs-var">hash</span></a></span><span>
 </span><span id="line-233"></span><span>    </span><span class="annot"><span class="annottext">BuiltinData -&gt; Maybe BuiltinData
 forall a. FromData a =&gt; BuiltinData -&gt; Maybe a
 </span><span class="hs-identifier hs-var">fromBuiltinData</span></span><span> </span><span class="annot"><span class="annottext">BuiltinData
-</span><a href="#local-6989586621679282652"><span class="hs-identifier hs-var">datum</span></a></span><span>
+</span><a href="#local-6989586621679282827"><span class="hs-identifier hs-var">datum</span></a></span><span>
 </span><span id="line-234"></span><span>
 </span><span id="line-235"></span><span>
 </span><span id="line-236"></span><span class="hs-comment">-- | Serialize the oracle as bytes.</span><span>
@@ -567,10 +567,10 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span id="line-251"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Mantra.Oracle.Types.html#Oracle"><span class="hs-identifier hs-type">Oracle</span></a></span><span>        </span><span class="hs-comment">-- ^ The oracle.</span><span>
 </span><span id="line-252"></span><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">AddressAny</span></span><span> </span><span class="hs-comment">-- ^ Action writing the validator and returning its address.</span><span>
 </span><span id="line-253"></span><span id="exportOracle"><span class="annot"><span class="annottext">exportOracle :: FilePath -&gt; NetworkId -&gt; Oracle -&gt; IO AddressAny
-</span><a href="Mantra.Oracle.html#exportOracle"><span class="hs-identifier hs-var hs-var">exportOracle</span></a></span></span><span> </span><span id="local-6989586621679282649"><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679282649"><span class="hs-identifier hs-var">filename</span></a></span></span><span> </span><span id="local-6989586621679282648"><span class="annot"><span class="annottext">NetworkId
-</span><a href="#local-6989586621679282648"><span class="hs-identifier hs-var">network</span></a></span></span><span> </span><span id="local-6989586621679282647"><span class="annot"><span class="annottext">Oracle
-</span><a href="#local-6989586621679282647"><span class="hs-identifier hs-var">oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="Mantra.Oracle.html#exportOracle"><span class="hs-identifier hs-var hs-var">exportOracle</span></a></span></span><span> </span><span id="local-6989586621679282824"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679282824"><span class="hs-identifier hs-var">filename</span></a></span></span><span> </span><span id="local-6989586621679282823"><span class="annot"><span class="annottext">NetworkId
+</span><a href="#local-6989586621679282823"><span class="hs-identifier hs-var">network</span></a></span></span><span> </span><span id="local-6989586621679282822"><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679282822"><span class="hs-identifier hs-var">oracle</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-254"></span><span>  </span><span class="hs-keyword">do</span><span>
 </span><span id="line-255"></span><span>    </span><span class="annot"><span class="annottext">IO (Either (FileError ()) ()) -&gt; IO ()
 forall (f :: * -&gt; *) a. Functor f =&gt; f a -&gt; f ()
@@ -589,7 +589,7 @@ HasTextEnvelope a =&gt;
 FilePath
 -&gt; Maybe TextEnvelopeDescr -&gt; a -&gt; IO (Either (FileError ()) ())
 </span><span class="hs-identifier hs-var">writeFileTextEnvelope</span></span><span> </span><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679282649"><span class="hs-identifier hs-var">filename</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe TextEnvelopeDescr
+</span><a href="#local-6989586621679282824"><span class="hs-identifier hs-var">filename</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe TextEnvelopeDescr
 forall a. Maybe a
 </span><span class="hs-identifier hs-var">Nothing</span></span><span>
 </span><span id="line-257"></span><span>      </span><span class="annot"><span class="annottext">(PlutusScript PlutusScriptV1 -&gt; IO ())
@@ -597,7 +597,7 @@ forall a. Maybe a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Oracle -&gt; PlutusScript PlutusScriptV1
 </span><a href="Mantra.Oracle.html#plutusOracle"><span class="hs-identifier hs-var">plutusOracle</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
-</span><a href="#local-6989586621679282647"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><a href="#local-6989586621679282822"><span class="hs-identifier hs-var">oracle</span></a></span><span>
 </span><span id="line-258"></span><span>    </span><span class="annot"><span class="annottext">AddressAny -&gt; IO AddressAny
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span>
@@ -605,6 +605,6 @@ forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">NetworkId -&gt; Oracle -&gt; AddressAny
 </span><a href="Mantra.Oracle.html#oracleAddress"><span class="hs-identifier hs-var">oracleAddress</span></a></span><span> </span><span class="annot"><span class="annottext">NetworkId
-</span><a href="#local-6989586621679282648"><span class="hs-identifier hs-var">network</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
-</span><a href="#local-6989586621679282647"><span class="hs-identifier hs-var">oracle</span></a></span><span>
+</span><a href="#local-6989586621679282823"><span class="hs-identifier hs-var">network</span></a></span><span> </span><span class="annot"><span class="annottext">Oracle
+</span><a href="#local-6989586621679282822"><span class="hs-identifier hs-var">oracle</span></a></span><span>
 </span><span id="line-260"></span></pre></body></html>
