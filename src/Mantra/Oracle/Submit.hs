@@ -33,7 +33,7 @@ import Data.Function                                     (on)
 import Data.Maybe                                        (catMaybes, fromJust)
 import Data.Word                                         (Word64)
 import Ledger.Value                                      (AssetClass(..), CurrencySymbol(..), TokenName(..))
-import Mantra.Oracle                                     (oracleAddress, plutusOracle)
+import Mantra.Oracle                                     (oracleAddressAny, plutusOracle)
 import Mantra.Oracle.Types                               (Action(..), Oracle(..))
 import Mantra.Types                                      (MantraM, foistMantraEither, foistMantraEitherIO, foistMantraMaybe)
 import Ouroboros.Network.Protocol.LocalTxSubmission.Type (SubmitResult(..))
@@ -123,7 +123,7 @@ operateOracle action oldData newData metadataKey message connection network orac
   do
     let
       script = plutusOracle oracle
-      scriptAddress = oracleAddress network oracle
+      scriptAddress = oracleAddressAny network oracle
       messageMetadata = ("674", ) <$> message
       oracleMetadata = do
                          metadataKey' <- metadataKey

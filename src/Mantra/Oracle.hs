@@ -33,6 +33,7 @@ module Mantra.Oracle (
 , oracleInstance
 , oracleValidator
 , oracleAddress
+, oracleAddressAny
 , plutusOracle
 , exportOracle
 -- * Access
@@ -49,7 +50,7 @@ import Cardano.Api          (AddressAny, NetworkId, PaymentCredential(..), Stake
 import Cardano.Api.Shelley  (PlutusScript(..), PlutusScriptVersion(..), PlutusScriptV1, Script(..), hashScript, writeFileTextEnvelope)
 import Codec.Serialise      (serialise)
 import Control.Monad        (void)
-import Ledger               (Datum(..), DatumHash, ScriptContext(..), TxOut(..), findOwnInput, getContinuingOutputs, txInInfoResolved, txOutValue, unValidatorScript, valueSpent)
+import Ledger               (Address, Datum(..), DatumHash, ScriptContext(..), TxOut(..), findOwnInput, getContinuingOutputs, scriptAddress, txInInfoResolved, txOutValue, unValidatorScript, valueSpent)
 import Ledger.Typed.Scripts (DatumType, RedeemerType, TypedValidator, Validator, ValidatorTypes, mkTypedValidator, validatorScript, wrapValidator)
 import Ledger.Value         (assetClassValueOf, geq)
 import Mantra.Oracle.Types  (Action(..), Oracle(..))
@@ -101,55 +102,48 @@ makeValidator Oracle{..} _ redeemer context@ScriptContext{..} =
     -- Oracle input and output.
     continuingOutputs = getContinuingOutputs context
     oracleInput =
-      maybe (traceError "Missing oracle input.") txInInfoResolved
-        $ findOwnInput context
+      case findOwnInput context of
+        Just input -> txInInfoResolved input
+        _          -> error ()
     oracleOutput =
       case continuingOutputs of
         [output] -> output
-        _        -> traceError "Not exactly one oracle output."
+        _        -> error ()
+
+    -- Values.
+    valueBefore = txOutValue oracleInput
+    valueAfter  = txOutValue oracleOutput
+    valueInput  = valueSpent scriptContextTxInfo
 
     -- Datum token.
-    datumTokenInput  = assetClassValueOf (txOutValue oracleInput ) datumToken == 1
-    datumTokenOutput = assetClassValueOf (txOutValue oracleOutput) datumToken == 1
-    singleDatum =
-         traceIfFalse "Missing single oracle token input."  datumTokenInput
-      && traceIfFalse "Missing single oracle token output." datumTokenOutput
+    datumFromOracle = assetClassValueOf valueBefore datumToken == 1
+    datumToOracle   = assetClassValueOf valueAfter  datumToken == 1
 
     -- Datum value.
-    inputDatumHash = txOutDatumHash oracleInput
+    inputDatumHash  = txOutDatumHash oracleInput
     outputDatumHash = txOutDatumHash oracleOutput
-    datumPresent =
-      traceIfFalse "Missing output datum."
-        $ isJust outputDatumHash
-    unchangedDatum =
-      traceIfFalse "Datum illegally changed."
-        $ outputDatumHash == inputDatumHash
+    unchangedDatum = outputDatumHash == inputDatumHash
 
     -- Control token.
-    controlTokenInput  = assetClassValueOf (valueSpent scriptContextTxInfo        ) controlToken
-    controlTokenOutput = assetClassValueOf (sum $ txOutValue <$> continuingOutputs) controlToken
-    signedByControl = traceIfFalse "Not accompanied by control token."
-      $ controlTokenInput > 0
-    noScriptControl = traceIfFalse "Control token may not be sent to script."
-      $ controlTokenOutput == 0
-    controlled = signedByControl && noScriptControl
+    controlTokenInput = assetClassValueOf valueInput controlToken
+    controlToOracle   = assetClassValueOf valueAfter controlToken
+    authorizedByControl = controlTokenInput > 0
+    noControlToOracle   = deleting || controlToOracle == 0
 
     -- Deletion.
-    deleting =
-         traceIfFalse "Missing single oracle token input." datumTokenInput
-      && traceIfFalse "No continuing outputs allowed." (null continuingOutputs)
+    deleting = null continuingOutputs
 
     -- Fee amount.
-    feePaid =
-      traceIfFalse "Insufficient fee."
-        $ txOutValue oracleOutput `geq` (txOutValue oracleInput <> requiredFee)
+    feePaid = valueAfter `geq` (valueBefore <> requiredFee)
 
   in
 
-    case redeemer of
-      Delete  -> deleting && controlled
-      Read    -> singleDatum  && unchangedDatum && feePaid
-      Write   -> singleDatum  && controlled  && datumPresent
+    datumFromOracle
+      && noControlToOracle
+      && case redeemer of
+           Delete -> deleting      && authorizedByControl
+           Write  -> datumToOracle && authorizedByControl
+           Read   -> datumToOracle && unchangedDatum && feePaid
 
 
 -- | Type for the script.
@@ -178,14 +172,20 @@ oracleValidator = validatorScript . oracleInstance
 
 
 -- | Compute the address for an oracle.
-oracleAddress :: NetworkId  -- ^ The network identifier.
-              -> Oracle     -- ^ The oracle.
-              -> AddressAny -- ^ The script address.
-oracleAddress network oracle = 
+oracleAddress :: Oracle  -- ^ The oracle.
+              -> Address -- ^ The script address.
+oracleAddress = scriptAddress . oracleValidator
+
+
+-- | Compute the address for an oracle.
+oracleAddressAny :: NetworkId  -- ^ The network identifier.
+                 -> Oracle     -- ^ The oracle.
+                 -> AddressAny -- ^ The script address.
+oracleAddressAny network oracle =
   toAddressAny
     $ makeShelleyAddress network
       (
-        PaymentCredentialByScript 
+        PaymentCredentialByScript
           . hashScript
           . PlutusScript PlutusScriptV1
           $ plutusOracle oracle
@@ -254,4 +254,4 @@ exportOracle filename network oracle =
       . writeFileTextEnvelope filename Nothing
       $ plutusOracle oracle
     return
-      $ oracleAddress network oracle
+      $ oracleAddressAny network oracle
