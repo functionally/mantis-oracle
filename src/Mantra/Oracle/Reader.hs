@@ -38,15 +38,16 @@ module Mantra.Oracle.Reader (
 
 import PlutusTx.Prelude hiding ((<>))
 
-import Cardano.Api          (AddressAny, NetworkId, PaymentCredential(..), StakeAddressReference(..), makeShelleyAddress, toAddressAny)
-import Cardano.Api.Shelley  (PlutusScript(..), PlutusScriptVersion(..), PlutusScriptV1, Script(..), hashScript, writeFileTextEnvelope)
-import Codec.Serialise      (serialise)
-import Control.Monad        (void)
-import Ledger               (AssetClass, Datum(..), ScriptContext(..), TxInfo(..), TxOut(..), findDatum, txInInfoResolved, txOutValue, unValidatorScript)
-import Ledger.Typed.Scripts (DatumType, RedeemerType, TypedValidator, Validator, ValidatorTypes, mkTypedValidator, validatorScript, wrapValidator)
-import Ledger.Value         (assetClassValueOf)
-import Prelude              (FilePath, IO)
-import PlutusTx             (FromData(..), applyCode, compile, liftCode)
+import Cardano.Api               (AddressAny, NetworkId, PaymentCredential(..), StakeAddressReference(..), makeShelleyAddress, toAddressAny)
+import Cardano.Api.Shelley       (PlutusScript(..), PlutusScriptVersion(..), PlutusScriptV1, Script(..), hashScript, writeFileTextEnvelope)
+import Codec.Serialise           (serialise)
+import Control.Monad             (void)
+import Ledger.Typed.Scripts      (DatumType, RedeemerType, TypedValidator, ValidatorTypes, mkTypedValidator, validatorScript, wrapValidator)
+import Prelude                   (FilePath, IO)
+import Plutus.V1.Ledger.Contexts (ScriptContext(..), TxInInfo(..), TxInfo(..), TxOut(..), findDatum)
+import Plutus.V1.Ledger.Scripts  (Datum(..), Validator, unValidatorScript)
+import Plutus.V1.Ledger.Value    (AssetClass, assetClassValueOf)
+import PlutusTx                  (FromData(..), applyCode, compile, liftCode)
 
 import qualified Data.ByteString.Short as SBS (ShortByteString, toShort)
 import qualified Data.ByteString.Lazy  as LBS (toStrict)
@@ -58,7 +59,7 @@ import qualified Data.ByteString.Lazy  as LBS (toStrict)
 findOracleValue :: FromData a
                 => AssetClass -- ^ The asset class for the datum token.
                 -> TxInfo     -- ^ The transaction information.
-                -> Maybe a    -- ^
+                -> Maybe a    -- ^ The oracle value, if any.
 findOracleValue token txInfo@TxInfo{..} =
   do
     let

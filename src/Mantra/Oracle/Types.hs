@@ -32,10 +32,10 @@ module Mantra.Oracle.Types (
 
 import PlutusTx.Prelude
 
-import Data.Aeson   (FromJSON, ToJSON)
-import GHC.Generics (Generic)
-import Ledger.Ada   (lovelaceValueOf)
-import Ledger.Value (AssetClass(..), Value)
+import Data.Aeson             (FromJSON, ToJSON)
+import GHC.Generics           (Generic)
+import Plutus.V1.Ledger.Ada   (lovelaceValueOf)
+import Plutus.V1.Ledger.Value (AssetClass(..), Value)
 
 import qualified Ledger.Value as Value   (singleton)
 import qualified Prelude      as Haskell (Eq, Show)

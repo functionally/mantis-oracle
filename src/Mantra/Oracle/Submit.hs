@@ -26,25 +26,25 @@ module Mantra.Oracle.Submit (
 ) where
 
 
-import Cardano.Api
+import Cardano.Api                                       (AddressAny, AddressInEra, AlonzoEra, AssetId(..), AssetName(..), AsType(AsPolicyId), BuildTxWith(..), CardanoEra(..), CardanoMode, ConsensusModeIsMultiEra(..), EraInMode(..), ExecutionUnits(..), KeyWitnessInCtx(..), Lovelace, LocalNodeConnectInfo, MultiAssetSupportedInEra(..), NetworkId, PaymentKey, PlutusScript, PlutusScriptV1, PlutusScriptVersion(..), Quantity(..), QueryInEra(..), QueryInMode(..), QueryInShelleyBasedEra(..), QueryUTxOFilter(..), ScriptData, ScriptDataJsonSchema(..), ScriptDataSupportedInEra(..), ScriptData(..), ScriptDatum(..), ScriptLanguageInEra(..), ScriptWitness(..), ScriptWitnessInCtx(..), ShelleyBasedEra(..), SigningKey, ShelleyWitnessSigningKey(..), TxAuxScripts(..), TxBody(..), TxBodyContent(..), TxCertificates(..), CollateralSupportedInEra(..), TxExtraKeyWitnesses(..), TxExtraScriptData(..), TxFee(..), TxFeesExplicitInEra(..), TxId, TxIn, TxInMode(..), TxInsCollateral(..), TxMetadata, TxMetadataInEra(..), TxMetadataJsonSchema(..), TxMetadataSupportedInEra(..), TxMintValue(..), TxOut(..), TxOutDatumHash(..), TxOutValue(..), TxScriptValidity(..), TxUpdateProposal(..), TxValidityLowerBound(..), TxValidityUpperBound(..), TxWithdrawals(..), UTxO(..), ValidityNoUpperBoundSupportedInEra(..), Value, Witness(..), anyAddressInEra, deserialiseFromRawBytes, getTxId, hashScriptData, lovelaceToQuantity, lovelaceToValue, makeTransactionBodyAutoBalance, metadataFromJson, negateValue, quantityToLovelace, queryNodeLocalState, scriptDataFromJson, selectAsset, selectLovelace, signShelleyTransaction, submitTxToNodeLocal, valueFromList, valueToList)
 import Control.Monad.Except                              (throwError, liftIO)
 import Data.List                                         (sortBy)
 import Data.Function                                     (on)
 import Data.Maybe                                        (catMaybes, fromJust)
 import Data.Word                                         (Word64)
-import Ledger.Value                                      (AssetClass(..), CurrencySymbol(..), TokenName(..))
 import Mantra.Oracle                                     (oracleAddressAny, plutusOracle)
 import Mantra.Oracle.Types                               (Action(..), Oracle(..))
 import Mantra.Types                                      (MantraM, foistMantraEither, foistMantraEitherIO, foistMantraMaybe)
 import Ouroboros.Network.Protocol.LocalTxSubmission.Type (SubmitResult(..))
+import Plutus.V1.Ledger.Value                            (AssetClass(..), CurrencySymbol(..), TokenName(..))
 import PlutusTx.Builtins                                 (fromBuiltin)
 
-import qualified Data.Aeson          as A
-import qualified Data.HashMap.Strict as H
-import qualified Data.Map.Strict     as M
-import qualified Data.Set            as S
-import qualified Data.Text           as T
-import qualified PlutusTx.Prelude    as P
+import qualified Data.Aeson          as A (Value(..))
+import qualified Data.HashMap.Strict as H (fromList)
+import qualified Data.Map.Strict     as M (toList)
+import qualified Data.Set            as S (empty, fromList, singleton)
+import qualified Data.Text           as T (pack)
+import qualified PlutusTx.Prelude    as P (fromEnum)
 
 
 -- | Submit the transaction to create an oracle. The payment address must have *separate* eUTxOs containing the datum token and the control token; it also must have at least one other UTxO containing no tokens.
