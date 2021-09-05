@@ -537,6 +537,12 @@ The oracle can be incorporated into other smart-contract scripts that use the or
 See the slighly older version of this tool at https://github.com/functionally/mantra-oracle/blob/51d21574dd2a11280ece72068d56ef33f5672404/ReadMe.md for examples use the Plutus simulator and the Plutus Application Backend. Full simulator and PAB support will be included when the PAB is released.
 
 
+Testing
+-------
+
+The [test suite](tests/ReadMe.md) contains 29 tests that provide complete coverage for the logical and redemption of the Plutus validator for the oracle.
+
+
 API documentation
 -----------------
 

@@ -78,9 +78,9 @@ import qualified Data.Map.Strict as M (filter, lookup, toList)
 makeLift ''Oracle
 
 
--- FIXME: Temporarily map actions to integers, in order to accommodate Alonzo Purple.
 #if USE_PAB
 #else
+-- FIXME: Temporarily map actions to integers, in order to accommodate lack of .
 instance FromData Action where
   fromBuiltinData = fmap toEnum . fromBuiltinData
 instance UnsafeFromData Action where
