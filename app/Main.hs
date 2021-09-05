@@ -25,19 +25,20 @@ module Main (
 ) where
 
 
-import Cardano.Api          -- (ConsensusModeParams(..), EpochSlots(..), LocalNodeConnectInfo(..), NetworkId(..), NetworkMagic(..), serialiseAddress)
-import Control.Monad.Except (liftIO)
-import Data.String          (fromString)
-import Data.Version         (showVersion)
-import Data.Word            (Word32, Word64)
-import Ledger.Value         (AssetClass, CurrencySymbol(..), TokenName(..), assetClass)
-import Mantra.Oracle        (exportOracle)
-import Mantra.Oracle.Submit (createOracle, deleteOracle, writeOracle)
-import Mantra.Oracle.Types  (Parameters(..), makeOracle)
-import Mantra.Types
-import Paths_mantra_oracle  (version)
-import System.Exit          (exitFailure)
-import System.IO            (hPutStrLn, stderr)
+import Cardano.Api           -- (ConsensusModeParams(..), EpochSlots(..), LocalNodeConnectInfo(..), NetworkId(..), NetworkMagic(..), serialiseAddress)
+import Control.Monad.Except  (liftIO)
+import Data.String           (fromString)
+import Data.Version          (showVersion)
+import Data.Word             (Word32, Word64)
+import Ledger.Value          (AssetClass, CurrencySymbol(..), TokenName(..), assetClass)
+import Mantra.Oracle         (exportOracle)
+import Mantra.Oracle.Reader  (exportReader)
+import Mantra.Oracle.Submit  (createOracle, deleteOracle, writeOracle)
+import Mantra.Oracle.Types   (Parameters(..), makeOracle)
+import Mantra.Types          (foistMantraEitherIO, foistMantraMaybe, foistMantraMaybeIO, runMantraToIO)
+import Paths_mantra_oracle   (version)
+import System.Exit           (exitFailure)
+import System.IO             (hPutStrLn, stderr)
 
 import qualified Data.Aeson             as A
 import qualified Data.ByteString.Base16 as Base16 (decode)
@@ -116,6 +117,11 @@ data Command =
     , messageFile    :: Maybe FilePath
     , scriptLovelace :: Maybe Integer
     }
+  | Reader
+    {
+      configFile :: FilePath
+    , output     :: FilePath
+    }
 #if USE_PAB
   | Test
     {
@@ -135,10 +141,10 @@ data Command =
     }
   | Control
     {
-      frequency   :: Int
-    , host        :: Text
-    , port        :: Int
-    , oracle      :: FilePath
+      frequency :: Int
+    , host      :: Text
+    , port      :: Int
+    , oracle    :: FilePath
     }
   | Employ
     {
@@ -173,7 +179,7 @@ main =
                             <$> O.strArgument (O.metavar "CONFIG_FILE" <> O.help "The configuration file."                      )
                             <*> O.strArgument (O.metavar "OUTPUT_FILE" <> O.help "Output filename for the serialized validator.")
                         )
-                        $ O.progDesc "Export the validator code and compute its address."
+                        $ O.progDesc "Export the validator and compute its address."
                     )
                  <> O.command "create"
                     (
@@ -205,6 +211,16 @@ main =
                             <*> O.optional (O.option O.auto $ O.long "lovelace"   <> O.metavar "LOVELACE"        <> O.help "The value to be sent to the script."        )
                         )
                         $ O.progDesc "Delete the oracle."
+                    )
+                 <> O.command "reader"
+                    (
+                      O.info
+                        (
+                          Reader
+                            <$> O.strArgument (O.metavar "CONFIG_FILE" <> O.help "The configuration file."                      )
+                            <*> O.strArgument (O.metavar "OUTPUT_FILE" <> O.help "Output filename for the serialized validator.")
+                        )
+                        $ O.progDesc "Export an example validator for reading the oracle and compute its address."
                     )
                  <> O.command "write"
                     (
@@ -375,6 +391,13 @@ main =
                           operate
                             $ deleteOracle
                                 oldData
+      Reader{..}   -> do
+                        Configuration{..} <- read <$> readFile configFile
+                        let
+                          network = maybe Mainnet (Testnet . NetworkMagic) magic
+                        address <-
+                          exportReader output network $ readAssetClass datumAsset
+                        putStrLn . T.unpack . serialiseAddress $ address
       Write{..}    -> run
                         $ do
                           oldData <-

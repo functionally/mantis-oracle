@@ -1,7 +1,7 @@
 cabal-version     : 2.4
 name              : mantra-oracle
 description       : This Cardano oracle reports structured data (namely, the `PlutuxTx.Data` type) to a transaction if the fee, as a quantity of a fungible token, is paid. It can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic.
-version           : 0.3.0.3
+version           : 0.3.1.1
 author            : Brian W Bush <code@functionally.io>
 maintainer        : Brian W Bush <code@functionally.io>
 copyright         : (c) 2021 Brian W Bush
@@ -24,6 +24,7 @@ flag USE_PAB
 library
   hs-source-dirs   : src
   exposed-modules  : Mantra.Oracle
+                     Mantra.Oracle.Reader
                      Mantra.Oracle.Submit
                      Mantra.Oracle.Types
   if flag(USE_PAB)
