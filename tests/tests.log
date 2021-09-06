@@ -1,0 +1,98 @@
+$ git log -n 1 --pretty=oneline
+70145c9227012f9d70fcebd8b8b5898633757464 (HEAD -> dev) eliminated token-based pseudo-denial-of-service attacks
+
+
+$ mantra-oracle --version
+Mantra Oracle 0.3.2.0, (c) 2021 Brian W Bush <code@functionally.io>
+
+
+$ ./setup.sh
+addr_test1wqf6h0qy65jx8gpmnm23ysckxkvwu727405carf3zuv2lacqsmyxg
+addr_test1wrf74z3llpxf9uc7hgn3dmcaqdn9uwga9eywhaq3zjt6vncfd96hw
+
+
+$ ./00-mint.sh
+Transaction successfully submitted.
+
+
+$ ./01-create.sh
+
+PASSED 01a No creation without tokens.
+
+PASSED 01b No creation with bad key.
+
+TxId "3a791120781be2b3a8cead81f5f877f1c7bbbea748ecaeed28ff5a9e7a4de43e"
+PASSED 01c Creation.
+
+
+$ ./02-read.sh
+
+PASSED 02a No reading if altering datum.
+
+PASSED 02b No reading if discarding datum.
+
+PASSED 02c No reading if stealing datum token.
+
+PASSED 02d No reading if stealing everything.
+
+PASSED 02e No reading without any fee.
+
+PASSED 02f No reading without sufficient fee.
+
+PASSED 02g No reading with excess fee.
+
+PASSED 02h No reading without sufficient ADA.
+
+PASSED 02i No reading with excess ADA.
+
+PASSED 02j No reading with insufficent fee and excess ADA.
+
+PASSED 02k No reading with insufficent ADA and excess fee.
+
+PASSED 02l Reading.
+
+Transaction successfully submitted.
+
+
+$ ./03-write.sh
+
+PASSED 03a No writing without control.
+
+PASSED 03b No writing if stealing datum token.
+
+PASSED 03c No writing if stealing everything.
+
+PASSED 03d No writing if depositing control token.
+
+TxId "a27a485d0d66c83f9b40cbd1146f680ff3e2473b13e0f0f163ac109307052055"
+PASSED 03e Writing.
+
+
+$ ./04-other.sh
+
+PASSED 04a Illegal redeemer.
+
+PASSED 04b Another illegal redeemer.
+
+
+$ ./05-delete.sh
+
+PASSED 05a No deletion without control.
+
+PASSED 05b No deletion with fee instead of control.
+
+PASSED 05c No deletion with ADA sent to script.
+
+PASSED 05d No deletion with datum token sent to script.
+
+PASSED 05e No deletion with control token sent to script.
+
+PASSED 05f No deletion with control and datum tokens sent to script.
+
+TxId "ae50e2dcef6db484e18be7ab96f99ef87631269e2acccaa2af46e02889ff8709"
+PASSED 05g Deletion.
+
+
+$ ./99-burn.sh
+
+Transaction successfully submitted.

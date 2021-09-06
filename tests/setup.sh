@@ -29,3 +29,7 @@ mantra-oracle export $CONFIG $SCRIPT_O
 
 mantra-oracle reader $CONFIG $SCRIPT_C
 
+
+### Record transaction.
+
+echo "Run query.sh to find the resulting transaction and enter that as TXID_0 in local.sh."

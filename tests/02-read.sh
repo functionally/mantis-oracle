@@ -136,9 +136,9 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-out "$ADDRESS_1+5000000+989 $TOKEN_F" \
   --change-address $ADDRESS_1 \
   --tx-in-collateral $TXID_2#3 \
-  --out-file tx.raw
+  --out-file tx.raw 2>/dev/null
 
-assert_success "02g Reading with excess fee."
+assert_failure "02g No reading with excess fee."
 
 
 ### Insufficient ADA.
@@ -176,9 +176,9 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-out "$ADDRESS_1+5000000+990 $TOKEN_F" \
   --change-address $ADDRESS_1 \
   --tx-in-collateral $TXID_2#3 \
-  --out-file tx.raw
+  --out-file tx.raw 2>/dev/null
 
-assert_success "02i Reading with excess ADA."
+assert_failure "02i No reading with excess ADA."
 
 
 ### Insufficent fee, excess ADA.
