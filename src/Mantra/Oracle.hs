@@ -52,7 +52,7 @@ import Codec.Serialise           (serialise)
 import Control.Monad             (void)
 import Ledger                    (scriptAddress)
 import Ledger.Typed.Scripts      (DatumType, RedeemerType, TypedValidator, Validator, ValidatorTypes, mkTypedValidator, validatorScript, wrapValidator)
-import Ledger.Value              (assetClassValueOf, geq)
+import Ledger.Value              (assetClassValueOf)
 import Mantra.Oracle.Types       (Action(..), Oracle(..))
 import Prelude                   (FilePath, IO, (<>))
 import Plutus.V1.Ledger.Address  (Address, )
@@ -137,7 +137,7 @@ makeValidator Oracle{..} _ redeemer context@ScriptContext{..} =
     deleting = null continuingOutputs
 
     -- Fee amount.
-    feePaid = valueAfter `geq` (valueBefore <> requiredFee)
+    feePaid = valueAfter == valueBefore <> requiredFee
 
   in
 
