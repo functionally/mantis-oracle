@@ -16,7 +16,7 @@
    id="svg8"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    sodipodi:docname="transactions.svg"
-   inkscape:export-filename="/scratch/code.functionally.io/sofr-oracle/repo/transactions.png"
+   inkscape:export-filename="/scratch/code.functionally.io/mantra-oracle/transactions.png"
    inkscape:export-xdpi="150"
    inkscape:export-ydpi="150">
   <defs
@@ -294,7 +294,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -368,7 +368,7 @@
          id="tspan1795"
          x="59.19463"
          y="119.88591"
-         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332">write</tspan><tspan
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:7.05555534px;font-family:'Noto Serif';-inkscape-font-specification:'Noto Serif, Medium';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332">create</tspan><tspan
          sodipodi:role="line"
          x="59.19463"
          y="128.70535"
