@@ -27,3 +27,5 @@ cardano-cli transaction sign $MAGIC \
 
 cardano-cli transaction submit $MAGIC \
   --tx-file tx.signed
+
+rm tx.{raw,signed}
