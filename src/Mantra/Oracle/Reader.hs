@@ -48,6 +48,7 @@ import Plutus.V1.Ledger.Contexts (ScriptContext(..), TxInInfo(..), TxInfo(..), T
 import Plutus.V1.Ledger.Scripts  (Datum(..), Validator, unValidatorScript)
 import Plutus.V1.Ledger.Value    (AssetClass, assetClassValueOf)
 import PlutusTx                  (FromData(..), applyCode, compile, liftCode)
+import PlutusTx.AssocMap         (lookup)
 
 import qualified Data.ByteString.Short as SBS (ShortByteString, toShort)
 import qualified Data.ByteString.Lazy  as LBS (toStrict)
@@ -81,25 +82,28 @@ findOracleValue token txInfo@TxInfo{..} =
 
 {-# INLINABLE makeValidator #-}
 
--- | Make the validator for the reader.
-makeValidator :: AssetClass     -- ^ The asset class for the datum token.
-              -> BuiltinData    -- ^ The datum.
-              -> BuiltinData    -- ^ The redeemer.
-              -> ScriptContext  -- ^ The context.
-              -> Bool           -- ^ Whether the transaction is valid.
-makeValidator datumToken _ redeemer ScriptContext{..} =
-  let
-    datum = findOracleValue datumToken scriptContextTxInfo
-  in
-    datum == Just redeemer
+-- | Make the validator for the reader. This validator looks up its own key in the oracle daum and then compares that value to its own redeemer.
+makeValidator :: AssetClass        -- ^ The asset class for the datum token.
+              -> BuiltinByteString -- ^ The datum.
+              -> BuiltinByteString -- ^ The redeemer.
+              -> ScriptContext     -- ^ The context.
+              -> Bool              -- ^ Whether the transaction is valid.
+makeValidator datumToken key expectedValue ScriptContext{..} =
+  fromMaybe False
+    $ do
+      datum <- findOracleValue datumToken scriptContextTxInfo
+      object <- fromBuiltinData datum
+      actualValue <- lookup key object
+      return
+        $ actualValue == expectedValue
 
 
 -- | Type for the script.
 data ReaderScript
 
 instance ValidatorTypes ReaderScript  where
-    type instance DatumType    ReaderScript  = BuiltinData
-    type instance RedeemerType ReaderScript  = BuiltinData
+    type instance DatumType    ReaderScript  = BuiltinByteString
+    type instance RedeemerType ReaderScript  = BuiltinByteString
 
 
 -- | Compute the instance for an oracle.
@@ -110,7 +114,7 @@ readerInstance oracle =
     ($$(compile [|| makeValidator ||]) `applyCode` liftCode oracle)
       $$(compile [|| wrap ||])
     where
-      wrap = wrapValidator @BuiltinData @BuiltinData
+      wrap = wrapValidator @BuiltinByteString @BuiltinByteString
 
 
 -- | Compute the validator for an oracle.

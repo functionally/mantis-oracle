@@ -3,6 +3,7 @@ tmp/
 *.log
 *.sw?
 dist-newstyle/
+keys/
 *.cid
 *.address
 *.skey
@@ -11,4 +12,3 @@ dist-newstyle/
 *.script
 *.protocol
 tx.*
-*-service/
