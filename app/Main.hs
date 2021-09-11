@@ -27,10 +27,12 @@ module Main (
 
 import Cardano.Api            (AsType(AsAddressAny, AsPaymentKey, AsSigningKey), ConsensusModeParams(..), EpochSlots(..), LocalNodeConnectInfo(..), NetworkId(..), NetworkMagic(..), Quantity(..), deserialiseAddress, quantityToLovelace, readFileTextEnvelope, serialiseAddress)
 import Control.Monad.Except   (liftIO)
+import Data.Maybe             (fromMaybe)
 import Data.String            (fromString)
 import Data.Version           (showVersion)
 import Data.Word              (Word32, Word64)
 import Mantra.Oracle          (exportOracle)
+import Mantra.Oracle.Loop     (loopOracle)
 import Mantra.Oracle.Reader   (exportReader)
 import Mantra.Oracle.Submit   (createOracle, deleteOracle, writeOracle)
 import Mantra.Oracle.Types    (Parameters(..), makeOracle)
@@ -112,6 +114,19 @@ data Command =
     , signingKeyFile :: FilePath
     , oldDataFile    :: FilePath
     , newDataFile    :: FilePath
+    , maxCollateral  :: Maybe Integer
+    , metadataKey    :: Maybe Word64
+    , messageFile    :: Maybe FilePath
+    , scriptLovelace :: Maybe Integer
+    }
+  | Loop
+    {
+      configFile     :: FilePath
+    , signingAddress :: String
+    , signingKeyFile :: FilePath
+    , oldDataFile    :: FilePath
+    , dataScriptFile :: FilePath
+    , frequency      :: Maybe Int
     , maxCollateral  :: Maybe Integer
     , metadataKey    :: Maybe Word64
     , messageFile    :: Maybe FilePath
@@ -211,6 +226,24 @@ main =
                             <*> O.optional (O.option O.auto $ O.long "lovelace"   <> O.metavar "LOVELACE"        <> O.help "The value to be sent to the script."        )
                         )
                         $ O.progDesc "Delete the oracle."
+                    )
+                 <> O.command "loop"
+                    (
+                      O.info
+                        (
+                          Loop
+                            <$> O.strArgument               (                        O.metavar "CONFIG_FILE"     <> O.help "The configuration file."                               )
+                            <*> O.strArgument               (                        O.metavar "SIGNING_ADDRESS" <> O.help "The address for the signing key."                      )
+                            <*> O.strArgument               (                        O.metavar "SIGNING_FILE"    <> O.help "The signing key file."                                 )
+                            <*> O.strArgument               (                        O.metavar "OLD_JSON_FILE"   <> O.help "The JSON file for the existing oracle data."           )
+                            <*> O.strArgument               (                        O.metavar "UPDATER_FILE"    <> O.help "The shell script file for updating the oracle data."   )
+                            <*> O.optional (O.option O.auto $ O.long "frequency"  <> O.metavar "INTEGER"         <> O.help "The frequency in seconds for updating the oracle data.")
+                            <*> O.optional (O.option O.auto $ O.long "collateral" <> O.metavar "LOVELACE"        <> O.help "The maximum collateral for the transaction."           )
+                            <*> O.optional (O.option O.auto $ O.long "metadata"   <> O.metavar "INTEGER"         <> O.help "The metadata key for the oracle data."                 )
+                            <*> O.optional (O.strOption     $ O.long "message"    <> O.metavar "JSON_FILE"       <> O.help "The JSON file for the message metadata."               )
+                            <*> O.optional (O.option O.auto $ O.long "lovelace"   <> O.metavar "LOVELACE"        <> O.help "The value to be sent to the script."                   )
+                        )
+                        $ O.progDesc "Update the oracle's value periodically."
                     )
                  <> O.command "reader"
                     (
@@ -376,21 +409,16 @@ main =
                         $ do
                           newData <-
                             foistMantraMaybeIO "Failed reading new data JSON."
-                              . A.decodeFileStrict
-                              $ newDataFile
+                              $ A.decodeFileStrict newDataFile
                           operate
-                            $ createOracle
-                                newData
-                                metadataKey
+                            $ createOracle newData metadataKey
       Delete{..}   -> run
                         $ do
                           oldData <-
                             foistMantraMaybeIO "Failed reading old data JSON."
-                              . A.decodeFileStrict
-                              $ oldDataFile
+                              $ A.decodeFileStrict oldDataFile
                           operate
-                            $ deleteOracle
-                                oldData
+                            $ deleteOracle oldData
       Reader{..}   -> do
                         Configuration{..} <- read <$> readFile configFile
                         let
@@ -402,17 +430,19 @@ main =
                         $ do
                           oldData <-
                             foistMantraMaybeIO "Failed reading old data JSON."
-                              . A.decodeFileStrict
-                              $ oldDataFile
+                              $ A.decodeFileStrict oldDataFile
                           newData <-
                             foistMantraMaybeIO "Failed reading new data JSON."
-                              . A.decodeFileStrict
-                              $ newDataFile
+                              $ A.decodeFileStrict newDataFile
                           operate
-                            $ writeOracle
-                                oldData
-                                newData
-                                metadataKey
+                            $ writeOracle oldData newData metadataKey
+      Loop{..}    -> run
+                        $ do
+                          oldData <-
+                            foistMantraMaybeIO "Failed reading old data JSON."
+                              $ A.decodeFileStrict oldDataFile
+                          operate
+                            $ loopOracle oldData dataScriptFile (fromMaybe (24 * 60 * 60) frequency) metadataKey
 #if USE_PAB
       Test{..}     -> Simulate.main
                         (CurrencySymbol $ BS.pack currency   )
