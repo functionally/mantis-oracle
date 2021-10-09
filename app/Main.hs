@@ -85,6 +85,7 @@ data Command =
     {
       configFile :: FilePath
     , output     :: FilePath
+    , core       :: Maybe FilePath
     }
   | Create
     {
@@ -191,8 +192,9 @@ main =
                       O.info
                         (
                           Export
-                            <$> O.strArgument (O.metavar "CONFIG_FILE" <> O.help "The configuration file."                      )
-                            <*> O.strArgument (O.metavar "OUTPUT_FILE" <> O.help "Output filename for the serialized validator.")
+                            <$> O.strArgument                 (O.metavar "CONFIG_FILE" <> O.help "The configuration file."                      )
+                            <*> O.strArgument                 (O.metavar "SCRIPT_FILE" <> O.help "Output filename for the serialized validator.")
+                            <*> O.optional    (O.strArgument $ O.metavar "CORE_FILE"   <> O.help "Output filename for the Plutus Core code."    )
                         )
                         $ O.progDesc "Export the validator and compute its address."
                     )
@@ -396,7 +398,7 @@ main =
                         let
                           network = maybe Mainnet (Testnet . NetworkMagic) magic
                         address <-
-                          exportOracle output network
+                          exportOracle output core network
                             . makeOracle
                             $ Parameters
                               (readAssetClass controlAsset)

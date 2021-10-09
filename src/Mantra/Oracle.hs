@@ -50,15 +50,18 @@ import Cardano.Api               (AddressAny, NetworkId, PaymentCredential(..), 
 import Cardano.Api.Shelley       (PlutusScript(..), PlutusScriptVersion(..), PlutusScriptV1, Script(..), hashScript, writeFileTextEnvelope)
 import Codec.Serialise           (serialise)
 import Control.Monad             (void)
+import Control.Monad.Extra       (whenJust)
 import Ledger                    (scriptAddress)
 import Ledger.Typed.Scripts      (DatumType, RedeemerType, TypedValidator, Validator, ValidatorTypes, mkTypedValidator, validatorScript, wrapValidator)
 import Ledger.Value              (assetClassValueOf)
 import Mantra.Oracle.Types       (Action(..), Oracle(..))
-import Prelude                   (FilePath, IO, (<>))
+import Prelude                   (FilePath, IO, (<>), show, writeFile)
 import Plutus.V1.Ledger.Address  (Address, )
 import Plutus.V1.Ledger.Contexts (ScriptContext(..), TxInInfo(..), TxOut(..), findOwnInput, getContinuingOutputs, valueSpent)
 import Plutus.V1.Ledger.Scripts  (Datum(..), DatumHash, unValidatorScript)
+import PlutusPrelude             (pretty)
 import PlutusTx                  (FromData(..), ToData(..), UnsafeFromData(..), applyCode, compile, liftCode, makeLift)
+import PlutusTx.Code             (CompiledCodeIn(DeserializedCode))
 
 import qualified Data.ByteString.Short as SBS (ShortByteString, toShort)
 import qualified Data.ByteString.Lazy  as LBS (toStrict)
@@ -93,11 +96,11 @@ instance ToData Action where
 {-# INLINABLE makeValidator #-}
 
 -- | Make the validator for the oracle.
-makeValidator :: Oracle         -- ^ The oracle.
-              -> BuiltinData    -- ^ The datum.
-              -> Action         -- ^ The redeemer.
-              -> ScriptContext  -- ^ The context.
-              -> Bool           -- ^ Whether the transaction is valid.
+makeValidator :: Oracle        -- ^ The oracle.
+              -> BuiltinData   -- ^ The datum.
+              -> Action        -- ^ The redeemer.
+              -> ScriptContext -- ^ The context.
+              -> Bool          -- ^ Whether the transaction is valid.
 makeValidator Oracle{..} _ redeemer context@ScriptContext{..} =
 
   let
@@ -247,14 +250,23 @@ plutusOracle = PlutusScriptSerialised . serialiseOracle
 
 
 -- | Export the validator for an oracle and compute its address.
-exportOracle :: FilePath      -- ^ The filename for writing the validator bytes.
-             -> NetworkId     -- ^ The network identifier.
-             -> Oracle        -- ^ The oracle.
-             -> IO AddressAny -- ^ Action writing the validator and returning its address.
-exportOracle filename network oracle =
+exportOracle :: FilePath       -- ^ The filename for writing the validator bytes.
+             -> Maybe FilePath -- ^ The filename for writing the Plutus core code.
+             -> NetworkId      -- ^ The network identifier.
+             -> Oracle         -- ^ The oracle.
+             -> IO AddressAny  -- ^ Action writing the validator and returning its address.
+exportOracle validatorFile coreFile network oracle =
   do
+    let
+      wrap = wrapValidator @BuiltinData @Action
+      DeserializedCode core Nothing =
+        $$(compile [|| wrap ||])
+          `applyCode` ($$(compile [|| makeValidator ||]) `applyCode` liftCode oracle)
+    whenJust coreFile
+      $ \coreFile' ->
+      writeFile coreFile' (show $ pretty core)
     void
-      . writeFileTextEnvelope filename Nothing
+      . writeFileTextEnvelope validatorFile Nothing
       $ plutusOracle oracle
     return
       $ oracleAddressAny network oracle

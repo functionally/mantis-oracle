@@ -129,13 +129,14 @@ First, learn about the `export` command:
 
     $ mantra-oracle export --help
     
-    Usage: mantra-oracle export CONFIG_FILE OUTPUT_FILE
+    Usage: mantra-oracle export CONFIG_FILE SCRIPT_FILE [CORE_FILE]
     
       Export the validator and compute its address.
     
     Available options:
       CONFIG_FILE              The configuration file.
-      OUTPUT_FILE              Output filename for the serialized validator.
+      SCRIPT_FILE              Output filename for the serialized validator.
+      CORE_FILE                Output filename for the Plutus Core code.
       -h,--help                Show this help text
 
 Now export the Plutus script for the oracle and find its address:
