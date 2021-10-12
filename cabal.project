@@ -1,4 +1,4 @@
-index-state: 2021-04-30T00:00:00Z
+index-state: 2021-08-14T00:00:00Z
 
 
 -- This configuration is known to work with GHC 8.10.4 and cabal 3.4.0.0.
@@ -65,10 +65,13 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/input-output-hk/cardano-node
-  tag: 0fb43f4e3da8b225f4f86557aed90a183981a64f
-  --sha256: 0mkir1pg78hp7adxgb8cz6jj4izs07np23fxxnwhkvf0ql92nan7
+  tag: ed7fdbf65f40f8e194850b87dd8c631fe26154e6
+  --sha256: 0ivvqnw6fflfbzywychfsyyjd6jn3pg1r0vv63m1rdwp04v59kh5
   subdir:
     cardano-api
+    cardano-node
+    cardano-cli
+    cardano-config
 
 source-repository-package
   type: git
@@ -85,8 +88,8 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/input-output-hk/cardano-base
-  tag: e8a48cf0500b03c744c7fc6f2fedb86e8bdbe055
-  --sha256: 0s3w796y4bgjidg5iwapdq88cq9ipy346gagbip6xlqxdvpp99xj
+  tag: 592aa61d657ad5935a33bace1243abce3728b643
+  --sha256: 1bgq3a2wfdz24jqfwylcc6jjg5aji8dpy5gjkhpnmkkvgcr2rkyb
   subdir:
     base-deriving-via
     binary
@@ -107,9 +110,9 @@ source-repository-package
 
 source-repository-package
   type: git
-  location: https://github.com/input-output-hk/cardano-ledger-specs
-  tag: f827a4321e42f528e25f6079f7af3eb18f10d391
-  --sha256: 0dmgxg7cpgz4lnscqrrk4gakw9w90dx8ljv5wr923rfp9nyzc5qf
+  location: https://github.com/raduom/cardano-ledger-specs
+  tag: ef6bb99782d61316da55470620c7da994cc352b2
+  --sha256: 0z2818kwiwv7smz0ff8wr4zb405pymgd12zm32asas0mp5bqxkin
   subdir:
     alonzo/impl
     byron/chain/executable-spec
@@ -119,13 +122,14 @@ source-repository-package
     byron/ledger/impl
     byron/ledger/impl/test
     cardano-ledger-core
+    cardano-protocol-tpraos
     semantics/executable-spec
     semantics/small-steps-test
+    shelley-ma/impl
+    shelley-ma/shelley-ma-test
     shelley/chain-and-ledger/dependencies/non-integer
     shelley/chain-and-ledger/executable-spec
     shelley/chain-and-ledger/shelley-spec-ledger-test
-    shelley-ma/impl
-    shelley-ma/shelley-ma-test
 --TODO: disabled until it drops its dep on plutus-tx-plugin
 --  alonzo/test
 
@@ -147,8 +151,8 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/input-output-hk/iohk-monitoring-framework
-  tag: 808724ff8a19a33d0ed06f9ef59fbd900b08553c
-  --sha256: 0298dpl29gxzs9as9ha6y0w18hqwc00ipa3hzkxv7nlfrjjz8hmz
+  tag: 46f994e216a1f8b36fe4669b47b2a7011b0e153c
+  --sha256: 1il8fx3misp3650ryj368b3x95ksz01zz3x0z9k00807j93d0ka0
   subdir:
     contra-tracer
     iohk-monitoring
@@ -168,13 +172,14 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/input-output-hk/ouroboros-network
-  tag: aa7bc087737edca29133844b14bb7cba2cd213f2
-  --sha256: 1rcjlj5z8igrfy07lkdrlm4xcx9a3g0jl69wvqk0vvff4hfr00ar
+  tag: 5d37a927046bc7da2887830d8e35cf604622ce09
+  --sha256: 1620zcnivgm1wp1kq3vqc44g77lv7dalzgywc96qsblf1sv9fw3p
   subdir:
-    io-sim
     io-classes
+    io-sim
     monoidal-synchronisation
     network-mux
+    ntp-client
     ouroboros-consensus
     ouroboros-consensus-byron
     ouroboros-consensus-cardano
@@ -188,16 +193,35 @@ source-repository-package
 source-repository-package
   type: git
   location: https://github.com/input-output-hk/plutus
-  tag: edc6d4672c41de4485444122ff843bc86ff421a0
-  --sha256: 12dmxp11xlal8rr3371sir5q4f7gscmyl84nw6wm47mb5b28bk92
+  tag: e2cd641501d13715120329092b3a93df35493a44
+  --sha256: 0aicyg6skqhpfciakwn68b9ppkpm95j1x3d4sj3xmc542sr6932g
   subdir:
+    doc
+    fake-pab
+    freer-extras
+    marlowe
+    marlowe-actus
+    marlowe-dashboard-server
+    marlowe-playground-server
+    marlowe-symbolic
+    playground-common
+    plutus-benchmark
+    plutus-chain-index
+    plutus-contract
     plutus-core
+    plutus-errors
     plutus-ledger
     plutus-ledger-api
+    plutus-metatheory
+    plutus-pab
+    plutus-playground-server
     plutus-tx
     plutus-tx-plugin
+    plutus-use-cases
     prettyprinter-configurable
+    quickcheck-dynamic
     stubs/plutus-ghc-stub
+    web-ghc
     word-array
 
 -- Drops an instance breaking our code. Should be released to Hackage eventually.
@@ -207,6 +231,39 @@ source-repository-package
   tag: ee59880f47ab835dbd73bea0847dab7869fc20d8
   --sha256: 1lrzknw765pz2j97nvv9ip3l1mcpf2zr4n56hwlz0rk7wq7ls4cm
 
+-- Needs some patches, but upstream seems to be fairly dead (no activity in > 1 year)
+source-repository-package
+  type: git
+  location: https://github.com/input-output-hk/purescript-bridge.git
+  tag: 6a92d7853ea514be8b70bab5e72077bf5a510596
+  --sha256: 13j64vv116in3c204qsl1v0ajphac9fqvsjp7x3zzfr7n7g61drb
+
+source-repository-package
+  type: git
+  location: https://github.com/input-output-hk/servant-purescript.git
+  tag: a0c7c7e37c95564061247461aef4be505a853538
+  --sha256: 177na04jf6wf18kandzsah40lw3xswmmccpr3hkb8wb4hypcffnf
+
+source-repository-package
+  type: git
+  location: https://github.com/input-output-hk/cardano-addresses
+  tag: d2f86caa085402a953920c6714a0de6a50b655ec
+  --sha256: 0p6jbnd7ky2yf7bwb1350k8880py8dgqg39k49q02a6ij4ld01ay
+  subdir:
+    core
+
+source-repository-package
+  type: git
+  location: https://github.com/input-output-hk/cardano-wallet
+  tag: ae7569293e94241ef6829139ec02bd91abd069df
+  --sha256: 1mv1dhpkdj9ridm1fvq6jc85qs6zvbp172228rq72gyawjwrgvi6
+  subdir:
+    lib/text-class
+    lib/strict-non-empty-containers
+    lib/core
+    lib/test-utils
+    lib/numeric
+
 constraints:
     hedgehog >= 1.0
   , bimap >= 0.4.0
@@ -215,6 +272,8 @@ constraints:
     -- systemd-2.3.0 requires at least network 3.1.1.0 but it doesn't declare
     -- that dependency
   , network >= 3.1.1.0
+  , dependent-sum > 0.6.2.0
+  , singletons < 3.0
 
 package comonad
   flags: -test-doctests
@@ -224,4 +283,9 @@ package cardano-ledger-alonzo-test
 
 allow-newer:
   monoidal-containers:aeson,
-  size-based:template-haskell
+  size-based:template-haskell,
+  ouroboros-consensus-byron:formatting,
+  beam-core:aeson,
+  beam-sqlite:aeson,
+  beam-sqlite:dlist,
+  beam-migrate:aeson
