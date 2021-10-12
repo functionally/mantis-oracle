@@ -26,7 +26,7 @@ module Mantra.Oracle.Submit (
 ) where
 
 
-import Cardano.Api                                       (AddressAny, AddressInEra, AlonzoEra, AssetId(..), AssetName(..), AsType(AsPolicyId), BuildTxWith(..), CardanoEra(..), CardanoMode, ConsensusModeIsMultiEra(..), EraInMode(..), ExecutionUnits(..), KeyWitnessInCtx(..), Lovelace, LocalNodeConnectInfo, MultiAssetSupportedInEra(..), NetworkId, PaymentKey, PlutusScript, PlutusScriptV1, PlutusScriptVersion(..), Quantity(..), QueryInEra(..), QueryInMode(..), QueryInShelleyBasedEra(..), QueryUTxOFilter(..), ScriptData, ScriptDataJsonSchema(..), ScriptDataSupportedInEra(..), ScriptData(..), ScriptDatum(..), ScriptLanguageInEra(..), ScriptWitness(..), ScriptWitnessInCtx(..), ShelleyBasedEra(..), SigningKey, ShelleyWitnessSigningKey(..), TxAuxScripts(..), TxBody(..), TxBodyContent(..), TxCertificates(..), CollateralSupportedInEra(..), TxExtraKeyWitnesses(..), TxExtraScriptData(..), TxFee(..), TxFeesExplicitInEra(..), TxId, TxIn, TxInMode(..), TxInsCollateral(..), TxMetadata, TxMetadataInEra(..), TxMetadataJsonSchema(..), TxMetadataSupportedInEra(..), TxMintValue(..), TxOut(..), TxOutDatumHash(..), TxOutValue(..), TxScriptValidity(..), TxUpdateProposal(..), TxValidityLowerBound(..), TxValidityUpperBound(..), TxWithdrawals(..), UTxO(..), ValidityNoUpperBoundSupportedInEra(..), Value, Witness(..), anyAddressInEra, deserialiseFromRawBytes, getTxId, hashScriptData, lovelaceToQuantity, lovelaceToValue, makeTransactionBodyAutoBalance, metadataFromJson, negateValue, quantityToLovelace, queryNodeLocalState, scriptDataFromJson, selectAsset, selectLovelace, signShelleyTransaction, submitTxToNodeLocal, valueFromList, valueToList)
+import Cardano.Api                                       (AddressAny, AddressInEra, AlonzoEra, AssetId(..), AssetName(..), AsType(AsPolicyId), BalancedTxBody(..), BuildTxWith(..), CardanoEra(..), CardanoMode, ConsensusModeIsMultiEra(..), EraInMode(..), ExecutionUnits(..), KeyWitnessInCtx(..), Lovelace, LocalNodeConnectInfo, MultiAssetSupportedInEra(..), NetworkId, PaymentKey, PlutusScript, PlutusScriptV1, PlutusScriptVersion(..), Quantity(..), QueryInEra(..), QueryInMode(..), QueryInShelleyBasedEra(..), QueryUTxOFilter(..), ScriptData, ScriptDataJsonSchema(..), ScriptDataSupportedInEra(..), ScriptData(..), ScriptDatum(..), ScriptLanguageInEra(..), ScriptWitness(..), ScriptWitnessInCtx(..), ShelleyBasedEra(..), SigningKey, ShelleyWitnessSigningKey(..), TxAuxScripts(..), TxBody(..), TxBodyContent(..), TxCertificates(..), CollateralSupportedInEra(..), TxExtraKeyWitnesses(..), TxExtraScriptData(..), TxFee(..), TxFeesExplicitInEra(..), TxId, TxIn, TxInMode(..), TxInsCollateral(..), TxMetadata, TxMetadataInEra(..), TxMetadataJsonSchema(..), TxMetadataSupportedInEra(..), TxMintValue(..), TxOut(..), TxOutDatumHash(..), TxOutValue(..), TxScriptValidity(..), TxUpdateProposal(..), TxValidityLowerBound(..), TxValidityUpperBound(..), TxWithdrawals(..), UTxO(..), ValidityNoUpperBoundSupportedInEra(..), Value, Witness(..), anyAddressInEra, deserialiseFromRawBytes, getTxId, hashScriptData, lovelaceToQuantity, lovelaceToValue, makeTransactionBodyAutoBalance, metadataFromJson, negateValue, quantityToLovelace, queryNodeLocalState, scriptDataFromJson, selectAsset, selectLovelace, signShelleyTransaction, submitTxToNodeLocal, valueFromList, valueToList)
 import Control.Monad.Except                              (throwError, liftIO)
 import Data.List                                         (sortBy)
 import Data.Function                                     (on)
@@ -288,17 +288,19 @@ build action connection script scriptAddress controlAddress (datumTxIn,  datumVa
       txUpdateProposal  = TxUpdateProposalNone
       txMintValue       = TxMintNone
       txScriptValidity  = TxScriptValidityNone
-    foistMantraEither
-      $ makeTransactionBodyAutoBalance
-          AlonzoEraInCardanoMode
-          start
-          history
-          protocol
-          S.empty
-          utxo
-          TxBodyContent{..}
-          controlAddress'
-          Nothing
+    BalancedTxBody txBody _ _ <-
+      foistMantraEither
+        $ makeTransactionBodyAutoBalance
+            AlonzoEraInCardanoMode
+            start
+            history
+            protocol
+            S.empty
+            utxo
+            TxBodyContent{..}
+            controlAddress'
+            Nothing
+    return txBody
 
 
 -- | Sign and submit a transaction.
