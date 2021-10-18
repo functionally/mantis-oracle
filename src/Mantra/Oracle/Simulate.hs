@@ -36,12 +36,12 @@ import Data.Monoid              (Last (..))
 import Data.Text                (Text)
 import Ledger.Ada               (fromValue, getLovelace, lovelaceValueOf)
 import Ledger.Address           (pubKeyAddress)
-import Ledger.Tx                (txOutTxOut, txOutValue)
+import Ledger.Tx                (ChainIndexTxOut(..))
 import Ledger.Value             (AssetClass(..), CurrencySymbol, TokenName, Value, assetClass, assetClassValueOf, flattenValue, toString)
-import Mantra.Oracle            (findOracle, oracleAddress)
-import Mantra.Oracle.Client     (runOracleClient)
-import Mantra.Oracle.Controller (runOracleController)
-import Mantra.Oracle.Types      (Oracle(..), Parameters(..))
+import Mantra.Oracle            (oracleAddress)
+import Mantra.Oracle.Client     (findOracle, runOracleClient)
+import Mantra.Oracle.Controller (OracleSchema, runOracleController)
+import Mantra.Oracle.Types      (Oracle(..), Parameters(..), makeOracle)
 import Prelude                  (IO, String, (<>), div, show)
 import PlutusTx                 (Data(I))
 import Wallet.Emulator.Wallet   (Wallet(..))
@@ -49,8 +49,9 @@ import Wallet.Emulator.Wallet   (Wallet(..))
 import qualified Control.Monad.Freer.Extras as X (logInfo)
 import qualified Data.Map                   as M (elems, fromList)
 import qualified Ledger.Value               as V (singleton)
-import qualified Plutus.Contract            as C (BlockchainActions, Contract, handleError, logError, logInfo, ownPubKey, tell, utxoAt, waitNSlots)
-import qualified Plutus.Trace.Emulator      as E (EmulatorConfig(..), EmulatorTrace, activateContractWallet, callEndpoint, observableState, runEmulatorTraceIO', waitNSlots)
+import qualified Plutus.Contract            as C (Contract, logInfo, ownPubKey, tell, utxosAt, waitNSlots)
+import qualified Plutus.Contract.Test       as C (w1, w2, w3, w4)
+import qualified Plutus.Trace.Emulator      as E (EmulatorConfig(..), EmulatorTrace, activateContractWallet, callEndpoint, runEmulatorTraceIO', waitNSlots)
 
 
 -- | Run the example.
@@ -59,48 +60,51 @@ main :: CurrencySymbol -- ^ Currency symbol for the example tokens.
      -> TokenName      -- ^ Name of the datum token.
      -> TokenName      -- ^ Name of the fee token.
      -> Integer        -- ^ Amount of fee token needed to read the oracle.
-     -> IO () -- ^ Action for running the example.
-main symbol controlName datumName feeName feeAmount  =
+     -> Integer        -- ^ Amount of lovelace to read the oracle.
+     -> IO ()          -- ^ Action for running the example.
+main symbol controlName datumName feeName feeAmount lovelaceAmount =
 
   let
 
     controlParameter = AssetClass (symbol, controlName)
     datumParameter   = AssetClass (symbol, datumName  )
     feeToken         = AssetClass (symbol, feeName    )
-   
+
     initial = lovelaceValueOf 100_000_000
     withValue = V.singleton symbol
 
-    config =
-      E.EmulatorConfig
-        . Left
+    _initialChainState =
+      Left
         $  M.fromList
         [
           -- Wallet 1 controls the oracle.
           (
-            Wallet 1
+            C.w1
           , initial <> controlName `withValue` 1 <> datumName `withValue` 1
           )
         , (
           -- Wallet 2 has enough of the fee token to read the oracle twice.
-            Wallet 2
+            C.w2
           , initial <> feeName `withValue` (feeAmount * 2)
           )
         , (
             -- Wallet 3 doesn't not have have enough fee tokens to read the oracle at all.
-            Wallet 3
+            C.w3
           , initial <> feeName `withValue` (feeAmount `div` 2)
           )
         , (
             -- Wallet 4 just monitors transactions of the oracle.
-            Wallet 4
+            C.w4
           , initial
           )
         ]
+    _slotConfig = def
+    _feeConfig = def
 
   in
 
-    E.runEmulatorTraceIO' def config
+   do
+    E.runEmulatorTraceIO' def E.EmulatorConfig{..}
       $ testTrace Parameters{..}
 
 
@@ -111,29 +115,23 @@ testTrace parameters =
   do
 
     let
-      getOracle w =
-        do
-          last <- E.observableState w
-          case last of
-            Last Nothing       -> E.waitNSlots 1          >> getOracle w
-            Last (Just oracle) -> X.logInfo (show oracle) >> return oracle
+      oracle = makeOracle parameters
 
     X.logInfo @String "Wallet 1 starts the oracle, but does not set its value yet."
-    w1 <- E.activateContractWallet (Wallet 1)
+    w1 <- E.activateContractWallet C.w1
        $  runOracleController parameters
     void $ E.waitNSlots 1
-    oracle <- getOracle w1
 
-    sequence_ [E.activateContractWallet (Wallet i) . peekFunds oracle $ Just i | i <- [1..4]]
-    void . E.activateContractWallet (Wallet 1) $ peekFunds oracle Nothing
+    sequence_ [E.activateContractWallet w . peekFunds oracle $ Just w | w <- [C.w1, C.w2, C.w3, C.w4]]
+    void . E.activateContractWallet C.w1 $ peekFunds oracle Nothing
 
     X.logInfo @String "Wallet 4 just watches transactions of the oracle."
-    void . E.activateContractWallet (Wallet 4)
+    void . E.activateContractWallet C.w4
          $ peekDatum oracle
     void $ E.waitNSlots 3
 
     X.logInfo @String "Wallet 2 has sufficient fee token to read the oracle twice."
-    w2 <- E.activateContractWallet (Wallet 2) 
+    w2 <- E.activateContractWallet C.w2
        $  runOracleClient oracle
     void $ E.waitNSlots 3
 
@@ -150,7 +148,7 @@ testTrace parameters =
     void $ E.waitNSlots 3
 
     X.logInfo @String "Wallet 3 doesn't have sufficient fee token to read the oracle at all."
-    w3 <- E.activateContractWallet (Wallet 3) 
+    w3 <- E.activateContractWallet C.w3
        $  runOracleClient oracle
     void $ E.waitNSlots 3
 
@@ -176,8 +174,8 @@ testTrace parameters =
 
 
 -- | Log the oracle's current data.
-peekDatum :: Oracle                                    -- ^ The oracle.
-          -> C.Contract () C.BlockchainActions Text () -- ^ Action for logging the oracle's data.
+peekDatum :: Oracle                             -- ^ The oracle.
+          -> C.Contract () OracleSchema Text () -- ^ Action for logging the oracle's data.
 peekDatum oracle =
   do
     inst <- findOracle oracle
@@ -189,21 +187,20 @@ peekDatum oracle =
 
 
 -- | Log the funds in a wallet or in the oracle script.
-peekFunds :: Oracle                                              -- ^ The oracle.
-          -> Maybe Integer                                       -- ^ The wallet number, or `Nothing` for the oracle script.
-          -> C.Contract (Last Value) C.BlockchainActions Text () -- ^ Action for logging the funds.
+peekFunds :: Oracle                                       -- ^ The oracle.
+          -> Maybe Wallet                                 -- ^ The wallet, or `Nothing` for the oracle script.
+          -> C.Contract (Last Value) OracleSchema Text () -- ^ Action for logging the funds.
 peekFunds oracle@Oracle{..} i =
   do
     let
       [(currency, feeName, _)] = flattenValue requiredFee
       feeToken = assetClass currency feeName
-      funds :: C.Contract (Last Value) C.BlockchainActions Text Value
       funds =
         do
           owner <- C.ownPubKey
-          utxos <- C.utxoAt $ maybe (oracleAddress oracle) (const $ pubKeyAddress owner) i
+          utxos <- C.utxosAt $ maybe (oracleAddress oracle) (const $ pubKeyAddress owner) i
           let
-            value = sum $ txOutValue . txOutTxOut <$> M.elems utxos
+            value = sum $ _ciTxOutValue <$> M.elems utxos
           C.logInfo
             $ maybe "Funds in Script" (("Funds in Wallet " ++) . show) i
             ++ ": " ++ show (getLovelace $ fromValue value) ++ " Lovelace"
@@ -211,7 +208,6 @@ peekFunds oracle@Oracle{..} i =
             ++ ", " ++ show (assetClassValueOf value datumToken  ) ++ " " ++ toString (snd $ unAssetClass datumToken  )
             ++ ", " ++ show (assetClassValueOf value feeToken    ) ++ " " ++ toString feeName
           return value
-    C.handleError C.logError
-      $ funds >>= C.tell . Last . Just
+    funds >>= C.tell . Last . Just
     void $ C.waitNSlots 1
     peekFunds oracle i

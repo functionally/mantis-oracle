@@ -1,348 +1,448 @@
-Slot 00000: TxnValidate c30be98c4e2bd64263bd3a55253f5593808e0654eb7cb89a1958f49303018bb6
+Slot 00000: TxnValidate 7d08d52612594d45e310965bd71ea08edba88b925291bd424f98dc6b5345a354
 Slot 00000: SlotAdd Slot 1
-
+Slot 00001: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 1, blockId= BlockId(-554761215918413124), blockNo= 0). UTxO state was added to the end.
+Slot 00001: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 1, blockId= BlockId(-554761215918413124), blockNo= 0). UTxO state was added to the end.
+Slot 00001: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 1, blockId= BlockId(-554761215918413124), blockNo= 0). UTxO state was added to the end.
+Slot 00001: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 1, blockId= BlockId(-554761215918413124), blockNo= 0). UTxO state was added to the end.
 Slot 00001: *** USER LOG: Wallet 1 starts the oracle, but does not set its value yet.
-Slot 00001: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 1}:
+Slot 00001: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f}:
   Contract instance started
-Slot 00001: *** CONTRACT LOG: "Created oracle: Oracle {controlToken = (addacafe,\"BRIO\"), datumToken = (addacafe,\"SOFR\"), requiredFee = Value (Map [(addacafe,Map [(\"PIGY\",1000000)])])}"
 Slot 00001: SlotAdd Slot 2
-
-Slot 00002: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 1}:
-  Sending contract state to Thread 0
+Slot 00002: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 2, blockId= BlockId(-3750763034362895579), blockNo= 1). UTxO state was added to the end.
+Slot 00002: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 2, blockId= BlockId(-3750763034362895579), blockNo= 1). UTxO state was added to the end.
+Slot 00002: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 2, blockId= BlockId(-3750763034362895579), blockNo= 1). UTxO state was added to the end.
+Slot 00002: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 2, blockId= BlockId(-3750763034362895579), blockNo= 1). UTxO state was added to the end.
+Slot 00002: 00000000-0000-4000-8000-000000000001 {Contract instance for wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f}:
+  Contract instance started
+Slot 00002: 00000000-0000-4000-8000-000000000002 {Contract instance for wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04}:
+  Contract instance started
+Slot 00002: 00000000-0000-4000-8000-000000000003 {Contract instance for wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e}:
+  Contract instance started
+Slot 00002: 00000000-0000-4000-8000-000000000004 {Contract instance for wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3}:
+  Contract instance started
+Slot 00002: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00002: *** USER LOG: Wallet 4 just watches transactions of the oracle.
+Slot 00002: 00000000-0000-4000-8000-000000000005 {Contract instance for wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f}:
+  Contract instance started
+Slot 00002: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00002: 00000000-0000-4000-8000-000000000006 {Contract instance for wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3}:
+  Contract instance started
+Slot 00002: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00002: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00002: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00002: SlotAdd Slot 3
-
-Slot 00003: *** USER LOG: Oracle {controlToken = (addacafe,"BRIO"), datumToken = (addacafe,"SOFR"), requiredFee = Value (Map [(addacafe,Map [("PIGY",1000000)])])}
-Slot 00003: 00000000-0000-4000-8000-000000000001 {Contract instance for wallet 1}:
-  Contract instance started
-Slot 00003: 00000000-0000-4000-8000-000000000002 {Contract instance for wallet 2}:
-  Contract instance started
-Slot 00003: 00000000-0000-4000-8000-000000000003 {Contract instance for wallet 3}:
-  Contract instance started
-Slot 00003: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
-Slot 00003: 00000000-0000-4000-8000-000000000004 {Contract instance for wallet 4}:
-  Contract instance started
-Slot 00003: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
-Slot 00003: *** USER LOG: Wallet 4 just watches transactions of the oracle.
-Slot 00003: 00000000-0000-4000-8000-000000000005 {Contract instance for wallet 1}:
-  Contract instance started
-Slot 00003: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00003: 00000000-0000-4000-8000-000000000006 {Contract instance for wallet 4}:
-  Contract instance started
-Slot 00003: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00003: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 3, blockId= BlockId(-3750763034362895579), blockNo= 2). UTxO state was added to the end.
+Slot 00003: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 3, blockId= BlockId(-3750763034362895579), blockNo= 2). UTxO state was added to the end.
+Slot 00003: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 3, blockId= BlockId(-3750763034362895579), blockNo= 2). UTxO state was added to the end.
+Slot 00003: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 3, blockId= BlockId(-3750763034362895579), blockNo= 2). UTxO state was added to the end.
+Slot 00003: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00003: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00003: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00003: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00003: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00003: SlotAdd Slot 4
-
-Slot 00004: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
-Slot 00004: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
-Slot 00004: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00004: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00004: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 4, blockId= BlockId(-3750763034362895579), blockNo= 3). UTxO state was added to the end.
+Slot 00004: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 4, blockId= BlockId(-3750763034362895579), blockNo= 3). UTxO state was added to the end.
+Slot 00004: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 4, blockId= BlockId(-3750763034362895579), blockNo= 3). UTxO state was added to the end.
+Slot 00004: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 4, blockId= BlockId(-3750763034362895579), blockNo= 3). UTxO state was added to the end.
+Slot 00004: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00004: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00004: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00004: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00004: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00004: SlotAdd Slot 5
-
-Slot 00005: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
-Slot 00005: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
-Slot 00005: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00005: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00005: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00005: SlotAdd Slot 6
-
-Slot 00006: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
-Slot 00006: *** USER LOG: Wallet 2 has sufficient fee token to read the oracle twice.
-Slot 00006: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2}:
+Slot 00005: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 5, blockId= BlockId(-3750763034362895579), blockNo= 4). UTxO state was added to the end.
+Slot 00005: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 5, blockId= BlockId(-3750763034362895579), blockNo= 4). UTxO state was added to the end.
+Slot 00005: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 5, blockId= BlockId(-3750763034362895579), blockNo= 4). UTxO state was added to the end.
+Slot 00005: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 5, blockId= BlockId(-3750763034362895579), blockNo= 4). UTxO state was added to the end.
+Slot 00005: *** USER LOG: Wallet 2 has sufficient fee token to read the oracle twice.
+Slot 00005: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04}:
   Contract instance started
-Slot 00006: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
-Slot 00006: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00006: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00005: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00005: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00005: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00005: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00005: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00005: SlotAdd Slot 6
+Slot 00006: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 6, blockId= BlockId(-3750763034362895579), blockNo= 5). UTxO state was added to the end.
+Slot 00006: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 6, blockId= BlockId(-3750763034362895579), blockNo= 5). UTxO state was added to the end.
+Slot 00006: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 6, blockId= BlockId(-3750763034362895579), blockNo= 5). UTxO state was added to the end.
+Slot 00006: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 6, blockId= BlockId(-3750763034362895579), blockNo= 5). UTxO state was added to the end.
+Slot 00006: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00006: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00006: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00006: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00006: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00006: SlotAdd Slot 7
-
-Slot 00007: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
-Slot 00007: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
-Slot 00007: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00007: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00007: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 7, blockId= BlockId(-3750763034362895579), blockNo= 6). UTxO state was added to the end.
+Slot 00007: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 7, blockId= BlockId(-3750763034362895579), blockNo= 6). UTxO state was added to the end.
+Slot 00007: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 7, blockId= BlockId(-3750763034362895579), blockNo= 6). UTxO state was added to the end.
+Slot 00007: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 7, blockId= BlockId(-3750763034362895579), blockNo= 6). UTxO state was added to the end.
+Slot 00007: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00007: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00007: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00007: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00007: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00007: SlotAdd Slot 8
-
-Slot 00008: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
-Slot 00008: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
-Slot 00008: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00008: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00008: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 8, blockId= BlockId(-3750763034362895579), blockNo= 7). UTxO state was added to the end.
+Slot 00008: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 8, blockId= BlockId(-3750763034362895579), blockNo= 7). UTxO state was added to the end.
+Slot 00008: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 8, blockId= BlockId(-3750763034362895579), blockNo= 7). UTxO state was added to the end.
+Slot 00008: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 8, blockId= BlockId(-3750763034362895579), blockNo= 7). UTxO state was added to the end.
+Slot 00008: *** USER LOG: Wallet 2 tries to read the oracle before it holds data.
+Slot 00008: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00008: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00008: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00008: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00008: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00008: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04}:
+  Receive endpoint call on 'read' for Object (fromList [("contents",Array [Object (fromList [("getEndpointDescription",String "read")]),Object (fromList [("unEndpointValue",Array [])])]),("tag",String "ExposeEndpointResp")])
+Slot 00008: *** CONTRACT LOG: "Oracle not found."
 Slot 00008: SlotAdd Slot 9
-
-Slot 00009: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
-Slot 00009: *** USER LOG: Wallet 2 tries to read the oracle before it holds data.
-Slot 00009: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
-Slot 00009: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00009: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00009: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 9, blockId= BlockId(-3750763034362895579), blockNo= 8). UTxO state was added to the end.
+Slot 00009: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 9, blockId= BlockId(-3750763034362895579), blockNo= 8). UTxO state was added to the end.
+Slot 00009: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 9, blockId= BlockId(-3750763034362895579), blockNo= 8). UTxO state was added to the end.
+Slot 00009: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 9, blockId= BlockId(-3750763034362895579), blockNo= 8). UTxO state was added to the end.
+Slot 00009: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00009: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00009: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00009: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00009: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2}:
-  Receive endpoint call: Object (fromList [("tag",String "read"),("value",Object (fromList [("unEndpointValue",Array [])]))])
-Slot 00009: *** CONTRACT LOG: "Oracle not found."
+Slot 00009: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00009: SlotAdd Slot 10
-
-Slot 00010: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
-Slot 00010: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
-Slot 00010: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00010: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00010: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 10, blockId= BlockId(-3750763034362895579), blockNo= 9). UTxO state was added to the end.
+Slot 00010: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 10, blockId= BlockId(-3750763034362895579), blockNo= 9). UTxO state was added to the end.
+Slot 00010: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 10, blockId= BlockId(-3750763034362895579), blockNo= 9). UTxO state was added to the end.
+Slot 00010: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 10, blockId= BlockId(-3750763034362895579), blockNo= 9). UTxO state was added to the end.
+Slot 00010: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00010: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00010: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00010: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00010: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00010: SlotAdd Slot 11
-
-Slot 00011: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
-Slot 00011: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
-Slot 00011: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00011: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00011: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 11, blockId= BlockId(-3750763034362895579), blockNo= 10). UTxO state was added to the end.
+Slot 00011: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 11, blockId= BlockId(-3750763034362895579), blockNo= 10). UTxO state was added to the end.
+Slot 00011: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 11, blockId= BlockId(-3750763034362895579), blockNo= 10). UTxO state was added to the end.
+Slot 00011: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 11, blockId= BlockId(-3750763034362895579), blockNo= 10). UTxO state was added to the end.
+Slot 00011: *** USER LOG: Wallet 1 writes a value to the oracle.
+Slot 00011: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
+Slot 00011: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00011: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00011: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00011: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00011: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f}:
+  Receive endpoint call on 'write' for Object (fromList [("contents",Array [Object (fromList [("getEndpointDescription",String "write")]),Object (fromList [("unEndpointValue",String "1905dc")])]),("tag",String "ExposeEndpointResp")])
+Slot 00011: W76d5e12: TxSubmit: a6469777a6eff1e443f267770ea46f2f94288d4c8a9b69f4d7b0a3d6030c4cf9
+Slot 00011: TxnValidate a6469777a6eff1e443f267770ea46f2f94288d4c8a9b69f4d7b0a3d6030c4cf9
 Slot 00011: SlotAdd Slot 12
-
-Slot 00012: *** CONTRACT LOG: "Funds in Wallet 1: 100000000 Lovelace, 1 BRIO, 1 SOFR, 0 PIGY"
-Slot 00012: *** USER LOG: Wallet 1 writes a value to the oracle.
-Slot 00012: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
-Slot 00012: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00012: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00012: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00012: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 1}:
-  Receive endpoint call: Object (fromList [("tag",String "write"),("value",Object (fromList [("unEndpointValue",String "1905dc")]))])
-Slot 00012: W1: TxSubmit: bebbbee80a25d4ba39f607b9dc54b4fab929741fa60ed9675d731bb0d113877a
-Slot 00012: TxnValidate bebbbee80a25d4ba39f607b9dc54b4fab929741fa60ed9675d731bb0d113877a
+Slot 00012: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 12, blockId= BlockId(-1850057248273471053), blockNo= 11). UTxO state was added to the end.
+Slot 00012: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 12, blockId= BlockId(-1850057248273471053), blockNo= 11). UTxO state was added to the end.
+Slot 00012: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 12, blockId= BlockId(-1850057248273471053), blockNo= 11). UTxO state was added to the end.
+Slot 00012: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 12, blockId= BlockId(-1850057248273471053), blockNo= 11). UTxO state was added to the end.
+Slot 00012: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00012: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00012: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00012: *** CONTRACT LOG: "Oracle value: 1500."
+Slot 00012: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
+Slot 00012: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00012: *** CONTRACT LOG: "Set oracle datum: I 1500."
 Slot 00012: SlotAdd Slot 13
-
-Slot 00013: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
-Slot 00013: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
-Slot 00013: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00013: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00013: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 13, blockId= BlockId(-3750763034362895579), blockNo= 12). UTxO state was added to the end.
+Slot 00013: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 13, blockId= BlockId(-3750763034362895579), blockNo= 12). UTxO state was added to the end.
+Slot 00013: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 13, blockId= BlockId(-3750763034362895579), blockNo= 12). UTxO state was added to the end.
+Slot 00013: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 13, blockId= BlockId(-3750763034362895579), blockNo= 12). UTxO state was added to the end.
+Slot 00013: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00013: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00013: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00013: *** CONTRACT LOG: "Oracle value: 1500."
 Slot 00013: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
-Slot 00013: *** CONTRACT LOG: "Set oracle datum: I 1500."
+Slot 00013: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00013: SlotAdd Slot 14
-
-Slot 00014: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
-Slot 00014: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
-Slot 00014: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00014: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00014: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 14, blockId= BlockId(-3750763034362895579), blockNo= 13). UTxO state was added to the end.
+Slot 00014: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 14, blockId= BlockId(-3750763034362895579), blockNo= 13). UTxO state was added to the end.
+Slot 00014: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 14, blockId= BlockId(-3750763034362895579), blockNo= 13). UTxO state was added to the end.
+Slot 00014: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 14, blockId= BlockId(-3750763034362895579), blockNo= 13). UTxO state was added to the end.
+Slot 00014: *** USER LOG: Wallet 2 read the oracle.
+Slot 00014: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00014: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
+Slot 00014: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00014: *** CONTRACT LOG: "Oracle value: 1500."
 Slot 00014: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
+Slot 00014: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00014: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04}:
+  Receive endpoint call on 'read' for Object (fromList [("contents",Array [Object (fromList [("getEndpointDescription",String "read")]),Object (fromList [("unEndpointValue",Array [])])]),("tag",String "ExposeEndpointResp")])
+Slot 00014: *** CONTRACT LOG: "Found oracle with datum: I 1500."
+Slot 00014: W2e463c8: TxSubmit: dc6a9e154538da825e6c4f5fb1aa7f681a33fa3fa9d6eff30047c4ef419f0a1c
+Slot 00014: TxnValidate dc6a9e154538da825e6c4f5fb1aa7f681a33fa3fa9d6eff30047c4ef419f0a1c
 Slot 00014: SlotAdd Slot 15
-
-Slot 00015: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
-Slot 00015: *** USER LOG: Wallet 2 read the oracle.
-Slot 00015: *** CONTRACT LOG: "Funds in Wallet 2: 100000000 Lovelace, 0 BRIO, 0 SOFR, 2000000 PIGY"
-Slot 00015: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00015: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00015: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 15, blockId= BlockId(1256829835698556578), blockNo= 14). UTxO state was added to the end.
+Slot 00015: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 15, blockId= BlockId(1256829835698556578), blockNo= 14). UTxO state was added to the end.
+Slot 00015: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 15, blockId= BlockId(1256829835698556578), blockNo= 14). UTxO state was added to the end.
+Slot 00015: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 15, blockId= BlockId(1256829835698556578), blockNo= 14). UTxO state was added to the end.
+Slot 00015: *** CONTRACT LOG: "Transaction succesful: dc6a9e154538da825e6c4f5fb1aa7f681a33fa3fa9d6eff30047c4ef419f0a1c."
+Slot 00015: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00015: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99994727 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00015: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00015: *** CONTRACT LOG: "Oracle value: 1500."
-Slot 00015: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
-Slot 00015: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2}:
-  Receive endpoint call: Object (fromList [("tag",String "read"),("value",Object (fromList [("unEndpointValue",Array [])]))])
-Slot 00015: *** CONTRACT LOG: "Found oracle with datum: I 1500."
-Slot 00015: W2: TxSubmit: 4eda51ad65209c8a305d5e3e818a87d0997d1c8257962617d1dd8019297ea713
-Slot 00015: TxnValidate 4eda51ad65209c8a305d5e3e818a87d0997d1c8257962617d1dd8019297ea713
+Slot 00015: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00015: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00015: SlotAdd Slot 16
-
-Slot 00016: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
-Slot 00016: *** CONTRACT LOG: "Transaction succesful: 4eda51ad65209c8a305d5e3e818a87d0997d1c8257962617d1dd8019297ea713."
-Slot 00016: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00016: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00016: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00016: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 16, blockId= BlockId(-3750763034362895579), blockNo= 15). UTxO state was added to the end.
+Slot 00016: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 16, blockId= BlockId(-3750763034362895579), blockNo= 15). UTxO state was added to the end.
+Slot 00016: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 16, blockId= BlockId(-3750763034362895579), blockNo= 15). UTxO state was added to the end.
+Slot 00016: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 16, blockId= BlockId(-3750763034362895579), blockNo= 15). UTxO state was added to the end.
+Slot 00016: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00016: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99994727 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00016: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00016: *** CONTRACT LOG: "Oracle value: 1500."
 Slot 00016: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00016: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00016: SlotAdd Slot 17
-
-Slot 00017: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
-Slot 00017: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00017: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00017: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00017: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 17, blockId= BlockId(-3750763034362895579), blockNo= 16). UTxO state was added to the end.
+Slot 00017: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 17, blockId= BlockId(-3750763034362895579), blockNo= 16). UTxO state was added to the end.
+Slot 00017: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 17, blockId= BlockId(-3750763034362895579), blockNo= 16). UTxO state was added to the end.
+Slot 00017: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 17, blockId= BlockId(-3750763034362895579), blockNo= 16). UTxO state was added to the end.
+Slot 00017: *** USER LOG: Wallet 3 doesn't have sufficient fee token to read the oracle at all.
+Slot 00017: 00000000-0000-4000-8000-000000000008 {Contract instance for wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e}:
+  Contract instance started
+Slot 00017: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00017: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99994727 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00017: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00017: *** CONTRACT LOG: "Oracle value: 1500."
 Slot 00017: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00017: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00017: SlotAdd Slot 18
-
-Slot 00018: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
-Slot 00018: *** USER LOG: Wallet 3 doesn't have sufficient fee token to read the oracle at all.
-Slot 00018: 00000000-0000-4000-8000-000000000008 {Contract instance for wallet 3}:
-  Contract instance started
-Slot 00018: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00018: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00018: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00018: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 18, blockId= BlockId(-3750763034362895579), blockNo= 17). UTxO state was added to the end.
+Slot 00018: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 18, blockId= BlockId(-3750763034362895579), blockNo= 17). UTxO state was added to the end.
+Slot 00018: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 18, blockId= BlockId(-3750763034362895579), blockNo= 17). UTxO state was added to the end.
+Slot 00018: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 18, blockId= BlockId(-3750763034362895579), blockNo= 17). UTxO state was added to the end.
+Slot 00018: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00018: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99994727 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00018: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00018: *** CONTRACT LOG: "Oracle value: 1500."
 Slot 00018: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00018: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00018: SlotAdd Slot 19
-
-Slot 00019: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
-Slot 00019: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00019: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00019: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00019: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 19, blockId= BlockId(-3750763034362895579), blockNo= 18). UTxO state was added to the end.
+Slot 00019: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 19, blockId= BlockId(-3750763034362895579), blockNo= 18). UTxO state was added to the end.
+Slot 00019: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 19, blockId= BlockId(-3750763034362895579), blockNo= 18). UTxO state was added to the end.
+Slot 00019: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 19, blockId= BlockId(-3750763034362895579), blockNo= 18). UTxO state was added to the end.
+Slot 00019: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00019: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99994727 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00019: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00019: *** CONTRACT LOG: "Oracle value: 1500."
 Slot 00019: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00019: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00019: SlotAdd Slot 20
-
-Slot 00020: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
-Slot 00020: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00020: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00020: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00020: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 20, blockId= BlockId(-3750763034362895579), blockNo= 19). UTxO state was added to the end.
+Slot 00020: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 20, blockId= BlockId(-3750763034362895579), blockNo= 19). UTxO state was added to the end.
+Slot 00020: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 20, blockId= BlockId(-3750763034362895579), blockNo= 19). UTxO state was added to the end.
+Slot 00020: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 20, blockId= BlockId(-3750763034362895579), blockNo= 19). UTxO state was added to the end.
+Slot 00020: *** USER LOG: Wallet 3 tries to read the oracle, even though it has insufficient fee tokens.
+Slot 00020: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00020: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99994727 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00020: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00020: *** CONTRACT LOG: "Oracle value: 1500."
 Slot 00020: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00020: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00020: 00000000-0000-4000-8000-000000000008 {Contract instance for wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e}:
+  Receive endpoint call on 'read' for Object (fromList [("contents",Array [Object (fromList [("getEndpointDescription",String "read")]),Object (fromList [("unEndpointValue",Array [])])]),("tag",String "ExposeEndpointResp")])
+Slot 00020: *** CONTRACT LOG: "Found oracle with datum: I 1500."
 Slot 00020: SlotAdd Slot 21
-
-Slot 00021: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
-Slot 00021: *** USER LOG: Wallet 3 tries to read the oracle, even though it has insufficient fee tokens.
-Slot 00021: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00021: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00021: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00021: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 21, blockId= BlockId(-3750763034362895579), blockNo= 20). UTxO state was added to the end.
+Slot 00021: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 21, blockId= BlockId(-3750763034362895579), blockNo= 20). UTxO state was added to the end.
+Slot 00021: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 21, blockId= BlockId(-3750763034362895579), blockNo= 20). UTxO state was added to the end.
+Slot 00021: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 21, blockId= BlockId(-3750763034362895579), blockNo= 20). UTxO state was added to the end.
+Slot 00021: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00021: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99994727 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00021: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00021: *** CONTRACT LOG: "Oracle value: 1500."
 Slot 00021: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
-Slot 00021: 00000000-0000-4000-8000-000000000008 {Contract instance for wallet 3}:
-  Receive endpoint call: Object (fromList [("tag",String "read"),("value",Object (fromList [("unEndpointValue",Array [])]))])
-Slot 00021: *** CONTRACT LOG: "Found oracle with datum: I 1500."
-Slot 00021: *** CONTRACT LOG: "WalletError (InsufficientFunds \"Total: Value (Map [(,Map [(\\\"\\\",100000000)]),(addacafe,Map [(\\\"PIGY\\\",500000)])]) expected: Value (Map [(,Map [(\\\"\\\",10)]),(addacafe,Map [(\\\"PIGY\\\",1000000)])])\")"
+Slot 00021: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00021: SlotAdd Slot 22
-
-Slot 00022: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
-Slot 00022: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00022: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00022: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00022: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 22, blockId= BlockId(-3750763034362895579), blockNo= 21). UTxO state was added to the end.
+Slot 00022: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 22, blockId= BlockId(-3750763034362895579), blockNo= 21). UTxO state was added to the end.
+Slot 00022: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 22, blockId= BlockId(-3750763034362895579), blockNo= 21). UTxO state was added to the end.
+Slot 00022: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 22, blockId= BlockId(-3750763034362895579), blockNo= 21). UTxO state was added to the end.
+Slot 00022: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00022: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99994727 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00022: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00022: *** CONTRACT LOG: "Oracle value: 1500."
 Slot 00022: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00022: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00022: SlotAdd Slot 23
-
-Slot 00023: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
-Slot 00023: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00023: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00023: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00023: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 23, blockId= BlockId(-3750763034362895579), blockNo= 22). UTxO state was added to the end.
+Slot 00023: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 23, blockId= BlockId(-3750763034362895579), blockNo= 22). UTxO state was added to the end.
+Slot 00023: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 23, blockId= BlockId(-3750763034362895579), blockNo= 22). UTxO state was added to the end.
+Slot 00023: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 23, blockId= BlockId(-3750763034362895579), blockNo= 22). UTxO state was added to the end.
+Slot 00023: *** USER LOG: Wallet 1 updates the value of the oracle.
+Slot 00023: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
+Slot 00023: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99994727 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00023: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00023: *** CONTRACT LOG: "Oracle value: 1500."
 Slot 00023: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00023: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00023: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f}:
+  Receive endpoint call on 'write' for Object (fromList [("contents",Array [Object (fromList [("getEndpointDescription",String "write")]),Object (fromList [("unEndpointValue",String "1909c4")])]),("tag",String "ExposeEndpointResp")])
+Slot 00023: W76d5e12: TxSubmit: fd7e178cbd3891b9d787992fa8008513e23357698c542677055360086139a4f1
+Slot 00023: TxnValidate fd7e178cbd3891b9d787992fa8008513e23357698c542677055360086139a4f1
 Slot 00023: SlotAdd Slot 24
-
-Slot 00024: *** CONTRACT LOG: "Funds in Wallet 1: 99999990 Lovelace, 1 BRIO, 0 SOFR, 0 PIGY"
-Slot 00024: *** USER LOG: Wallet 1 updates the value of the oracle.
-Slot 00024: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00024: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00024: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00024: *** CONTRACT LOG: "Oracle value: 1500."
-Slot 00024: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
-Slot 00024: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 1}:
-  Receive endpoint call: Object (fromList [("tag",String "write"),("value",Object (fromList [("unEndpointValue",String "1909c4")]))])
-Slot 00024: W1: TxSubmit: 6b8c1f5daa4568966c6603bc2ab6beaa300abc5d6312138a252a057e3ef77c67
-Slot 00024: TxnValidate 6b8c1f5daa4568966c6603bc2ab6beaa300abc5d6312138a252a057e3ef77c67
+Slot 00024: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 24, blockId= BlockId(265761162858550649), blockNo= 23). UTxO state was added to the end.
+Slot 00024: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 24, blockId= BlockId(265761162858550649), blockNo= 23). UTxO state was added to the end.
+Slot 00024: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 24, blockId= BlockId(265761162858550649), blockNo= 23). UTxO state was added to the end.
+Slot 00024: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 24, blockId= BlockId(265761162858550649), blockNo= 23). UTxO state was added to the end.
+Slot 00024: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99994717 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00024: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99994727 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00024: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00024: *** CONTRACT LOG: "Oracle value: 2500."
+Slot 00024: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
+Slot 00024: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00024: *** CONTRACT LOG: "Updated oracle datum: I 2500."
 Slot 00024: SlotAdd Slot 25
-
-Slot 00025: *** CONTRACT LOG: "Funds in Wallet 1: 99999980 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00025: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00025: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00025: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00025: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 25, blockId= BlockId(-3750763034362895579), blockNo= 24). UTxO state was added to the end.
+Slot 00025: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 25, blockId= BlockId(-3750763034362895579), blockNo= 24). UTxO state was added to the end.
+Slot 00025: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 25, blockId= BlockId(-3750763034362895579), blockNo= 24). UTxO state was added to the end.
+Slot 00025: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 25, blockId= BlockId(-3750763034362895579), blockNo= 24). UTxO state was added to the end.
+Slot 00025: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99994717 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00025: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99994727 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00025: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00025: *** CONTRACT LOG: "Oracle value: 2500."
 Slot 00025: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
-Slot 00025: *** CONTRACT LOG: "Updated oracle datum: I 2500."
+Slot 00025: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00025: SlotAdd Slot 26
-
-Slot 00026: *** CONTRACT LOG: "Funds in Wallet 1: 99999980 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00026: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00026: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00026: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00026: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 26, blockId= BlockId(-3750763034362895579), blockNo= 25). UTxO state was added to the end.
+Slot 00026: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 26, blockId= BlockId(-3750763034362895579), blockNo= 25). UTxO state was added to the end.
+Slot 00026: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 26, blockId= BlockId(-3750763034362895579), blockNo= 25). UTxO state was added to the end.
+Slot 00026: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 26, blockId= BlockId(-3750763034362895579), blockNo= 25). UTxO state was added to the end.
+Slot 00026: *** USER LOG: Wallet 2 reads the oracle a second time.
+Slot 00026: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99994717 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00026: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99994727 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00026: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00026: *** CONTRACT LOG: "Oracle value: 2500."
 Slot 00026: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
+Slot 00026: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00026: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04}:
+  Receive endpoint call on 'read' for Object (fromList [("contents",Array [Object (fromList [("getEndpointDescription",String "read")]),Object (fromList [("unEndpointValue",Array [])])]),("tag",String "ExposeEndpointResp")])
+Slot 00026: *** CONTRACT LOG: "Found oracle with datum: I 2500."
+Slot 00026: W2e463c8: TxSubmit: 521d39d1bcc7b1d71e71022ae31b5477213fb39f9c2591f242867d89b5bbe4e7
+Slot 00026: TxnValidate 521d39d1bcc7b1d71e71022ae31b5477213fb39f9c2591f242867d89b5bbe4e7
 Slot 00026: SlotAdd Slot 27
-
-Slot 00027: *** CONTRACT LOG: "Funds in Wallet 1: 99999980 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00027: *** USER LOG: Wallet 2 reads the oracle a second time.
-Slot 00027: *** CONTRACT LOG: "Funds in Wallet 2: 99999990 Lovelace, 0 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00027: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00027: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00027: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 27, blockId= BlockId(-6454575431564350126), blockNo= 26). UTxO state was added to the end.
+Slot 00027: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 27, blockId= BlockId(-6454575431564350126), blockNo= 26). UTxO state was added to the end.
+Slot 00027: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 27, blockId= BlockId(-6454575431564350126), blockNo= 26). UTxO state was added to the end.
+Slot 00027: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 27, blockId= BlockId(-6454575431564350126), blockNo= 26). UTxO state was added to the end.
+Slot 00027: *** CONTRACT LOG: "Transaction succesful: 521d39d1bcc7b1d71e71022ae31b5477213fb39f9c2591f242867d89b5bbe4e7."
+Slot 00027: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99994717 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00027: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99989454 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00027: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00027: *** CONTRACT LOG: "Oracle value: 2500."
-Slot 00027: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 0 PIGY"
-Slot 00027: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2}:
-  Receive endpoint call: Object (fromList [("tag",String "read"),("value",Object (fromList [("unEndpointValue",Array [])]))])
-Slot 00027: *** CONTRACT LOG: "Found oracle with datum: I 2500."
-Slot 00027: W2: TxSubmit: 04ec120e4d1e28e879a5d9b2d6bf81c8d116967c14c33ff86391ed9e0743ea5e
-Slot 00027: TxnValidate 04ec120e4d1e28e879a5d9b2d6bf81c8d116967c14c33ff86391ed9e0743ea5e
+Slot 00027: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00027: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00027: SlotAdd Slot 28
-
-Slot 00028: *** CONTRACT LOG: "Funds in Wallet 1: 99999980 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00028: *** CONTRACT LOG: "Transaction succesful: 04ec120e4d1e28e879a5d9b2d6bf81c8d116967c14c33ff86391ed9e0743ea5e."
-Slot 00028: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00028: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00028: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00028: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 28, blockId= BlockId(-3750763034362895579), blockNo= 27). UTxO state was added to the end.
+Slot 00028: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 28, blockId= BlockId(-3750763034362895579), blockNo= 27). UTxO state was added to the end.
+Slot 00028: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 28, blockId= BlockId(-3750763034362895579), blockNo= 27). UTxO state was added to the end.
+Slot 00028: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 28, blockId= BlockId(-3750763034362895579), blockNo= 27). UTxO state was added to the end.
+Slot 00028: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99994717 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00028: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99989454 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00028: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00028: *** CONTRACT LOG: "Oracle value: 2500."
 Slot 00028: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00028: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00028: SlotAdd Slot 29
-
-Slot 00029: *** CONTRACT LOG: "Funds in Wallet 1: 99999980 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00029: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00029: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00029: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00029: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 29, blockId= BlockId(-3750763034362895579), blockNo= 28). UTxO state was added to the end.
+Slot 00029: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 29, blockId= BlockId(-3750763034362895579), blockNo= 28). UTxO state was added to the end.
+Slot 00029: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 29, blockId= BlockId(-3750763034362895579), blockNo= 28). UTxO state was added to the end.
+Slot 00029: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 29, blockId= BlockId(-3750763034362895579), blockNo= 28). UTxO state was added to the end.
+Slot 00029: *** USER LOG: Wallet 1 deletes the oracle.
+Slot 00029: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99994717 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
+Slot 00029: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99989454 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00029: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00029: *** CONTRACT LOG: "Oracle value: 2500."
 Slot 00029: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
+Slot 00029: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00029: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f}:
+  Receive endpoint call on 'delete' for Object (fromList [("contents",Array [Object (fromList [("getEndpointDescription",String "delete")]),Object (fromList [("unEndpointValue",Array [])])]),("tag",String "ExposeEndpointResp")])
+Slot 00029: W76d5e12: TxSubmit: 1d3790929437c9750aa4cd0a08a1657c20bdbdc88bef6f151a5cee6462ae0d34
+Slot 00029: TxnValidate 1d3790929437c9750aa4cd0a08a1657c20bdbdc88bef6f151a5cee6462ae0d34
 Slot 00029: SlotAdd Slot 30
-
-Slot 00030: *** CONTRACT LOG: "Funds in Wallet 1: 99999980 Lovelace, 1 BRIO, 0 SOFR, 1000000 PIGY"
-Slot 00030: *** USER LOG: Wallet 1 deletes the oracle.
-Slot 00030: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00030: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00030: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00030: *** CONTRACT LOG: "Oracle value: 2500."
-Slot 00030: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 1 SOFR, 1000000 PIGY"
-Slot 00030: 00000000-0000-4000-8000-000000000000 {Contract instance for wallet 1}:
-  Receive endpoint call: Object (fromList [("tag",String "delete"),("value",Object (fromList [("unEndpointValue",Array [])]))])
-Slot 00030: W1: TxSubmit: e855818b8c4de5a024c2659341691a7130277547e5843b4bcaba4ade08e88bcf
-Slot 00030: TxnValidate e855818b8c4de5a024c2659341691a7130277547e5843b4bcaba4ade08e88bcf
+Slot 00030: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 30, blockId= BlockId(-5885028653935170972), blockNo= 29). UTxO state was added to the end.
+Slot 00030: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 30, blockId= BlockId(-5885028653935170972), blockNo= 29). UTxO state was added to the end.
+Slot 00030: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 30, blockId= BlockId(-5885028653935170972), blockNo= 29). UTxO state was added to the end.
+Slot 00030: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 30, blockId= BlockId(-5885028653935170972), blockNo= 29). UTxO state was added to the end.
+Slot 00030: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99989444 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Slot 00030: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99989454 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00030: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
+Slot 00030: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00030: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00030: *** CONTRACT LOG: "Deleted oracle datum."
 Slot 00030: SlotAdd Slot 31
-
-Slot 00031: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
-Slot 00031: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00031: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00031: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00031: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 31, blockId= BlockId(-3750763034362895579), blockNo= 30). UTxO state was added to the end.
+Slot 00031: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 31, blockId= BlockId(-3750763034362895579), blockNo= 30). UTxO state was added to the end.
+Slot 00031: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 31, blockId= BlockId(-3750763034362895579), blockNo= 30). UTxO state was added to the end.
+Slot 00031: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 31, blockId= BlockId(-3750763034362895579), blockNo= 30). UTxO state was added to the end.
+Slot 00031: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99989444 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Slot 00031: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99989454 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00031: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00031: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00031: *** CONTRACT LOG: "Deleted oracle datum."
+Slot 00031: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00031: SlotAdd Slot 32
-
-Slot 00032: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
-Slot 00032: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00032: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00032: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00032: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 32, blockId= BlockId(-3750763034362895579), blockNo= 31). UTxO state was added to the end.
+Slot 00032: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 32, blockId= BlockId(-3750763034362895579), blockNo= 31). UTxO state was added to the end.
+Slot 00032: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 32, blockId= BlockId(-3750763034362895579), blockNo= 31). UTxO state was added to the end.
+Slot 00032: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 32, blockId= BlockId(-3750763034362895579), blockNo= 31). UTxO state was added to the end.
+Slot 00032: *** USER LOG: Wallet 2 tries to read the oracle after its deletion.
+Slot 00032: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99989444 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Slot 00032: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99989454 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00032: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00032: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00032: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00032: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04}:
+  Receive endpoint call on 'read' for Object (fromList [("contents",Array [Object (fromList [("getEndpointDescription",String "read")]),Object (fromList [("unEndpointValue",Array [])])]),("tag",String "ExposeEndpointResp")])
+Slot 00032: *** CONTRACT LOG: "Oracle not found."
 Slot 00032: SlotAdd Slot 33
-
-Slot 00033: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
-Slot 00033: *** USER LOG: Wallet 2 tries to read the oracle after its deletion.
-Slot 00033: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00033: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00033: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00033: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 33, blockId= BlockId(-3750763034362895579), blockNo= 32). UTxO state was added to the end.
+Slot 00033: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 33, blockId= BlockId(-3750763034362895579), blockNo= 32). UTxO state was added to the end.
+Slot 00033: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 33, blockId= BlockId(-3750763034362895579), blockNo= 32). UTxO state was added to the end.
+Slot 00033: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 33, blockId= BlockId(-3750763034362895579), blockNo= 32). UTxO state was added to the end.
+Slot 00033: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99989444 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Slot 00033: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99989454 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00033: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00033: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00033: 00000000-0000-4000-8000-000000000007 {Contract instance for wallet 2}:
-  Receive endpoint call: Object (fromList [("tag",String "read"),("value",Object (fromList [("unEndpointValue",Array [])]))])
-Slot 00033: *** CONTRACT LOG: "Oracle not found."
+Slot 00033: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00033: SlotAdd Slot 34
-
-Slot 00034: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
-Slot 00034: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00034: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00034: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00034: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 34, blockId= BlockId(-3750763034362895579), blockNo= 33). UTxO state was added to the end.
+Slot 00034: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 34, blockId= BlockId(-3750763034362895579), blockNo= 33). UTxO state was added to the end.
+Slot 00034: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 34, blockId= BlockId(-3750763034362895579), blockNo= 33). UTxO state was added to the end.
+Slot 00034: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 34, blockId= BlockId(-3750763034362895579), blockNo= 33). UTxO state was added to the end.
+Slot 00034: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99989444 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Slot 00034: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99989454 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00034: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00034: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00034: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00034: SlotAdd Slot 35
-
-Slot 00035: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
-Slot 00035: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00035: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00035: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00035: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 35, blockId= BlockId(-3750763034362895579), blockNo= 34). UTxO state was added to the end.
+Slot 00035: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 35, blockId= BlockId(-3750763034362895579), blockNo= 34). UTxO state was added to the end.
+Slot 00035: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 35, blockId= BlockId(-3750763034362895579), blockNo= 34). UTxO state was added to the end.
+Slot 00035: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 35, blockId= BlockId(-3750763034362895579), blockNo= 34). UTxO state was added to the end.
+Slot 00035: *** CONTRACT LOG: "Funds in Wallet Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 99989444 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Slot 00035: *** CONTRACT LOG: "Funds in Wallet Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 99989454 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00035: *** CONTRACT LOG: "Funds in Wallet Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
 Slot 00035: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
+Slot 00035: *** CONTRACT LOG: "Funds in Wallet Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
 Slot 00035: SlotAdd Slot 36
-
-Slot 00036: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
-Slot 00036: *** CONTRACT LOG: "Funds in Wallet 2: 99999980 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00036: *** CONTRACT LOG: "Funds in Wallet 3: 100000000 Lovelace, 0 BRIO, 0 SOFR, 500000 PIGY"
-Slot 00036: *** CONTRACT LOG: "Funds in Wallet 4: 100000000 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00036: *** CONTRACT LOG: "Funds in Script: 0 Lovelace, 0 BRIO, 0 SOFR, 0 PIGY"
-Slot 00036: SlotAdd Slot 37
-
-Slot 00037: *** CONTRACT LOG: "Funds in Wallet 1: 99999970 Lovelace, 1 BRIO, 1 SOFR, 2000000 PIGY"
+Slot 00036: W2e463c8: InsertionSuccess: New tip is Tip(slot= Slot 36, blockId= BlockId(-3750763034362895579), blockNo= 35). UTxO state was added to the end.
+Slot 00036: W36cb1d4: InsertionSuccess: New tip is Tip(slot= Slot 36, blockId= BlockId(-3750763034362895579), blockNo= 35). UTxO state was added to the end.
+Slot 00036: W76d5e12: InsertionSuccess: New tip is Tip(slot= Slot 36, blockId= BlockId(-3750763034362895579), blockNo= 35). UTxO state was added to the end.
+Slot 00036: Wce5bf08: InsertionSuccess: New tip is Tip(slot= Slot 36, blockId= BlockId(-3750763034362895579), blockNo= 35). UTxO state was added to the end.
 Final balances
-Wallet 1: 
-    {addacafe, "BRIO"}: 1
-    {addacafe, "SOFR"}: 1
-    {addacafe, "PIGY"}: 2000000
-    {, ""}: 99999970
-Wallet 2: 
-    {, ""}: 99999980
-Wallet 3: 
+Wallet 2e463c80f68b7047fa67403b1911f161aa597bbdf683d9b4e3f66ef3762c1499269f4f5278db3368fe58905f4cf581642fe40ead0506e7863c5a543254d21876070685fdff668e697efca70098985dec1497e079f958296a335b47ab3d0dffa1b394f26269b9e620c07148bfe1218a076be87eec941ca20340b443575467ef04: 
+    {, ""}: 99989454
+Wallet 36cb1d44654c33ed6b26cbe2da0848de2ebfdb20010679a06c5f609c474f349b8003380446e9159a34504f9fd19da3e93f215efa30cae9455d441be0eac8db66291a5a5e8c961f9da5fb8cb616ab630a6600f4a44acd520fa701b330849e4446d7d1711ac606ae93a2b3d457dd7f4f36b3af92dd0de82a7caf471fb5ed2b5ea3: 
     {, ""}: 100000000
-    {addacafe, "PIGY"}: 500000
-Wallet 4: 
+Wallet 76d5e1291d51f16eb442267faccd0ab51a3b0c4a21eb6b8f72d5f0a4ca467189ac5f70a018c6df3f632b48fd8ead1b68f39a44de06f5a5de42a6a131af0f085d44becd56fa30041efea5ff2637205181837dffd03545d3db1c11e6dcbbd3415ce8f85aad41776b99eb62a797b8c5abbe82061e1634efc4c7d5ac6fff3ca94d7f: 
+    {cafe, "BRIO"}: 1
+    {cafe, "SOFR"}: 1
+    {cafe, "PIGY"}: 2000000
+    {, ""}: 99989444
+Wallet ce5bf0869d6720212e4dcf3ea6992cf4a9b88c39261fd9d6a635f046a17da49b6125ba6748c542e5821ec9d1e9d2f0564bc7572c1ec0e1a82cce88951dec70639e228ed6586bd2946247d66f88fac7e266a9cf37ab49ef1b9b17befd34a3db085e5af768f7297f0e1138220378a2d13c470da5a79639d8313911adeb0436d91e: 
     {, ""}: 100000000
+    {cafe, "PIGY"}: 500000

@@ -26,7 +26,6 @@ module Mantra.Oracle.Controller (
 -- * Schema
   OracleSchema
 -- * Endpoints
-, createOracle
 , deleteOracle
 , writeOracle
 -- * Utilities
@@ -38,42 +37,29 @@ import PlutusTx.Prelude hiding ((<>))
 
 import Data.Monoid          (Last (..))
 import Data.Text            (Text)
+import Data.Void            (Void)
 import Ledger               (Redeemer(..), pubKeyHash, txId)
-import Ledger.Constraints   (mustPayToPubKey, mustPayToTheScript, mustSpendScriptOutput, otherScript, scriptInstanceLookups, unspentOutputs)
+import Ledger.Constraints   (TxConstraints, mustPayToPubKey, mustPayToTheScript, mustSpendScriptOutput, otherScript, typedValidatorLookups, unspentOutputs)
 import Ledger.Value         (assetClassValue)
-import Mantra.Oracle        (OracleScript, findOracle, oracleInstance, oracleValidator)
-import Mantra.Oracle.Client (readOracle)
+import Mantra.Oracle        (OracleScript, oracleInstance, oracleValidator)
+import Mantra.Oracle.Client (findOracle, readOracle)
 import Mantra.Oracle.Types  (Action(..), Oracle(..), Parameters, makeOracle)
-import Plutus.Contract      (BlockchainActions, Contract, Endpoint, HasBlockchainActions, type (.\/), awaitTxConfirmed, endpoint, logError, logInfo, ownPubKey, select, submitTxConstraints, submitTxConstraintsWith, tell)
-import PlutusTx             (Data, toData)
+import Plutus.Contract      (Contract, Endpoint, Promise, type (.\/), awaitTxConfirmed, handleEndpoint, logError, logInfo, ownPubKey, runError, select, submitTxConstraints, submitTxConstraintsWith, tell)
+import PlutusTx             (Data, ToData(..), dataToBuiltinData)
 import Prelude              (String, (<>), show)
 
 import qualified Data.Map as M (singleton)
 
 
--- | Create an oracle.
-createOracle :: HasBlockchainActions s
-             => Parameters               -- ^ Parameters defining the oracle.
-             -> Contract w s Text Oracle -- ^ Action for creating the oracle.
-createOracle parameters =
-  do
-    let
-      oracle = makeOracle parameters
-    logInfo $ "Created oracle: " ++ show oracle
-    return oracle
-
-
 -- | Schema for controlling the oracle.
 type OracleSchema =
-      BlockchainActions
-  .\/ Endpoint "read"   ()
+      Endpoint "read"   ()
   .\/ Endpoint "write"  Data
   .\/ Endpoint "delete" ()
 
 
 -- | Endpoint for writing datum to the oracle.
-writeOracle :: HasBlockchainActions s
-            => Oracle               -- ^ The oracle.
+writeOracle :: Oracle               -- ^ The oracle.
             -> Data                 -- ^ The datum to be written.
             -> Contract w s Text () -- ^ Action for writing the datum to the oracle.
 writeOracle oracle@Oracle{..} datum =
@@ -81,8 +67,8 @@ writeOracle oracle@Oracle{..} datum =
     owner <- pubKeyHash <$> ownPubKey
     let
       mustControl  = mustPayToPubKey    owner $ assetClassValue controlToken 1
-      mustUseDatum = mustPayToTheScript datum $ assetClassValue datumToken   1
-      notFound = 
+      mustUseDatum = mustPayToTheScript (dataToBuiltinData datum) $ assetClassValue datumToken   1 :: TxConstraints Action BuiltinData
+      notFound =
         do
           ledgerTx <-
             submitTxConstraints (oracleInstance oracle)
@@ -94,10 +80,10 @@ writeOracle oracle@Oracle{..} datum =
           let
             lookups = otherScript (oracleValidator oracle)
                    <> unspentOutputs (M.singleton outputRef output)
-                   <> scriptInstanceLookups (oracleInstance oracle)
+                   <> typedValidatorLookups (oracleInstance oracle)
             tx = mustControl
               <> mustUseDatum
-              <> mustSpendScriptOutput outputRef (Redeemer $ toData Write)
+              <> mustSpendScriptOutput outputRef (Redeemer $ toBuiltinData Write)
           ledgerTx <- submitTxConstraintsWith @OracleScript lookups tx
           awaitTxConfirmed $ txId ledgerTx
           logInfo $ "Updated oracle datum: " ++ show datum ++ "."
@@ -106,23 +92,22 @@ writeOracle oracle@Oracle{..} datum =
 
 
 -- | Endpoint for deleting (closing) the oracle.
-deleteOracle :: HasBlockchainActions s
-             => Oracle               -- ^ The oracle.
+deleteOracle :: Oracle               -- ^ The oracle.
              -> Contract w s Text () -- ^ Action to close the oracle.
 deleteOracle oracle@Oracle{..} =
   do
     owner <- pubKeyHash <$> ownPubKey
     let
-      mustControl  = mustPayToPubKey    owner $ assetClassValue controlToken 1
+      mustControl = mustPayToPubKey owner $ assetClassValue controlToken 1
       notFound = logError @String $ "Oracle not found."
       found (outputRef, output, _) =
         do
           let
             lookups = otherScript (oracleValidator oracle)
                    <> unspentOutputs (M.singleton outputRef output)
-                   <> scriptInstanceLookups (oracleInstance oracle)
+                   <> typedValidatorLookups (oracleInstance oracle)
             tx = mustControl
-              <> mustSpendScriptOutput outputRef (Redeemer $ toData Delete)
+              <> mustSpendScriptOutput outputRef (Redeemer $ toBuiltinData Delete)
           ledgerTx <- submitTxConstraintsWith @OracleScript lookups tx
           awaitTxConfirmed $ txId ledgerTx
           logInfo @String $ "Deleted oracle datum."
@@ -131,15 +116,35 @@ deleteOracle oracle@Oracle{..} =
 
 
 -- | Create the oracle and run its control endpoints.
-runOracleController :: Parameters                                  -- ^ The oracle's parameters.
-                    -> Contract (Last Oracle) OracleSchema Text () -- ^ Action for creating and running the oracle.
+runOracleController :: Parameters                                               -- ^ The oracle's parameters.
+                    -> Promise (Last (Either Text Oracle)) OracleSchema Void () -- ^ Action for creating and running the oracle.
 runOracleController parameters =
   do
-    oracle <- createOracle parameters
-    tell . Last $ Just oracle
     let
-      write'  = endpoint @"write"  >>= writeOracle  oracle
-      read'   = endpoint @"read"   >>  readOracle   oracle >> return ()
-      delete' = endpoint @"delete" >>  deleteOracle oracle
-      go = (write' `select` read' `select` delete') >> go
-    go
+      oracle = makeOracle parameters
+      write' =
+        handleEndpoint @"write"
+          $ \input ->
+            (tell . Last . Just) =<<
+              case input of
+                Right datum -> fmap (either Left (const $ Right oracle))
+                                 . runError
+                                 $ writeOracle oracle datum
+                Left  e     -> return $ Left e
+      read' =
+        handleEndpoint @"read"
+          $ \input ->
+            (tell . Last . Just) =<<
+              case input of
+                Right () -> fmap (either Left (const $ Right oracle)) . runError $ readOracle oracle
+                Left  e  -> return $ Left e
+      delete' =
+        handleEndpoint @"delete"
+          $ \input ->
+            (tell . Last . Just) =<<
+              case input of
+                Right () -> fmap (either Left (const $ Right oracle)) . runError $ deleteOracle oracle
+                Left  e  -> return $ Left e
+    let
+      operate = (read' `select` write' `select` delete') <> operate
+    operate

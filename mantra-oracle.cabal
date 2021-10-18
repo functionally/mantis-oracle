@@ -1,7 +1,7 @@
 cabal-version     : 2.4
 name              : mantra-oracle
 description       : This Cardano oracle reports structured data (namely, the `PlutuxTx.Data` type) to a transaction if the fee, as a quantity of a fungible token, is paid. It can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic.
-version           : 0.3.5.2
+version           : 0.4.0.0
 author            : Brian W Bush <code@functionally.io>
 maintainer        : Brian W Bush <code@functionally.io>
 copyright         : (c) 2021 Brian W Bush
@@ -16,58 +16,51 @@ source-repository head
   location: https://github.com/functionally/mantra-oracle.git
 
 
-flag USE_PAB
-  description: Compile for use with the Plutus Application Backend (PAB).
-  default    : False
-
-
 library
   hs-source-dirs   : src
   exposed-modules  : Mantra.Oracle
-                     Mantra.Oracle.Loop
-                     Mantra.Oracle.Reader
-                     Mantra.Oracle.Submit
-                     Mantra.Oracle.Types
-  if flag(USE_PAB)
-    exposed-modules: Mantra.Oracle.Client
+                     Mantra.Oracle.Client
                      Mantra.Oracle.Client.PAB
                      Mantra.Oracle.Controller
                      Mantra.Oracle.Controller.PAB
+                     Mantra.Oracle.Loop
+                     Mantra.Oracle.Reader
+                     Mantra.Oracle.SOFR
                      Mantra.Oracle.Simulate
                      Mantra.Oracle.Simulate.PAB
-                     Mantra.Oracle.SOFR
+                     Mantra.Oracle.Submit
+                     Mantra.Oracle.Types
                      Mantra.Orphans
   build-depends    : base ^>=4.14.1.0
                    , aeson
                    , bytestring
                    , cardano-api
                    , containers
+                   , data-default
                    , delay
                    , extra
+                   , freer-extras
+                   , freer-simple
                    , mantra
                    , mtl
+                   , openapi3
                    , ouroboros-network
+                   , playground-common
+                   , plutus-contract
                    , plutus-core
                    , plutus-ledger
                    , plutus-ledger-api
+                   , plutus-pab
                    , plutus-tx
                    , plutus-tx-plugin
+                   , plutus-use-cases
+                   , prettyprinter
+                   , req ^>= 3.9.0
                    , serialise
                    , shake
                    , text
                    , time
                    , unordered-containers
-  if flag(USE_PAB)
-    build-depends  : containers
-                   , data-default
-                   , freer-extras
-                   , freer-simple
-                   , playground-common
-                   , plutus-contract
-                   , plutus-pab
-                   , plutus-use-cases
-                   , prettyprinter
-                   , req ^>= 3.9.0
                    , uuid
                    , vector
   default-language: Haskell2010
@@ -87,10 +80,9 @@ executable mantra-oracle
                    , mantra-oracle
                    , mtl
                    , optparse-applicative
+                   , plutus-contract
                    , plutus-ledger-api
                    , plutus-tx
                    , text
-   if flag(USE_PAB)
-     build-depends : plutus-contract
    default-language: Haskell2010
    ghc-options     : -fplugin-opt PlutusTx.Plugin:defer-errors -Wall

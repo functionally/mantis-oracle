@@ -72,7 +72,6 @@ updateOracle address portNumber uuid x =
           (
             http address
               /: "api"
-              /: "new"
               /: "contract"
               /: "instance"
               /: T.pack (show uuid)

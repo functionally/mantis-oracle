@@ -54,7 +54,6 @@ readOraclePAB address portNumber uuid =
             (
               http address
                  /: "api"
-                 /: "new"
                  /: "contract"
                  /: "instance"
                  /: T.pack (show uuid)
