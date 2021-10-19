@@ -26,7 +26,7 @@
 {-# LANGUAGE TypeOperators      #-}
 
 
-module Mantra.Oracle.Simulate.PAB (
+module Mantra.Oracle.PAB (
 -- * Types
   TheContracts(..)
 -- * Action

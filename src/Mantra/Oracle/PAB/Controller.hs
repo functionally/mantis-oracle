@@ -16,7 +16,7 @@
 {-# LANGUAGE OverloadedStrings  #-}
 
 
-module Mantra.Oracle.Controller.PAB (
+module Mantra.Oracle.PAB.Controller (
 -- * Entry point
   runOraclePAB
 ) where

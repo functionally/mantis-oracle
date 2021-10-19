@@ -22,7 +22,7 @@
 {-# LANGUAGE TypeApplications   #-}
 
 
-module Mantra.Oracle.Simulate (
+module Mantra.Oracle.Emulate (
 -- * Example
   main
 ) where
