@@ -119,7 +119,7 @@ testTrace parameters =
 
     X.logInfo @String "Wallet 1 starts the oracle, but does not set its value yet."
     w1 <- E.activateContractWallet C.w1
-       $  runOracleController parameters
+       $  runOracleController oracle
     void $ E.waitNSlots 1
 
     sequence_ [E.activateContractWallet w . peekFunds oracle $ Just w | w <- [C.w1, C.w2, C.w3, C.w4]]

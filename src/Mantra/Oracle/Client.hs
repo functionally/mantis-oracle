@@ -55,35 +55,16 @@ import Prelude              (String, (<>), show)
 import qualified Data.Map.Strict as M (filter, singleton, toList)
 
 
+-- | Schema for reading the oracle.
+type ClientSchema = Endpoint "read" ()
+
+
 -- | Oracle script for clients.
 data ClientScript
 
 instance ValidatorTypes ClientScript where
   type instance DatumType    ClientScript = ()
   type instance RedeemerType ClientScript = ()
-
-
--- | Compute the lookup and constraints for reading the oracle on-chain.
-readOracleConstraints :: Oracle                                                               -- ^ The oracle.
-                      -> Contract w s Text (Maybe (ScriptLookups a, TxConstraints i o, Data)) -- ^ Action for computing the oracle's lookups, constraints, and data.
-readOracleConstraints oracle@Oracle{..} =
-  let
-    found (outputRef, output, datum) =
-      let
-         lookups = otherScript (oracleValidator oracle)
-                <> unspentOutputs (M.singleton outputRef output)
-         tx = mustSpendScriptOutput
-                outputRef (Redeemer $ toBuiltinData Read)
-           <> mustPayToOtherScript
-                (validatorHash $ oracleValidator oracle)
-                (Datum $ dataToBuiltinData datum)
-                (_ciTxOutValue output <> requiredFee)
-      in
-        (lookups, tx, datum)
-  in
-    do
-      inst <- findOracle oracle
-      return $ found <$> inst
 
 
 -- | Endpoint for reading the datum from the oracle.
@@ -107,8 +88,27 @@ readOracle oracle =
       =<< readOracleConstraints oracle
 
 
--- | Schema for reading the oracle.
-type ClientSchema = Endpoint "read" ()
+-- | Compute the lookup and constraints for reading the oracle on-chain.
+readOracleConstraints :: Oracle                                                               -- ^ The oracle.
+                      -> Contract w s Text (Maybe (ScriptLookups a, TxConstraints i o, Data)) -- ^ Action for computing the oracle's lookups, constraints, and data.
+readOracleConstraints oracle@Oracle{..} =
+  let
+    found (outputRef, output, datum) =
+      let
+         lookups = otherScript (oracleValidator oracle)
+                <> unspentOutputs (M.singleton outputRef output)
+         tx = mustSpendScriptOutput
+                outputRef (Redeemer $ toBuiltinData Read)
+           <> mustPayToOtherScript
+                (validatorHash $ oracleValidator oracle)
+                (Datum $ dataToBuiltinData datum)
+                (_ciTxOutValue output <> requiredFee)
+      in
+        (lookups, tx, datum)
+  in
+    do
+      inst <- findOracle oracle
+      return $ found <$> inst
 
 
 -- | Find an oracle on the blockchain.

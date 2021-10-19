@@ -18,6 +18,7 @@
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE FlexibleContexts   #-}
 {-# LANGUAGE LambdaCase         #-}
+{-# LANGUAGE OverloadedStrings  #-}
 {-# LANGUAGE RankNTypes         #-}
 {-# LANGUAGE RecordWildCards    #-}
 {-# LANGUAGE TypeApplications   #-}
@@ -55,11 +56,12 @@ import Plutus.PAB.Effects.Contract.Builtin (Builtin, HasDefinitions(..), SomeBui
 import Plutus.PAB.Monitoring.PABLogMsg     (PABMultiAgentMsg)
 import Plutus.PAB.Simulator                (SimulatorEffectHandlers)
 import Plutus.PAB.Types                    (PABError(..))
+import PlutusTx                            (Data(B))
 import Wallet.Emulator.Types               (Wallet(..), walletPubKey)
 import Wallet.Types                        (ContractInstanceId(..))
 
 import qualified Mantra.Oracle.Client        as O (ClientSchema, runOracleClient)
-import qualified Mantra.Oracle.Controller    as O (OracleSchema, runOracleController)
+import qualified Mantra.Oracle.Controller    as O (OracleSchema, runOracleController, writeOracle)
 import qualified Mantra.Oracle.Types         as O (Oracle, Parameters(..), makeOracle)
 import qualified Plutus.Contracts.Currency   as C (CurrencyError, OneShotCurrency, currencySymbol, mintContract)
 import qualified Plutus.PAB.Simulator        as S (Simulation, activateContract, logString, mkSimulatorHandlers, runSimulationWith, waitForState, waitUntilFinished)
@@ -69,12 +71,12 @@ import qualified Plutus.PAB.Webserver.Server as P (startServerDebug)
 -- | Contract specifications.
 data TheContracts =
     Init TokenName TokenName TokenName Integer Integer [(Wallet, Integer, FilePath)] -- ^ Initializer with control token name, datum token name, fee token name, fee amount, lovelace amount, and wallets with initial fee tokens and CID path.
-  | TheController O.Parameters                                                       -- ^ Controller.
+  | TheController O.Oracle                                                           -- ^ Controller.
   | TheClient     O.Oracle                                                           -- ^ Client.
     deriving (Eq, FromJSON, Generic, Show, ToJSON)
 
 instance ToSchema TheContracts where
-  declareNamedSchema = error "Schema not declared."
+  declareNamedSchema = error "Schema not declared." -- FIXME: Implement this!
 
 instance Pretty TheContracts where
   pretty = viaShow
@@ -86,10 +88,9 @@ instance HasDefinitions TheContracts where
     TheController _ -> endpointsToSchemas @O.OracleSchema
     TheClient     _ -> endpointsToSchemas @O.ClientSchema
   getContract = \case
-    Init controlName datumName feeName feeAmount lovelaceAmount wallets
-      -> SomeBuiltin $ initContract controlName datumName feeName feeAmount lovelaceAmount wallets
-    TheController parameters -> SomeBuiltin $ O.runOracleController parameters
-    TheClient oracle         -> SomeBuiltin $ O.runOracleClient oracle
+    Init controlName datumName feeName feeAmount lovelaceAmount wallets -> SomeBuiltin $ initContract controlName datumName feeName feeAmount lovelaceAmount wallets
+    TheController oracle                                                -> SomeBuiltin $ O.runOracleController oracle
+    TheClient oracle                                                    -> SomeBuiltin $ O.runOracleClient oracle
 
 
 -- | Run the Plutus application backend. The first wallet controls the oracle.
@@ -113,26 +114,18 @@ runPAB controlName datumName feeName feeAmount lovelaceAmount wallets =
       cidInit <-
         S.activateContract w1
           $ Init controlName datumName feeName feeAmount lovelaceAmount wallets
-      parameters <- waitForLast cidInit
+      oracle <- waitForLast cidInit
       void $ S.waitUntilFinished cidInit
 
-      S.logString @(Builtin TheContracts) "***** POINT A"
-      cidOracle <- S.activateContract w1 $ TheController parameters
-      S.logString @(Builtin TheContracts) "***** POINT B"
+      cidOracle <- S.activateContract w1 $ TheController oracle
       liftIO . writeFile f1 . show $ unContractInstanceId cidOracle
---    oracle <- waitForLast cidOracle
-      let oracle = O.makeOracle parameters
-      S.logString @(Builtin TheContracts) "***** POINT C"
 
       forM_ wallets
         $ \(w, _, f) ->
           when (w /= w1)
             $ do
               cid <- S.activateContract w $ TheClient oracle
-              liftIO
-                . writeFile f
-                . show
-                $ unContractInstanceId cid
+              liftIO . writeFile f . show $ unContractInstanceId cid
 
       void $ liftIO getLine
       shutdown
@@ -167,13 +160,13 @@ handlers =
 
 
 -- | Initialize the contract. The first wallet controls the oracle.
-initContract :: TokenName                                  -- ^ Name for the control token.
-             -> TokenName                                  -- ^ Name for the datum token.
-             -> TokenName                                  -- ^ Name for the fee token.
-             -> Integer                                    -- ^ The fee amount.
-             -> Integer                                    -- ^ The lovelace amount.
-             -> [(Wallet, Integer, FilePath)]              -- ^ Wallets, their initial fee token amount, and the paths to their Contract ID (CID) files.
-             -> Contract (Last O.Parameters) Empty Text () -- ^ Action for initializing the contract.
+initContract :: TokenName                              -- ^ Name for the control token.
+             -> TokenName                              -- ^ Name for the datum token.
+             -> TokenName                              -- ^ Name for the fee token.
+             -> Integer                                -- ^ The fee amount.
+             -> Integer                                -- ^ The lovelace amount.
+             -> [(Wallet, Integer, FilePath)]          -- ^ Wallets, their initial fee token amount, and the paths to their Contract ID (CID) files.
+             -> Contract (Last O.Oracle) Empty Text () -- ^ Action for initializing the contract.
 initContract controlName datumName feeName feeAmount lovelaceAmount wallets =
   do
     ownPK <- pubKeyHash <$> ownPubKey
@@ -187,7 +180,7 @@ initContract controlName datumName feeName feeAmount lovelaceAmount wallets =
                , (datumName  , 1                     )
                , (feeName    , sum $ snd3 <$> wallets)
                ]
-             :: Contract (Last O.Parameters) s C.CurrencyError C.OneShotCurrency
+             :: Contract (Last O.Oracle) s C.CurrencyError C.OneShotCurrency
            )
     sequence_
       [
@@ -204,7 +197,9 @@ initContract controlName datumName feeName feeAmount lovelaceAmount wallets =
       controlParameter = AssetClass (symbol, controlName)
       datumParameter   = AssetClass (symbol, datumName  )
       feeToken         = AssetClass (symbol, feeName    )
-    tell . Last $ Just O.Parameters{..}
+      oracle = O.makeOracle O.Parameters{..}
+    O.writeOracle oracle $ B ""
+    tell . Last $ Just oracle
 
 
 -- | Extract the second entry in a triplet.

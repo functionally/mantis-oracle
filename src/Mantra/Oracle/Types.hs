@@ -36,8 +36,8 @@ import GHC.Generics           (Generic)
 import Plutus.V1.Ledger.Ada   (lovelaceValueOf)
 import Plutus.V1.Ledger.Value (AssetClass(..), Value)
 
-import qualified Ledger.Value        as Value   (singleton)
-import qualified Prelude             as Haskell (Eq, Show)
+import qualified Ledger.Value as Value   (singleton)
+import qualified Prelude      as Haskell (Eq, Show)
 
 
 -- | An oracle controlled by one token, holding another token, and requiring a fee for its use.

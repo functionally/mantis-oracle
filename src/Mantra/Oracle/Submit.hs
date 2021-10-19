@@ -68,16 +68,16 @@ createOracle newData =
 
 
 -- | Submit the transaction to delete an oracle. The payment address must have an eUTxO containing the control token; it also must have at least one other UTxO containing no tokens.
-deleteOracle :: A.Value                           -- ^ The datum currently held in the script.
-             -> Maybe A.Value                     -- ^ The metadata message, if any.
-             -> LocalNodeConnectInfo CardanoMode  -- ^ The connection info for the local node.
-             -> NetworkId                         -- ^ The network identifier.
-             -> Oracle                            -- ^ The oracle.
-             -> AddressAny                        -- ^ The payment address.
-             -> SigningKey PaymentKey             -- ^ The signing key for the payment address.
-             -> Lovelace                          -- ^ The maximum value for collateral.
-             -> Quantity                          -- ^ The Lovelace to be sent to the script.
-             -> MantraM IO TxId                   -- ^ Action to submit the deletion transaction.
+deleteOracle :: A.Value                          -- ^ The datum currently held in the script.
+             -> Maybe A.Value                    -- ^ The metadata message, if any.
+             -> LocalNodeConnectInfo CardanoMode -- ^ The connection info for the local node.
+             -> NetworkId                        -- ^ The network identifier.
+             -> Oracle                           -- ^ The oracle.
+             -> AddressAny                       -- ^ The payment address.
+             -> SigningKey PaymentKey            -- ^ The signing key for the payment address.
+             -> Lovelace                         -- ^ The maximum value for collateral.
+             -> Quantity                         -- ^ The Lovelace to be sent to the script.
+             -> MantraM IO TxId                  -- ^ Action to submit the deletion transaction.
 deleteOracle oldData =
   operateOracle
     (Just Delete)

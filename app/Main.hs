@@ -167,7 +167,7 @@ data Command =
       deriving (Eq, Ord, Read, Show)
 
 
---   | Run an oracle command.
+--  | Run an oracle command.
 main :: IO () -- ^ Action for running the command.
 main =
   do

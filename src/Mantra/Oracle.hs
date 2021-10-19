@@ -63,9 +63,8 @@ import qualified Data.ByteString.Short as SBS (ShortByteString, toShort)
 import qualified Data.ByteString.Lazy  as LBS (toStrict)
 
 
+-- Lift data types.
 makeLift ''Oracle
-
-
 makeIsDataIndexed ''Action [('Delete , 0), ('Read,   1), ('Write,    2)]
 
 

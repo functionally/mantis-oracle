@@ -39,11 +39,11 @@ import Data.Monoid          (Last (..))
 import Data.Text            (Text)
 import Data.Void            (Void)
 import Ledger               (Redeemer(..), pubKeyHash, txId)
-import Ledger.Constraints   (TxConstraints, mustPayToPubKey, mustPayToTheScript, mustSpendScriptOutput, otherScript, typedValidatorLookups, unspentOutputs)
+import Ledger.Constraints   (mustPayToPubKey, mustPayToTheScript, mustSpendScriptOutput, otherScript, typedValidatorLookups, unspentOutputs)
 import Ledger.Value         (assetClassValue)
 import Mantra.Oracle        (OracleScript, oracleInstance, oracleValidator)
 import Mantra.Oracle.Client (findOracle, readOracle)
-import Mantra.Oracle.Types  (Action(..), Oracle(..), Parameters, makeOracle)
+import Mantra.Oracle.Types  (Action(..), Oracle(..))
 import Plutus.Contract      (Contract, Endpoint, Promise, type (.\/), awaitTxConfirmed, handleEndpoint, logError, logInfo, ownPubKey, runError, select, submitTxConstraints, submitTxConstraintsWith, tell)
 import PlutusTx             (Data, ToData(..), dataToBuiltinData)
 import Prelude              (String, (<>), show)
@@ -66,8 +66,8 @@ writeOracle oracle@Oracle{..} datum =
   do
     owner <- pubKeyHash <$> ownPubKey
     let
-      mustControl  = mustPayToPubKey    owner $ assetClassValue controlToken 1
-      mustUseDatum = mustPayToTheScript (dataToBuiltinData datum) $ assetClassValue datumToken   1 :: TxConstraints Action BuiltinData
+      mustControl  = mustPayToPubKey    owner                     $ assetClassValue controlToken 1
+      mustUseDatum = mustPayToTheScript (dataToBuiltinData datum) $ assetClassValue datumToken   1
       notFound =
         do
           ledgerTx <-
@@ -116,12 +116,11 @@ deleteOracle oracle@Oracle{..} =
 
 
 -- | Create the oracle and run its control endpoints.
-runOracleController :: Parameters                                               -- ^ The oracle's parameters.
+runOracleController :: Oracle                                                   -- ^ The oracle.
                     -> Promise (Last (Either Text Oracle)) OracleSchema Void () -- ^ Action for creating and running the oracle.
-runOracleController parameters =
+runOracleController oracle =
   do
     let
-      oracle = makeOracle parameters
       write' =
         handleEndpoint @"write"
           $ \input ->
@@ -136,14 +135,18 @@ runOracleController parameters =
           $ \input ->
             (tell . Last . Just) =<<
               case input of
-                Right () -> fmap (either Left (const $ Right oracle)) . runError $ readOracle oracle
+                Right () -> fmap (either Left (const $ Right oracle))
+                              . runError
+                              $ readOracle oracle
                 Left  e  -> return $ Left e
       delete' =
         handleEndpoint @"delete"
           $ \input ->
             (tell . Last . Just) =<<
               case input of
-                Right () -> fmap (either Left (const $ Right oracle)) . runError $ deleteOracle oracle
+                Right () -> fmap (either Left (const $ Right oracle))
+                              . runError
+                              $ deleteOracle oracle
                 Left  e  -> return $ Left e
     let
       operate = (read' `select` write' `select` delete') <> operate
