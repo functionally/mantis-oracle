@@ -13,11 +13,10 @@
 -----------------------------------------------------------------------------
 
 
-{-# LANGUAGE CPP               #-}
-{-# LANGUAGE DeriveAnyClass    #-}
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE DeriveAnyClass     #-}
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE NoImplicitPrelude  #-}
+{-# LANGUAGE RecordWildCards    #-}
 
 
 module Mantra.Oracle.Types (
@@ -85,23 +84,7 @@ makeOracle Parameters{..} =
 
 -- | Redeemers for the oracle.
 data Action =
-    Delete        -- ^ Delete (close) the oracle.
-  | Read          -- ^ Read the oracle's datum.
-  | Write         -- ^ Set or update the oracle's datum.
+    Delete -- ^ Delete (close) the oracle.
+  | Read   -- ^ Read the oracle's datum.
+  | Write  -- ^ Set or update the oracle's datum.
     deriving Haskell.Show
-
--- FIXME: Temporarily map actions to integers, in order to accommodate Alonzo Purple.
-#if USE_PAB
-#else
-instance Enum Action where
-  pred e = toEnum $ fromEnum e - 1
-  succ e = toEnum $ fromEnum e + 1
-  fromEnum Delete    = 0
-  fromEnum Read      = 1
-  fromEnum Write     = 2
-  toEnum i
-    | i == 0    = Delete
-    | i == 1    = Read
-    | i == 2    = Write
-    | otherwise = error ()
-#endif

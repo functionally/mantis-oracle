@@ -25,4 +25,4 @@ import Schema   (FormSchema(..), ToSchema(..))
 
 
 instance ToSchema Data where
-  toSchema = FormSchemaUnsupported "No schema is available for generic data."
+  toSchema = FormSchemaUnsupported "No schema is available for generic data." -- FIXME: Implement this!

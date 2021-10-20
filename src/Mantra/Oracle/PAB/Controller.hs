@@ -16,7 +16,7 @@
 {-# LANGUAGE OverloadedStrings  #-}
 
 
-module Mantra.Oracle.Controller.PAB (
+module Mantra.Oracle.PAB.Controller (
 -- * Entry point
   runOraclePAB
 ) where
@@ -72,7 +72,6 @@ updateOracle address portNumber uuid x =
           (
             http address
               /: "api"
-              /: "new"
               /: "contract"
               /: "instance"
               /: T.pack (show uuid)

@@ -13,7 +13,6 @@
 -----------------------------------------------------------------------------
 
 
-{-# LANGUAGE CPP                #-}
 {-# LANGUAGE NumericUnderscores #-}
 {-# LANGUAGE OverloadedStrings  #-}
 {-# LANGUAGE RecordWildCards    #-}
@@ -25,42 +24,38 @@ module Main (
 ) where
 
 
-import Cardano.Api            (AsType(AsAddressAny, AsPaymentKey, AsSigningKey), ConsensusModeParams(..), EpochSlots(..), LocalNodeConnectInfo(..), NetworkId(..), NetworkMagic(..), Quantity(..), deserialiseAddress, quantityToLovelace, readFileTextEnvelope, serialiseAddress)
-import Control.Monad.Except   (liftIO)
-import Data.Maybe             (fromMaybe)
-import Data.String            (fromString)
-import Data.Version           (showVersion)
-import Data.Word              (Word32, Word64)
-import Mantra.Oracle          (exportOracle)
-import Mantra.Oracle.Loop     (loopOracle)
-import Mantra.Oracle.Reader   (exportReader)
-import Mantra.Oracle.Submit   (createOracle, deleteOracle, writeOracle)
-import Mantra.Oracle.Types    (Parameters(..), makeOracle)
-import Mantra.Types           (foistMantraEitherIO, foistMantraMaybe, foistMantraMaybeIO, runMantraToIO)
-import Paths_mantra_oracle    (version)
-import Plutus.V1.Ledger.Value (AssetClass, CurrencySymbol(..), TokenName(..), assetClass)
-import System.Exit            (exitFailure)
-import System.IO              (hPutStrLn, stderr)
-
-import qualified Data.Aeson             as A      (decodeFileStrict)
-import qualified Data.ByteString.Base16 as Base16 (decode)
-import qualified Data.ByteString.Char8  as BS     (pack)
-import qualified Data.Text              as T      (pack, unpack)
-import qualified Options.Applicative    as O
-import qualified PlutusTx.Prelude       as P      (toBuiltin)
-
-#if USE_PAB
-
+import Cardano.Api                  (AsType(AsAddressAny, AsPaymentKey, AsSigningKey), ConsensusModeParams(..), EpochSlots(..), LocalNodeConnectInfo(..), NetworkId(..), NetworkMagic(..), Quantity(..), deserialiseAddress, quantityToLovelace, readFileTextEnvelope, serialiseAddress)
+import Control.Monad.Except         (liftIO)
+import Data.Maybe                   (fromMaybe)
+import Data.String                  (fromString)
 import Data.Text                    (Text)
-import Mantra.Oracle.Client.PAB     (readOraclePAB)
-import Mantra.Oracle.Controller.PAB (runOraclePAB)
-import Mantra.Oracle.SOFR           (fetchSOFR)
-import Wallet.Emulator.Wallet       (Wallet(..))
+import Data.Version                 (showVersion)
+import Data.Word                    (Word32, Word64)
+import Mantra.Oracle                (exportOracle)
+import Mantra.Oracle.PAB.Client     (readOraclePAB)
+import Mantra.Oracle.PAB.Controller (runOraclePAB)
+import Mantra.Oracle.Loop           (loopOracle)
+import Mantra.Oracle.Reader         (exportReader)
+import Mantra.Oracle.PAB            (runPAB)
+import Mantra.Oracle.PAB.SOFR       (fetchSOFR)
+import Mantra.Oracle.Submit         (createOracle, deleteOracle, writeOracle)
+import Mantra.Oracle.Types          (Parameters(..), makeOracle)
+import Mantra.Types                 (foistMantraEitherIO, foistMantraMaybe, foistMantraMaybeIO, runMantraToIO)
+import Paths_mantra_oracle          (version)
+import Plutus.V1.Ledger.Api         (toBuiltin)
+import Plutus.V1.Ledger.Value       (AssetClass, CurrencySymbol(..), TokenName(..), assetClass)
+import System.Exit                  (exitFailure)
+import System.IO                    (hPutStrLn, stderr)
+import Wallet.Emulator.Wallet       (knownWallet)
 
-import qualified Mantra.Oracle.Simulate     as Simulate (main)
-import qualified Mantra.Oracle.Simulate.PAB as Simulate (runPAB)
 
-#endif
+import qualified Data.Aeson             as A       (decodeFileStrict)
+import qualified Data.ByteString.Base16 as Base16  (decode)
+import qualified Data.ByteString.Char8  as BS      (pack)
+import qualified Data.Text              as T       (pack, unpack)
+import qualified Mantra.Oracle.Emulate  as Emulate (main)
+import qualified Options.Applicative    as O
+import qualified PlutusTx.Prelude       as P       (toBuiltin)
 
 
 -- | Node and oracle configuration.
@@ -138,41 +133,41 @@ data Command =
       configFile :: FilePath
     , output     :: FilePath
     }
-#if USE_PAB
-  | Test
+  | Trace
     {
-      currency    :: String
-    , controlName :: String
-    , datumName   :: String
-    , feeName     :: String
-    , feeAmount   :: Integer
+      currency        :: String
+    , controlName     :: String
+    , datumName       :: String
+    , feeName         :: String
+    , feeAmount'      :: Integer
+    , lovelaceAmount' :: Integer
     }
-  | Simulate
+  | SimulatePAB
     {
-      controlName :: String
-    , datumName   :: String
-    , feeName     :: String
-    , feeAmount   :: Integer
-    , wallets     :: [(Integer, Integer, FilePath)]
+      controlName     :: String
+    , datumName       :: String
+    , feeName         :: String
+    , feeAmount'      :: Integer
+    , lovelaceAmount' :: Integer
+    , wallets         :: [(Integer, Integer, FilePath)]
     }
-  | Control
+  | ControlPAB
     {
-      frequency :: Int
-    , host      :: Text
-    , port      :: Int
-    , oracle    :: FilePath
+      frequency' :: Int
+    , host       :: Text
+    , port       :: Int
+    , oracle     :: FilePath
     }
-  | Employ
+  | EmployPAB
     {
       host   :: Text
     , port   :: Int
     , wallet :: FilePath
     }
-#endif
-    deriving (Eq, Ord, Read, Show)
+      deriving (Eq, Ord, Read, Show)
 
 
--- | Run an oracle command.
+--  | Run an oracle command.
 main :: IO () -- ^ Action for running the command.
 main =
   do
@@ -274,38 +269,39 @@ main =
                         )
                         $ O.progDesc "Write a value to the oracle."
                     )
-#if USE_PAB
-                 <> O.command "trace"
+                 <> O.command "emulate"
                     (
                       O.info
                         (
-                          Test
-                            <$> O.strArgument     (O.metavar "CURRENCY"     <> O.help "Currency symbol for the tokens."            )
-                            <*> O.strArgument     (O.metavar "CONTROL_NAME" <> O.help "Name of control token."                     )
-                            <*> O.strArgument     (O.metavar "DATUM_NAME"   <> O.help "Name of datum token."                       )
-                            <*> O.strArgument     (O.metavar "FEE_NAME"     <> O.help "Name of fee token."                         )
-                            <*> O.argument O.auto (O.metavar "FEE_AMOUNT"   <> O.help "Number of fee tokens needed to read oracle.")
+                          Trace
+                            <$> O.strArgument     (O.metavar "CURRENCY"        <> O.help "Currency symbol for the tokens."            )
+                            <*> O.strArgument     (O.metavar "CONTROL_NAME"    <> O.help "Name of control token."                     )
+                            <*> O.strArgument     (O.metavar "DATUM_NAME"      <> O.help "Name of datum token."                       )
+                            <*> O.strArgument     (O.metavar "FEE_NAME"        <> O.help "Name of fee token."                         )
+                            <*> O.argument O.auto (O.metavar "FEE_AMOUNT"      <> O.help "Number of fee tokens needed to read oracle.")
+                            <*> O.argument O.auto (O.metavar "LOVELACE_AMOUNT" <> O.help "Lovelace needed to read oracle."            )
                         )
-                        $ O.progDesc "Run an example oracle in a simulation trace."
+                        $ O.progDesc "Run an example oracle in a emulation trace."
                     )
-                 <> O.command "simulate"
+                 <> O.command "pab-simulate"
                     (
                       O.info
                         (
-                          Simulate
-                            <$> O.strArgument     (O.metavar "CONTROL_NAME" <> O.help "Name of control token."                                                                                                                                          )
-                            <*> O.strArgument     (O.metavar "DATUM_NAME"   <> O.help "Name of datum token."                                                                                                                                            )
-                            <*> O.strArgument     (O.metavar "FEE_NAME"     <> O.help "Name of fee token."                                                                                                                                              )
-                            <*> O.argument O.auto (O.metavar "FEE_AMOUNT"   <> O.help "Number of fee tokens needed to read oracle."                                                                                                                     )
-                            <*> O.argument O.auto (O.metavar "WALLETS"      <> O.help "Wallet information in for '[(i, a, cid)]', where <i> is the wallet number, <a> is the number of fee tokens in the wallet, and <cid> is the path to the CID file.")
+                          SimulatePAB
+                            <$> O.strArgument     (O.metavar "CONTROL_NAME"    <> O.help "Name of control token."                                                                                                                                          )
+                            <*> O.strArgument     (O.metavar "DATUM_NAME"      <> O.help "Name of datum token."                                                                                                                                            )
+                            <*> O.strArgument     (O.metavar "FEE_NAME"        <> O.help "Name of fee token."                                                                                                                                              )
+                            <*> O.argument O.auto (O.metavar "FEE_AMOUNT"      <> O.help "Number of fee tokens needed to read oracle."                                                                                                                     )
+                            <*> O.argument O.auto (O.metavar "LOVELACE_AMOUNT" <> O.help "Lovelace needed to read oracle."            )
+                            <*> O.argument O.auto (O.metavar "WALLETS"         <> O.help "Wallet information in for '[(i, a, cid)]', where <i> is the wallet number, <a> is the number of fee tokens in the wallet, and <cid> is the path to the CID file.")
                         )
                         $ O.progDesc "Run an example oracle in the PAB simulator."
                     )
-                 <> O.command "control"
+                 <> O.command "pab-control"
                     (
                       O.info
                         (
-                          Control
+                          ControlPAB
                             <$> O.argument O.auto (O.metavar "POLL_DELAY" <> O.help "Number of seconds between polls of data source.")
                             <*> O.strArgument     (O.metavar "HOST"       <> O.help "The PAB host name."                             )
                             <*> O.argument O.auto (O.metavar "PORT"       <> O.help "The PAB port number."                           )
@@ -313,18 +309,17 @@ main =
                         )
                         $ O.progDesc "Run an oracle in the PAB."
                     )
-                 <> O.command "employ"
+                 <> O.command "pab-employ"
                     (
                       O.info
                         (
-                          Employ
+                          EmployPAB
                             <$> O.strArgument     (O.metavar "HOST"       <> O.help "The PAB host name."                            )
                             <*> O.argument O.auto (O.metavar "PORT"       <> O.help "The PAB port number."                          )
                             <*> O.strArgument     (O.metavar "WALLET_CID" <> O.help "The Contract ID (CID) for the wallet instance.")
                         )
                         $ O.progDesc "Employ an oracle in the PAB."
                     )
-#endif
                )
         )
         (
@@ -393,84 +388,84 @@ main =
             (maybe 2_000_000 (quantityToLovelace . Quantity) $ maxCollateral  command)
             (maybe 5_000_000                       Quantity  $ scriptLovelace command)
     case command of
-      Export{..}   -> do
-                        Configuration{..} <- read <$> readFile configFile
-                        let
-                          network = maybe Mainnet (Testnet . NetworkMagic) magic
-                        address <-
-                          exportOracle output core network
-                            . makeOracle
-                            $ Parameters
-                              (readAssetClass controlAsset)
-                              (readAssetClass datumAsset  )
-                              (readAssetClass feeAsset    )
-                              feeAmount
-                              lovelaceAmount
-                        putStrLn . T.unpack . serialiseAddress $ address
-      Create{..}   -> run
-                        $ do
-                          newData <-
-                            foistMantraMaybeIO "Failed reading new data JSON."
-                              $ A.decodeFileStrict newDataFile
-                          operate
-                            $ createOracle newData metadataKey
-      Delete{..}   -> run
-                        $ do
-                          oldData <-
-                            foistMantraMaybeIO "Failed reading old data JSON."
-                              $ A.decodeFileStrict oldDataFile
-                          operate
-                            $ deleteOracle oldData
-      Reader{..}   -> do
-                        Configuration{..} <- read <$> readFile configFile
-                        let
-                          network = maybe Mainnet (Testnet . NetworkMagic) magic
-                        address <-
-                          exportReader output network $ readAssetClass datumAsset
-                        putStrLn . T.unpack . serialiseAddress $ address
-      Write{..}    -> run
-                        $ do
-                          oldData <-
-                            foistMantraMaybeIO "Failed reading old data JSON."
-                              $ A.decodeFileStrict oldDataFile
-                          newData <-
-                            foistMantraMaybeIO "Failed reading new data JSON."
-                              $ A.decodeFileStrict newDataFile
-                          operate
-                            $ writeOracle oldData newData metadataKey
-      Loop{..}    -> run
-                        $ do
-                          oldData <-
-                            foistMantraMaybeIO "Failed reading old data JSON."
-                              $ A.decodeFileStrict oldDataFile
-                          operate
-                            $ loopOracle oldData dataScriptFile (fromMaybe (24 * 60 * 60) frequency) metadataKey
-#if USE_PAB
-      Test{..}     -> Simulate.main
-                        (CurrencySymbol $ BS.pack currency   )
-                        (TokenName      $ BS.pack controlName)
-                        (TokenName      $ BS.pack datumName  )
-                        (TokenName      $ BS.pack feeName    )
-                        feeAmount
-      Simulate{..} -> Simulate.runPAB
-                        (TokenName      $ BS.pack controlName)
-                        (TokenName      $ BS.pack datumName  )
-                        (TokenName      $ BS.pack feeName    )
-                        feeAmount
-                        [(Wallet i, a, f) | (i, a, f) <- wallets]
-      Control{..}  -> runOraclePAB
-                        (frequency * 1_000_000)
-                        host
-                        port
-                        oracle
-                        fetchSOFR
-      Employ{..}   -> do
-                        uuid <- read <$> readFile wallet
-                        readOraclePAB
-                          host
-                          port
-                          uuid
-#endif
+      Export{..}      -> do
+                           Configuration{..} <- read <$> readFile configFile
+                           let
+                             network = maybe Mainnet (Testnet . NetworkMagic) magic
+                           address <-
+                             exportOracle output core network
+                               . makeOracle
+                               $ Parameters
+                                 (readAssetClass controlAsset)
+                                 (readAssetClass datumAsset  )
+                                 (readAssetClass feeAsset    )
+                                 feeAmount
+                                 lovelaceAmount
+                           putStrLn . T.unpack . serialiseAddress $ address
+      Create{..}      -> run
+                           $ do
+                             newData <-
+                               foistMantraMaybeIO "Failed reading new data JSON."
+                                 $ A.decodeFileStrict newDataFile
+                             operate
+                               $ createOracle newData metadataKey
+      Delete{..}      -> run
+                           $ do
+                             oldData <-
+                               foistMantraMaybeIO "Failed reading old data JSON."
+                                 $ A.decodeFileStrict oldDataFile
+                             operate
+                               $ deleteOracle oldData
+      Reader{..}      -> do
+                           Configuration{..} <- read <$> readFile configFile
+                           let
+                             network = maybe Mainnet (Testnet . NetworkMagic) magic
+                           address <-
+                             exportReader output network $ readAssetClass datumAsset
+                           putStrLn . T.unpack . serialiseAddress $ address
+      Write{..}       -> run
+                           $ do
+                             oldData <-
+                               foistMantraMaybeIO "Failed reading old data JSON."
+                                 $ A.decodeFileStrict oldDataFile
+                             newData <-
+                               foistMantraMaybeIO "Failed reading new data JSON."
+                                 $ A.decodeFileStrict newDataFile
+                             operate
+                               $ writeOracle oldData newData metadataKey
+      Loop{..}        -> run
+                           $ do
+                             oldData <-
+                               foistMantraMaybeIO "Failed reading old data JSON."
+                                 $ A.decodeFileStrict oldDataFile
+                             operate
+                               $ loopOracle oldData dataScriptFile (fromMaybe (24 * 60 * 60) frequency) metadataKey
+      Trace{..}       -> Emulate.main
+                           (CurrencySymbol . toBuiltin $ BS.pack currency   )
+                           (TokenName      . toBuiltin $ BS.pack controlName)
+                           (TokenName      . toBuiltin $ BS.pack datumName  )
+                           (TokenName      . toBuiltin $ BS.pack feeName    )
+                           feeAmount'
+                           lovelaceAmount'
+      SimulatePAB{..} -> runPAB
+                           (TokenName . toBuiltin $ BS.pack controlName)
+                           (TokenName . toBuiltin $ BS.pack datumName  )
+                           (TokenName . toBuiltin $ BS.pack feeName    )
+                           feeAmount'
+                           lovelaceAmount'
+                           [(knownWallet i, a, f) | (i, a, f) <- wallets]
+      ControlPAB{..}  -> runOraclePAB
+                           (frequency' * 1_000_000)
+                           host
+                           port
+                           oracle
+                           fetchSOFR
+      EmployPAB{..}   -> do
+                           uuid <- read <$> readFile wallet
+                           readOraclePAB
+                             host
+                             port
+                             uuid
 
 
 -- | Read an asset class from a string with the policy ID in hexadecimal followed by a period and the asset name.

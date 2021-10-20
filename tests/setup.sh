@@ -14,8 +14,8 @@ cardano-cli query protocol-parameters $MAGIC --out-file $PROTOCOL
 
 cat << EOI > $SCRIPT_M
 {
-    "type" : "sig"
-,   "keyHash" : "$(cardano-cli address key-hash --payment-verification-key-file $VERIFICATION_0)"
+  "type"   : "sig"
+, "keyHash": "$(cardano-cli address key-hash --payment-verification-key-file $VERIFICATION_0)"
 }
 EOI
 

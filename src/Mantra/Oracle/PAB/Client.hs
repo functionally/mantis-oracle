@@ -18,7 +18,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 
-module Mantra.Oracle.Client.PAB (
+module Mantra.Oracle.PAB.Client (
 -- * Entry point
   readOraclePAB
 ) where
@@ -54,7 +54,6 @@ readOraclePAB address portNumber uuid =
             (
               http address
                  /: "api"
-                 /: "new"
                  /: "contract"
                  /: "instance"
                  /: T.pack (show uuid)

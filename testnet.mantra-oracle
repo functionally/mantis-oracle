@@ -2,7 +2,7 @@ Configuration
 {
   socketPath     = "/data/testnet.socket"
 , magic          = Just 1097911063
-, epochSlots     = 43200
+, epochSlots     = 21600
 , controlAsset   = "13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tCORN"
 , datumAsset     = "13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tFARM"
 , feeAsset       = "13a3efd825703a352a8f71f4e2758d08c28c564e8dfcce9f77776ad1.tPIGY"

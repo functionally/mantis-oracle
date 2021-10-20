@@ -9,6 +9,8 @@ keys/
 *.skey
 *.vkey
 *.plutus
+*.core
 *.script
 *.protocol
 tx.*
+tx-*.*

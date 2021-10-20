@@ -16,7 +16,7 @@
 {-# LANGUAGE OverloadedStrings  #-}
 
 
-module Mantra.Oracle.SOFR (
+module Mantra.Oracle.PAB.SOFR (
 -- * Data sources
   fetchSOFR
 ) where
