@@ -12,7 +12,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_2#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_0)" \
-    --tx-in-redeemer-value '1' \
+    --tx-in-redeemer-file ../redeemer-read.json \
   --tx-in $TXID_1#4 \
   --tx-in $TXID_2#0 \
   --tx-out "$ADDRESS_S+5000000+1 $TOKEN_D+10 $TOKEN_F" \
@@ -32,7 +32,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_2#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_0)" \
-    --tx-in-redeemer-value '1' \
+    --tx-in-redeemer-file ../redeemer-read.json \
   --tx-in $TXID_1#4 \
   --tx-in $TXID_2#0 \
   --tx-out "$ADDRESS_S+5000000+1 $TOKEN_D+10 $TOKEN_F" \
@@ -51,7 +51,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_2#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_0)" \
-    --tx-in-redeemer-value '1' \
+    --tx-in-redeemer-file ../redeemer-read.json \
   --tx-in $TXID_1#4 \
   --tx-in $TXID_2#0 \
   --tx-out "$ADDRESS_S+5000000+10 $TOKEN_F" \
@@ -70,7 +70,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_2#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_0)" \
-    --tx-in-redeemer-value '1' \
+    --tx-in-redeemer-file ../redeemer-read.json \
   --tx-in $TXID_1#4 \
   --tx-in $TXID_2#0 \
   --tx-out "$ADDRESS_1+5000000+1 $TOKEN_D+1000 $TOKEN_F" \
@@ -88,7 +88,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_2#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_0)" \
-    --tx-in-redeemer-value '1' \
+    --tx-in-redeemer-file ../redeemer-read.json \
   --tx-in $TXID_1#4 \
   --tx-in $TXID_2#0 \
   --tx-out "$ADDRESS_S+5000000+1 $TOKEN_D" \
@@ -108,7 +108,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_2#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_0)" \
-    --tx-in-redeemer-value '1' \
+    --tx-in-redeemer-file ../redeemer-read.json \
   --tx-in $TXID_1#4 \
   --tx-in $TXID_2#0 \
   --tx-out "$ADDRESS_S+5000000+1 $TOKEN_D+9 $TOKEN_F" \
@@ -128,7 +128,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_2#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_0)" \
-    --tx-in-redeemer-value '1' \
+    --tx-in-redeemer-file ../redeemer-read.json \
   --tx-in $TXID_1#4 \
   --tx-in $TXID_2#0 \
   --tx-out "$ADDRESS_S+5000000+1 $TOKEN_D+11 $TOKEN_F" \
@@ -148,7 +148,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_2#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_0)" \
-    --tx-in-redeemer-value '1' \
+    --tx-in-redeemer-file ../redeemer-read.json \
   --tx-in $TXID_1#4 \
   --tx-in $TXID_2#0 \
   --tx-out "$ADDRESS_S+4999999+1 $TOKEN_D+10 $TOKEN_F" \
@@ -168,7 +168,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_2#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_0)" \
-    --tx-in-redeemer-value '1' \
+    --tx-in-redeemer-file ../redeemer-read.json \
   --tx-in $TXID_1#4 \
   --tx-in $TXID_2#0 \
   --tx-out "$ADDRESS_S+5000001+1 $TOKEN_D+10 $TOKEN_F" \
@@ -188,7 +188,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_2#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_0)" \
-    --tx-in-redeemer-value '1' \
+    --tx-in-redeemer-file ../redeemer-read.json \
   --tx-in $TXID_1#4 \
   --tx-in $TXID_2#0 \
   --tx-out "$ADDRESS_S+9999999+1 $TOKEN_D+9 $TOKEN_F" \
@@ -208,7 +208,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_2#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_0)" \
-    --tx-in-redeemer-value '1' \
+    --tx-in-redeemer-file ../redeemer-read.json \
   --tx-in $TXID_1#4 \
   --tx-in $TXID_2#0 \
   --tx-out "$ADDRESS_S+4999999+1 $TOKEN_D+99 $TOKEN_F" \
@@ -228,7 +228,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_2#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_0)" \
-    --tx-in-redeemer-value '1' \
+    --tx-in-redeemer-file ../redeemer-read.json \
   --tx-in $TXID_1#4 \
   --tx-in $TXID_2#0 \
   --tx-out "$ADDRESS_S+5000000+1 $TOKEN_D+10 $TOKEN_F" \

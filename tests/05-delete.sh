@@ -12,7 +12,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_4#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_1)" \
-    --tx-in-redeemer-value '0' \
+    --tx-in-redeemer-file ../redeemer-delete.json \
   --tx-in $TXID_4#0 \
   --tx-out "$ADDRESS_1+5000000+1 $TOKEN_D" \
   --tx-out "$ADDRESS_1+5000000+10 $TOKEN_F" \
@@ -30,7 +30,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_4#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_1)" \
-    --tx-in-redeemer-value '0' \
+    --tx-in-redeemer-file ../redeemer-delete.json \
   --tx-in $TXID_3#2 \
   --tx-out "$ADDRESS_1+5000000+1 $TOKEN_D" \
   --tx-out "$ADDRESS_1+5000000+990 $TOKEN_F" \
@@ -48,7 +48,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_4#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_1)" \
-    --tx-in-redeemer-value '0' \
+    --tx-in-redeemer-file ../redeemer-delete.json \
   --tx-in $TXID_3#0 \
   --tx-in $TXID_4#2 \
   --tx-out "$ADDRESS_S+5000000" \
@@ -69,7 +69,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_4#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_1)" \
-    --tx-in-redeemer-value '0' \
+    --tx-in-redeemer-file ../redeemer-delete.json \
   --tx-in $TXID_3#0 \
   --tx-in $TXID_4#2 \
   --tx-out "$ADDRESS_1+5000000+1 $TOKEN_C" \
@@ -89,7 +89,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_4#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_1)" \
-    --tx-in-redeemer-value '0' \
+    --tx-in-redeemer-file ../redeemer-delete.json \
   --tx-in $TXID_3#0 \
   --tx-in $TXID_4#2 \
   --tx-out "$ADDRESS_S+5000000+1 $TOKEN_C" \
@@ -109,7 +109,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_4#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_1)" \
-    --tx-in-redeemer-value '0' \
+    --tx-in-redeemer-file ../redeemer-delete.json \
   --tx-in $TXID_3#0 \
   --tx-in $TXID_4#2 \
   --tx-out "$ADDRESS_S+5000000+1 $TOKEN_C" \

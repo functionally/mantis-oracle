@@ -12,7 +12,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_4#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_1)" \
-    --tx-in-redeemer-value '3' \
+    --tx-in-redeemer-file redeemer-illegal-1.json \
   --tx-in $TXID_4#2 \
   --tx-in $TXID_4#0 \
   --tx-in $TXID_3#2 \
@@ -34,7 +34,7 @@ cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_4#1 \
     --tx-in-script-file $SCRIPT_O \
     --tx-in-datum-value "$(cat $DATUM_1)" \
-    --tx-in-redeemer-value '-1' \
+    --tx-in-redeemer-file redeemer-illegal-1.json \
   --tx-in $TXID_4#2 \
   --tx-in $TXID_4#0 \
   --tx-in $TXID_3#2 \
