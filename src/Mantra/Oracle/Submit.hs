@@ -26,7 +26,8 @@ module Mantra.Oracle.Submit (
 ) where
 
 
-import Cardano.Api                                       (AddressAny, AddressInEra, AlonzoEra, AssetId(..), AssetName(..), AsType(AsPolicyId), BuildTxWith(..), CardanoEra(..), CardanoMode, ConsensusModeIsMultiEra(..), EraInMode(..), ExecutionUnits(..), KeyWitnessInCtx(..), Lovelace, LocalNodeConnectInfo, MultiAssetSupportedInEra(..), NetworkId, PaymentKey, PlutusScript, PlutusScriptV1, PlutusScriptVersion(..), Quantity(..), QueryInEra(..), QueryInMode(..), QueryInShelleyBasedEra(..), QueryUTxOFilter(..), ScriptData, ScriptDataJsonSchema(..), ScriptDataSupportedInEra(..), ScriptData(..), ScriptDatum(..), ScriptLanguageInEra(..), ScriptWitness(..), ScriptWitnessInCtx(..), ShelleyBasedEra(..), SigningKey, ShelleyWitnessSigningKey(..), TxAuxScripts(..), TxBody(..), TxBodyContent(..), TxCertificates(..), CollateralSupportedInEra(..), TxExtraKeyWitnesses(..), TxExtraScriptData(..), TxFee(..), TxFeesExplicitInEra(..), TxId, TxIn, TxInMode(..), TxInsCollateral(..), TxMetadata, TxMetadataInEra(..), TxMetadataJsonSchema(..), TxMetadataSupportedInEra(..), TxMintValue(..), TxOut(..), TxOutDatumHash(..), TxOutValue(..), TxScriptValidity(..), TxUpdateProposal(..), TxValidityLowerBound(..), TxValidityUpperBound(..), TxWithdrawals(..), UTxO(..), ValidityNoUpperBoundSupportedInEra(..), Value, Witness(..), anyAddressInEra, deserialiseFromRawBytes, getTxId, hashScriptData, lovelaceToQuantity, lovelaceToValue, makeTransactionBodyAutoBalance, metadataFromJson, negateValue, quantityToLovelace, queryNodeLocalState, scriptDataFromJson, selectAsset, selectLovelace, signShelleyTransaction, submitTxToNodeLocal, valueFromList, valueToList)
+import Cardano.Api                                       (AddressAny, AddressInEra, AlonzoEra, AssetId(..), AssetName(..), AsType(AsPolicyId), BalancedTxBody(..), BuildTxWith(..), CardanoEra(..), CardanoMode, ConsensusModeIsMultiEra(..), EraInMode(..), ExecutionUnits(..), KeyWitnessInCtx(..), Lovelace, LocalNodeConnectInfo, MultiAssetSupportedInEra(..), NetworkId, PaymentKey, PlutusScript, PlutusScriptV1, PlutusScriptVersion(..), Quantity(..), QueryInEra(..), QueryInMode(..), QueryInShelleyBasedEra(..), QueryUTxOFilter(..), ScriptData, ScriptDataJsonSchema(..), ScriptDataSupportedInEra(..), ScriptData(..), ScriptDatum(..), ScriptLanguageInEra(..), ScriptWitness(..), ScriptWitnessInCtx(..), ShelleyBasedEra(..), SigningKey, ShelleyWitnessSigningKey(..), TxAuxScripts(..), TxBody(..), TxBodyContent(..), TxCertificates(..), CollateralSupportedInEra(..), TxExtraKeyWitnesses(..), TxExtraScriptData(..), TxFee(..), TxFeesExplicitInEra(..), TxId, TxIn, TxInMode(..), TxInsCollateral(..), TxMetadata, TxMetadataInEra(..), TxMetadataJsonSchema(..), TxMetadataSupportedInEra(..), TxMintValue(..), TxOut(..), TxOutDatumHash(..), TxOutValue(..), TxScriptValidity(..), TxUpdateProposal(..), TxValidityLowerBound(..), TxValidityUpperBound(..), TxWithdrawals(..), UTxO(..), ValidityNoUpperBoundSupportedInEra(..), Value, Witness(..), anyAddressInEra, deserialiseFromRawBytes, getTxId, hashScriptData, lovelaceToQuantity, lovelaceToValue, makeTransactionBodyAutoBalance, metadataFromJson, negateValue, quantityToLovelace, queryNodeLocalState, scriptDataFromJson, selectAsset, selectLovelace, signShelleyTransaction, submitTxToNodeLocal, valueFromList, valueToList)
+import Cardano.Api.Shelley                               (fromPlutusData)
 import Control.Monad.Except                              (throwError, liftIO)
 import Data.List                                         (sortBy)
 import Data.Function                                     (on)
@@ -36,6 +37,7 @@ import Mantra.Oracle                                     (oracleAddressAny, plut
 import Mantra.Oracle.Types                               (Action(..), Oracle(..))
 import Mantra.Types                                      (MantraM, foistMantraEither, foistMantraEitherIO, foistMantraMaybe)
 import Ouroboros.Network.Protocol.LocalTxSubmission.Type (SubmitResult(..))
+import Plutus.V1.Ledger.Api                              (toData)
 import Plutus.V1.Ledger.Value                            (AssetClass(..), CurrencySymbol(..), TokenName(..))
 import PlutusTx.Builtins                                 (fromBuiltin)
 
@@ -44,7 +46,6 @@ import qualified Data.HashMap.Strict as H (fromList)
 import qualified Data.Map.Strict     as M (toList)
 import qualified Data.Set            as S (empty, fromList, singleton)
 import qualified Data.Text           as T (pack)
-import qualified PlutusTx.Prelude    as P (fromEnum)
 
 
 -- | Submit the transaction to create an oracle. The payment address must have *separate* eUTxOs containing the datum token and the control token; it also must have at least one other UTxO containing no tokens.
@@ -67,16 +68,16 @@ createOracle newData =
 
 
 -- | Submit the transaction to delete an oracle. The payment address must have an eUTxO containing the control token; it also must have at least one other UTxO containing no tokens.
-deleteOracle :: A.Value                           -- ^ The datum currently held in the script.
-             -> Maybe A.Value                     -- ^ The metadata message, if any.
-             -> LocalNodeConnectInfo CardanoMode  -- ^ The connection info for the local node.
-             -> NetworkId                         -- ^ The network identifier.
-             -> Oracle                            -- ^ The oracle.
-             -> AddressAny                        -- ^ The payment address.
-             -> SigningKey PaymentKey             -- ^ The signing key for the payment address.
-             -> Lovelace                          -- ^ The maximum value for collateral.
-             -> Quantity                          -- ^ The Lovelace to be sent to the script.
-             -> MantraM IO TxId                   -- ^ Action to submit the deletion transaction.
+deleteOracle :: A.Value                          -- ^ The datum currently held in the script.
+             -> Maybe A.Value                    -- ^ The metadata message, if any.
+             -> LocalNodeConnectInfo CardanoMode -- ^ The connection info for the local node.
+             -> NetworkId                        -- ^ The network identifier.
+             -> Oracle                           -- ^ The oracle.
+             -> AddressAny                       -- ^ The payment address.
+             -> SigningKey PaymentKey            -- ^ The signing key for the payment address.
+             -> Lovelace                         -- ^ The maximum value for collateral.
+             -> Quantity                         -- ^ The Lovelace to be sent to the script.
+             -> MantraM IO TxId                  -- ^ Action to submit the deletion transaction.
 deleteOracle oldData =
   operateOracle
     (Just Delete)
@@ -243,7 +244,7 @@ build action connection script scriptAddress controlAddress (datumTxIn,  datumVa
                           PlutusScriptV1
                           script
                           (ScriptDatumForTxIn oldData'')
-                          (ScriptDataNumber . P.fromEnum $ fromJust action)
+                          (fromPlutusData . toData $ fromJust action)
                           (ExecutionUnits 0 0)
                   )
                   oldData'
@@ -288,17 +289,19 @@ build action connection script scriptAddress controlAddress (datumTxIn,  datumVa
       txUpdateProposal  = TxUpdateProposalNone
       txMintValue       = TxMintNone
       txScriptValidity  = TxScriptValidityNone
-    foistMantraEither
-      $ makeTransactionBodyAutoBalance
-          AlonzoEraInCardanoMode
-          start
-          history
-          protocol
-          S.empty
-          utxo
-          TxBodyContent{..}
-          controlAddress'
-          Nothing
+    BalancedTxBody txBody _ _ <-
+      foistMantraEither
+        $ makeTransactionBodyAutoBalance
+            AlonzoEraInCardanoMode
+            start
+            history
+            protocol
+            S.empty
+            utxo
+            TxBodyContent{..}
+            controlAddress'
+            Nothing
+    return txBody
 
 
 -- | Sign and submit a transaction.

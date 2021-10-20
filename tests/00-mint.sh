@@ -9,10 +9,10 @@ set -e
 
 cardano-cli transaction build $MAGIC --alonzo-era \
   --tx-in $TXID_0#0 \
-  --tx-out "$ADDRESS_1+100000000" \
-  --tx-out "$ADDRESS_1+100000000+1    $TOKEN_C" \
-  --tx-out "$ADDRESS_1+100000000+1    $TOKEN_D" \
-  --tx-out "$ADDRESS_1+100000000+1000 $TOKEN_F" \
+  --tx-out "$ADDRESS_1+10000000" \
+  --tx-out "$ADDRESS_1+10000000+1    $TOKEN_C" \
+  --tx-out "$ADDRESS_1+10000000+1    $TOKEN_D" \
+  --tx-out "$ADDRESS_1+10000000+1000 $TOKEN_F" \
   --tx-out "$ADDRESS_1+2000000" \
   --change-address $ADDRESS_0 \
   --mint "1 $TOKEN_C+1 $TOKEN_D+1000 $TOKEN_F" \

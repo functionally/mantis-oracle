@@ -13,7 +13,6 @@
 -----------------------------------------------------------------------------
 
 
-{-# LANGUAGE CPP                   #-}
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
@@ -37,9 +36,6 @@ module Mantra.Oracle (
 , plutusOracle
 , exportOracle
 -- * Access
-#if USE_PAB
-, findOracle
-#endif
 , fetchDatum
 ) where
 
@@ -50,54 +46,36 @@ import Cardano.Api               (AddressAny, NetworkId, PaymentCredential(..), 
 import Cardano.Api.Shelley       (PlutusScript(..), PlutusScriptVersion(..), PlutusScriptV1, Script(..), hashScript, writeFileTextEnvelope)
 import Codec.Serialise           (serialise)
 import Control.Monad             (void)
-import Ledger                    (scriptAddress)
-import Ledger.Typed.Scripts      (DatumType, RedeemerType, TypedValidator, Validator, ValidatorTypes, mkTypedValidator, validatorScript, wrapValidator)
+import Control.Monad.Extra       (whenJust)
+import Ledger                    (Validator, scriptAddress)
+import Ledger.Typed.Scripts      (DatumType, RedeemerType, TypedValidator, ValidatorTypes, mkTypedValidator, validatorScript, wrapValidator)
 import Ledger.Value              (assetClassValueOf)
 import Mantra.Oracle.Types       (Action(..), Oracle(..))
-import Prelude                   (FilePath, IO, (<>))
+import Prelude                   (FilePath, IO, (<>), show, writeFile)
 import Plutus.V1.Ledger.Address  (Address, )
 import Plutus.V1.Ledger.Contexts (ScriptContext(..), TxInInfo(..), TxOut(..), findOwnInput, getContinuingOutputs, valueSpent)
 import Plutus.V1.Ledger.Scripts  (Datum(..), DatumHash, unValidatorScript)
-import PlutusTx                  (FromData(..), ToData(..), UnsafeFromData(..), applyCode, compile, liftCode, makeLift)
+import PlutusPrelude             (pretty)
+import PlutusTx                  (FromData(..), applyCode, compile, liftCode, makeIsDataIndexed, makeLift)
+import PlutusTx.Code             (CompiledCodeIn(DeserializedCode))
 
 import qualified Data.ByteString.Short as SBS (ShortByteString, toShort)
 import qualified Data.ByteString.Lazy  as LBS (toStrict)
 
-#if USE_PAB
 
-import Data.Text       (Text)
-import Ledger          (TxOutRef(..), TxOutTx(..), Validator, findDatum, txData)
-import Plutus.Contract (Contract, HasBlockchainActions, utxoAt)
-import PlutusTx        (Data, fromData)
-
-import qualified Data.Map.Strict as M (filter, lookup, toList)
-
-#endif
-
-
+-- Lift data types.
 makeLift ''Oracle
-
-
-#if USE_PAB
-#else
--- FIXME: Temporarily map actions to integers, in order to accommodate lack of .
-instance FromData Action where
-  fromBuiltinData = fmap toEnum . fromBuiltinData
-instance UnsafeFromData Action where
-  unsafeFromBuiltinData = toEnum . unsafeFromBuiltinData
-instance ToData Action where
-  toBuiltinData = toBuiltinData . fromEnum
-#endif
+makeIsDataIndexed ''Action [('Delete , 0), ('Read,   1), ('Write,    2)]
 
 
 {-# INLINABLE makeValidator #-}
 
 -- | Make the validator for the oracle.
-makeValidator :: Oracle         -- ^ The oracle.
-              -> BuiltinData    -- ^ The datum.
-              -> Action         -- ^ The redeemer.
-              -> ScriptContext  -- ^ The context.
-              -> Bool           -- ^ Whether the transaction is valid.
+makeValidator :: Oracle        -- ^ The oracle.
+              -> BuiltinData   -- ^ The datum.
+              -> Action        -- ^ The redeemer.
+              -> ScriptContext -- ^ The context.
+              -> Bool          -- ^ Whether the transaction is valid.
 makeValidator Oracle{..} _ redeemer context@ScriptContext{..} =
 
   let
@@ -196,31 +174,6 @@ oracleAddressAny network oracle =
       NoStakeAddress
 
 
-#if USE_PAB
-
--- | Find an oracle on the blockchain.
-findOracle :: HasBlockchainActions s
-           => Oracle                                              -- ^ The oracle.
-           -> Contract w s Text (Maybe (TxOutRef, TxOutTx, Data)) -- ^ Action for finding the oracle's UTxO and datum.
-findOracle oracle@Oracle{..} =
-  do
-    utxos <-
-      M.filter
-        (\o -> assetClassValueOf (txOutValue $ txOutTxOut o) datumToken == 1)
-        <$> utxoAt (oracleAddress oracle)
-    return
-      $ case M.toList utxos of
-          [(oref, o@TxOutTx{..})] -> do
-                                       datum <-
-                                         fetchDatum txOutTxOut
-                                            . flip M.lookup
-                                            $ txData txOutTxTx
-                                       return (oref, o, datum)
-          _                       -> Nothing
-
-#endif
-
-
 {-# INLINABLE fetchDatum #-}
 
 -- | Retrieve the oracle's datum from a transaction output.
@@ -247,14 +200,23 @@ plutusOracle = PlutusScriptSerialised . serialiseOracle
 
 
 -- | Export the validator for an oracle and compute its address.
-exportOracle :: FilePath      -- ^ The filename for writing the validator bytes.
-             -> NetworkId     -- ^ The network identifier.
-             -> Oracle        -- ^ The oracle.
-             -> IO AddressAny -- ^ Action writing the validator and returning its address.
-exportOracle filename network oracle =
+exportOracle :: FilePath       -- ^ The filename for writing the validator bytes.
+             -> Maybe FilePath -- ^ The filename for writing the Plutus core code.
+             -> NetworkId      -- ^ The network identifier.
+             -> Oracle         -- ^ The oracle.
+             -> IO AddressAny  -- ^ Action writing the validator and returning its address.
+exportOracle validatorFile coreFile network oracle =
   do
+    let
+      wrap = wrapValidator @BuiltinData @Action
+      DeserializedCode core Nothing =
+        $$(compile [|| wrap ||])
+          `applyCode` ($$(compile [|| makeValidator ||]) `applyCode` liftCode oracle)
+    whenJust coreFile
+      $ \coreFile' ->
+      writeFile coreFile' (show $ pretty core)
     void
-      . writeFileTextEnvelope filename Nothing
+      . writeFileTextEnvelope validatorFile Nothing
       $ plutusOracle oracle
     return
       $ oracleAddressAny network oracle

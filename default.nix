@@ -1,22 +1,4 @@
 let
-
-  # FIXME: This doesn't actually override anything!
-  local = self: super: {
-    haskellPackages = super.haskellPackages.override {
-      overrides = hself: hsuper: {
-        eventful-sql-common = hsuper.eventful-sql-common.overrideAttrs(old: {
-          configureFlags = old.configureFlags // [
-            "--ghc-option=-XDerivingStrategies"
-            "--ghc-option=-XStandaloneDeriving"
-            "--ghc-option=-XUndecidableInstances"
-            "--ghc-option=-XDataKinds"
-            "--ghc-option=-XFlexibleInstances"
-          ];
-        });
-      };
-    };
-  };
-
   # Read in the Niv sources
   sources = import ./nix/sources.nix {};
   # If ./nix/sources.nix file is not found run:
@@ -36,18 +18,13 @@ let
     haskellNix.sources.nixpkgs-2009
     # These arguments passed to nixpkgs, include some patches and also
     # the haskell.nix functionality itself as an overlay.
-    {
-      inherit (haskellNix.nixpkgsArgs) system;
-      overlays = haskellNix.nixpkgsArgs.overlays ++ [local];
-    };
-
+    haskellNix.nixpkgsArgs;
 in pkgs.haskell-nix.project {
-
   # 'cleanGit' cleans a source directory based on the files known by git
   src = pkgs.haskell-nix.haskellLib.cleanGit {
     name = "haskell-nix-project";
     src = ./.;
   };
   # Specify the GHC version to use.
-  compiler-nix-name = "ghc8104"; # Not required for `stack.yaml` based projects.
+  compiler-nix-name = "ghc8107"; # Not required for `stack.yaml` based projects.
 }
