@@ -12,3 +12,4 @@ keys/
 *.script
 *.protocol
 tx.*
+tx-*.*
