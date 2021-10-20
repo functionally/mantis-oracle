@@ -3,7 +3,7 @@ The Mantra Oracle: A General-Purpose Token-Based Oracle for Cardano
 
 This Cardano oracle reports structured data (namely, the `PlutuxTx.BuiltinData` type) to a transaction if the fee, as a quantity of a fungible token, is paid. It can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic.
 
-An example of this oracle in action on `testnet` is described at [https://github.com/pigytoken/pigy-delegation/blob/main/oracle/](https://github.com/pigytoken/pigy-delegation/blob/main/oracle/ReadMe.md).
+An example of this oracle in action on `mainnet` is described at [https://github.com/pigytoken/pigy-delegation/blob/main/oracle/](https://github.com/pigytoken/pigy-delegation/blob/main/oracle/ReadMe.md).
 
 
 Parameters
@@ -68,12 +68,12 @@ Example using the command line
 See [the step-by-step tutorial](Tutorial.md) for detailed instructions for creating, writing, reading, and deleting the oracle using command-line tools.
 
 
-Simulation and PAB Examples
----------------------------
+Emulation and Mock PAB Examples
+-------------------------------
 
-The oracle can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic via the `readOracleConstraints` function in [`Mantra.Oracle.Client`](src/Mantra/Oracle/Client.hs), which returns the correct lookups, transaction constraints, and datum for a script endpoint to employ the oracle. The `readOracle` function is the simplest example of an endpoint: it just reads the oracle value and performs no other actions.
+The oracle can be incorporated into other smart-contract scripts that use the oracle's value in their validation logic via the `readOracleConstraints` function in [`Mantra.Oracle.Client`](src/Mantra/Oracle/Client.hs), which returns the correct lookups, transaction constraints, and datum for a script endpoint to employ the oracle. The `readOracle` function is the simplest example of an endpoint: it just reads the oracle value and performs no other actions. The example [`Mantra.Oracle.Reader`](src/Mantra/Oracle/Reader.hs) is a Plutus validator that looks up a value within the oracles datum and uses it in a simple comparison.
 
-See the slighly older version of this tool at https://github.com/functionally/mantra-oracle/blob/51d21574dd2a11280ece72068d56ef33f5672404/ReadMe.md for examples use the Plutus simulator and the Plutus Application Backend. Full simulator and PAB support will be included when the PAB is released.
+See [the tutorial on using the Plutus Application Backend (PAB)](PAB.md) for details on emulating or simulation the oracle.
 
 
 Testing
