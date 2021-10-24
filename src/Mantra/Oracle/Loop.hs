@@ -36,6 +36,7 @@ import qualified Data.Aeson as A (decodeFileStrict, Value(..))
 -- | Submit the transaction to write new data to an oracle. The payment address must have an eUTxO containing the control token; it also must have at least one other UTxO containing no tokens.
 loopOracle :: A.Value                          -- ^ The datum currently held in the script.
            -> FilePath                         -- ^ The path to the script to update the datum.
+           -> Int                              -- ^ The delay in seconds for first updating the datum.
            -> Int                              -- ^ The frequency in seconds for updating the datum.
            -> Maybe Word64                     -- ^ The metadata key for the new datum, if any.
            -> Maybe A.Value                    -- ^ The metadata message, if any.
@@ -47,31 +48,32 @@ loopOracle :: A.Value                          -- ^ The datum currently held in 
            -> Lovelace                         -- ^ The maximum value for collateral.
            -> Quantity                         -- ^ The Lovelace to be sent to the script.
            -> MantraM IO TxId                  -- ^ Action to submit the writing transaction.
-loopOracle oldData updateScript updateFrequency metadataKey message connection network oracle controlAddress controlSigning maxCollateral scriptLovelace =
+loopOracle oldData updateScript updateDelay updateFrequency metadataKey message connection network oracle controlAddress controlSigning maxCollateral scriptLovelace =
   do
     let
-      go oldData' time =
+      updateDelay'     = toEnum $ 10^(12::Int) * updateDelay
+      updateFrequency' = toEnum $ 10^(12::Int) * updateFrequency
+      go oldData' delta time =
         do
-          liftIO $ putStrLn ""
-          liftIO . putStrLn $ "Timestamp: " ++ show time
           (Exit code, Stdout result, Stderr msg) <- liftIO $ cmd updateScript
           case (code, lines result) of
             (ExitSuccess  , [newDataFile]) -> do
+                                                let
+                                                  time' = delta `addUTCTime` time
+                                                delayTill time'
+                                                liftIO $ putStrLn ""
+                                                liftIO . putStrLn $ "Timestamp: " ++ show time
                                                 newData <-
                                                   foistMantraMaybeIO "Failed reading new data JSON."
                                                     $ A.decodeFileStrict newDataFile
                                                 liftIO . putStrLn $ "New datum file: " ++ show newDataFile
---                                              liftIO . putStrLn $ "New datum: " ++ show newData
                                                 txId <-
                                                   writeOracle oldData' newData
                                                     metadataKey message connection network oracle controlAddress controlSigning maxCollateral scriptLovelace
                                                 liftIO . putStrLn $ "TxId " ++ show txId
-                                                let
-                                                  time' = toEnum (10^(12::Int) * updateFrequency) `addUTCTime` time
-                                                delayTill time'
-                                                go newData time'
+                                                go newData updateFrequency' time'
             (ExitSuccess  , _            ) -> throwError "Update script did not return a single filepath to new datum."
             (ExitFailure _, _            ) -> throwError msg
 
-    go oldData
+    go oldData updateDelay'
       =<< liftIO getCurrentTime
