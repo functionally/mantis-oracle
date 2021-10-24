@@ -122,6 +122,7 @@ data Command =
     , signingKeyFile :: FilePath
     , oldDataFile    :: FilePath
     , dataScriptFile :: FilePath
+    , delay          :: Maybe Int
     , frequency      :: Maybe Int
     , maxCollateral  :: Maybe Integer
     , metadataKey    :: Maybe Word64
@@ -229,16 +230,17 @@ main =
                       O.info
                         (
                           Loop
-                            <$> O.strArgument               (                        O.metavar "CONFIG_FILE"     <> O.help "The configuration file."                               )
-                            <*> O.strArgument               (                        O.metavar "SIGNING_ADDRESS" <> O.help "The address for the signing key."                      )
-                            <*> O.strArgument               (                        O.metavar "SIGNING_FILE"    <> O.help "The signing key file."                                 )
-                            <*> O.strArgument               (                        O.metavar "OLD_JSON_FILE"   <> O.help "The JSON file for the existing oracle data."           )
-                            <*> O.strArgument               (                        O.metavar "UPDATER_FILE"    <> O.help "The shell script file for updating the oracle data."   )
-                            <*> O.optional (O.option O.auto $ O.long "frequency"  <> O.metavar "INTEGER"         <> O.help "The frequency in seconds for updating the oracle data.")
-                            <*> O.optional (O.option O.auto $ O.long "collateral" <> O.metavar "LOVELACE"        <> O.help "The maximum collateral for the transaction."           )
-                            <*> O.optional (O.option O.auto $ O.long "metadata"   <> O.metavar "INTEGER"         <> O.help "The metadata key for the oracle data."                 )
-                            <*> O.optional (O.strOption     $ O.long "message"    <> O.metavar "JSON_FILE"       <> O.help "The JSON file for the message metadata."               )
-                            <*> O.optional (O.option O.auto $ O.long "lovelace"   <> O.metavar "LOVELACE"        <> O.help "The value to be sent to the script."                   )
+                            <$> O.strArgument               (                        O.metavar "CONFIG_FILE"     <> O.help "The configuration file."                                 )
+                            <*> O.strArgument               (                        O.metavar "SIGNING_ADDRESS" <> O.help "The address for the signing key."                        )
+                            <*> O.strArgument               (                        O.metavar "SIGNING_FILE"    <> O.help "The signing key file."                                   )
+                            <*> O.strArgument               (                        O.metavar "OLD_JSON_FILE"   <> O.help "The JSON file for the existing oracle data."             )
+                            <*> O.strArgument               (                        O.metavar "UPDATER_FILE"    <> O.help "The shell script file for updating the oracle data."     )
+                            <*> O.optional (O.option O.auto $ O.long "delay"      <> O.metavar "INTEGER"         <> O.help "The delay in seconds for first updating the oracle data.")
+                            <*> O.optional (O.option O.auto $ O.long "frequency"  <> O.metavar "INTEGER"         <> O.help "The frequency in seconds for updating the oracle data."  )
+                            <*> O.optional (O.option O.auto $ O.long "collateral" <> O.metavar "LOVELACE"        <> O.help "The maximum collateral for the transaction."             )
+                            <*> O.optional (O.option O.auto $ O.long "metadata"   <> O.metavar "INTEGER"         <> O.help "The metadata key for the oracle data."                   )
+                            <*> O.optional (O.strOption     $ O.long "message"    <> O.metavar "JSON_FILE"       <> O.help "The JSON file for the message metadata."                 )
+                            <*> O.optional (O.option O.auto $ O.long "lovelace"   <> O.metavar "LOVELACE"        <> O.help "The value to be sent to the script."                     )
                         )
                         $ O.progDesc "Update the oracle's value periodically."
                     )
@@ -439,7 +441,12 @@ main =
                                foistMantraMaybeIO "Failed reading old data JSON."
                                  $ A.decodeFileStrict oldDataFile
                              operate
-                               $ loopOracle oldData dataScriptFile (fromMaybe (24 * 60 * 60) frequency) metadataKey
+                               $ loopOracle
+                                   oldData
+                                   dataScriptFile
+                                   (fromMaybe 0 delay)
+                                   (fromMaybe (24 * 60 * 60) frequency)
+                                   metadataKey
       Trace{..}       -> Emulate.main
                            (CurrencySymbol . toBuiltin $ BS.pack currency   )
                            (TokenName      . toBuiltin $ BS.pack controlName)
