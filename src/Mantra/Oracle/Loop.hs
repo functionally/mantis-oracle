@@ -53,16 +53,13 @@ loopOracle oldData updateScript updateDelay updateFrequency metadataKey message 
     let
       updateDelay'     = toEnum $ 10^(12::Int) * updateDelay
       updateFrequency' = toEnum $ 10^(12::Int) * updateFrequency
-      go oldData' delta time =
+      go oldData' time =
         do
+          liftIO $ putStrLn ""
+          liftIO . putStrLn $ "Timestamp: " ++ show time
           (Exit code, Stdout result, Stderr msg) <- liftIO $ cmd updateScript
           case (code, lines result) of
             (ExitSuccess  , [newDataFile]) -> do
-                                                let
-                                                  time' = delta `addUTCTime` time
-                                                delayTill time'
-                                                liftIO $ putStrLn ""
-                                                liftIO . putStrLn $ "Timestamp: " ++ show time
                                                 newData <-
                                                   foistMantraMaybeIO "Failed reading new data JSON."
                                                     $ A.decodeFileStrict newDataFile
@@ -71,9 +68,12 @@ loopOracle oldData updateScript updateDelay updateFrequency metadataKey message 
                                                   writeOracle oldData' newData
                                                     metadataKey message connection network oracle controlAddress controlSigning maxCollateral scriptLovelace
                                                 liftIO . putStrLn $ "TxId " ++ show txId
-                                                go newData updateFrequency' time'
+                                                let
+                                                  time' = updateFrequency' `addUTCTime` time
+                                                delayTill time'
+                                                go newData time'
             (ExitSuccess  , _            ) -> throwError "Update script did not return a single filepath to new datum."
             (ExitFailure _, _            ) -> throwError msg
-
-    go oldData updateDelay'
-      =<< liftIO getCurrentTime
+    start <- addUTCTime updateDelay' <$> liftIO getCurrentTime
+    delayTill start
+    go oldData start
